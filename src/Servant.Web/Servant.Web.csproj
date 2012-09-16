@@ -140,6 +140,7 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Helpers\EventLogHelper.cs" />
+    <Compile Include="Helpers\FileSystemHelper.cs" />
     <Compile Include="Helpers\RequestLogHelper.cs" />
     <Compile Include="Helpers\SiteHelper.cs" />
     <Compile Include="Modules\BaseModule.cs" />
@@ -201,9 +202,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Test\Test.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Shared\_Layout1.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Servant.Business\Servant.Business.csproj">

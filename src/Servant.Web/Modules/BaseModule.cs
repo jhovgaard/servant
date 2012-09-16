@@ -10,6 +10,7 @@ namespace Servant.Web.Modules
     {
         public dynamic Model = new ExpandoObject();
         protected PageModel Page { get; set; }
+        public bool HasErrors { get { return Model.Errors.Count != 0; }}
 
         public BaseModule()
         {
@@ -33,6 +34,11 @@ namespace Servant.Web.Modules
                 Model.Page = Page;
                 Model.Errors = new List<Error>();
                 return null;
+            };
+
+            After += ctx =>
+            {
+                Model.ErrorsAsJson = new Nancy.Json.JavaScriptSerializer().Serialize(Model.Errors);
             };
         }
 

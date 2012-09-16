@@ -33,19 +33,47 @@ namespace Servant.Web.Modules
                 Model.Site = site;
                 Model.ApplicationPools = SiteHelper.GetApplicationPools();
 
-                var result = SiteHelper.CreateSite(site);
+                if(string.IsNullOrWhiteSpace(site.Name))
+                    AddPropertyError("name", "Name is required.");
 
-                if(result == CreateSiteResult.NameAlreadyInUse)
-                    AddPropertyError("name", "There's already a site with that name.");
+                if (site.Name != null && SiteHelper.GetSiteByName(site.Name) != null)
+                    AddPropertyError("name", "There's already a site with this name.");
 
-                if(result == CreateSiteResult.BindingAlreadyInUse)
-                    AddPropertyError("httpbindings", "The binding is already in use.");
+                if(string.IsNullOrWhiteSpace(site.SitePath))
+                    AddPropertyError("sitepath", "Site path is required.");
 
-                if(result == CreateSiteResult.Failed)
-                    AddGlobalError("Something went completely wrong :-/");
+                if(site.SitePath != null && !FileSystemHelper.DirectoryExists(site.SitePath))
+                    AddPropertyError("sitepath", "The entered directory doesn't exist.");
 
-                if(result == CreateSiteResult.Success)
-                    return new RedirectResponse("/sites/");
+                if(site.HttpBindings == null)
+                    AddPropertyError("httpbindings", "Minimum 1 binding is required.");
+                else
+                {
+                    foreach(var binding in site.HttpBindings)
+                    {
+                        if(SiteHelper.IsBindingInUse(binding))
+                            AddPropertyError("httpbindings", string.Format("The binding {0} is already in use.", binding));
+                    }
+                }
+
+                
+                
+                if(!HasErrors)
+                {
+                    var result = SiteHelper.CreateSite(site);
+
+                    if(result == CreateSiteResult.NameAlreadyInUse)
+                        AddPropertyError("name", "There's already a site with that name.");
+
+                    if(result == CreateSiteResult.BindingAlreadyInUse)
+                        AddPropertyError("httpbindings", "The binding is already in use.");
+
+                    if(result == CreateSiteResult.Failed)
+                        AddGlobalError("Something went completely wrong :-/");
+
+                    if(result == CreateSiteResult.Success)
+                        return new RedirectResponse("/sites/");
+                }
 
                 return View["Create", Model];
             };

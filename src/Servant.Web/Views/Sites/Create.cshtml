@@ -7,26 +7,21 @@
 
 <h2>Websites - Create site</h2>
 
-@foreach (var error in Model.Errors)
-{
-    @: @error.IsGlobal @(error.PropertyName): @error.Message <br />
-}
-
 <form action="/sites/create/" method="POST">
     <h4 class="margin-top30">General</h4>
     
-    <div class="margin-top10">
+    <div class="margin-top10 control-group">
         <label for="sitename">Site name</label>
         <input type="text" class="input-medium span4" id="sitename" name="name" value="@Model.Site.Name" />
         
     </div>
 
-    <div class="margin-top10">
+    <div class="margin-top10 control-group">
         <label for="sitepath">Site path (i.e.: C:\Sites\MyWebsite\)</label>
         <input type="text" class="input-medium span4" id="sitepath" name="sitepath" value="@Model.Site.SitePath" />
     </div>
     
-    <div class="margin-top10">
+    <div class="margin-top10 control-group">
         <label for="applicationpool">Application pool</label>
         <select name="applicationpool" id="applicationpool" class="span4 input-medium">
             <option value="">Automatically create new</option>
@@ -45,24 +40,26 @@
     </div>
     
     <h4 class="margin-top30">Bindings<img src="/images/icon_add.png" class="margin-left10 pointer" id="add-binding" /></h4>
-    
-    <table class="margin-top10" id="bindings">
-        @if (Model.Site.HttpBindings != null)
-        {
-            @foreach (var binding in Model.Site.HttpBindings)
+    <div class="control-group">
+        <span class="help-block"></span>
+        <table class="margin-top10" id="bindings">
+            @if (Model.Site.HttpBindings != null)
             {
+                foreach (var binding in Model.Site.HttpBindings)
+                {
+                    <tr>
+                        <td><input type="text" class="input-medium span4" name="httpbindings" value="@binding" /></td>
+                        <td><img src="/Images/icon_delete.png" class="remove-binding pointer @Html.Raw(Model.Site.HttpBindings.Length == 1 ? " hide" : "")" /></td>
+                    </tr>
+                }
+            } else {
                 <tr>
-                    <td><input type="text" class="input-medium span4" name="httpbindings" value="@binding" /></td>
-                    <td><img src="/Images/icon_delete.png" class="remove-binding pointer @Html.Raw(Model.Site.HttpBindings.Length == 1 ? " hide" : "")" /></td>
+                    <td><input type="text" class="input-medium span4" name="httpbindings" value="" /></td>
+                    <td><img src="/Images/icon_delete.png" class="pointer hide" /></td>
                 </tr>
             }
-        } else {
-            <tr>
-                <td><input type="text" class="input-medium span4" name="httpbindings" value="" /></td>
-                <td><img src="/Images/icon_delete.png" class="pointer hide" /></td>
-            </tr>
-        }
-    </table>
+        </table>
+    </div>
 
     <div class="margin-top30">
         <input type="submit" class="btn btn-primary" value="Save settings" />

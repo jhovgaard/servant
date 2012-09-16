@@ -32,6 +32,9 @@ namespace Servant.Web.Helpers
         }
 
         private static Servant.Business.Objects.Site ParseSite(Microsoft.Web.Administration.Site site) {
+            if (site == null)
+                return null;
+
             var allowedProtocols = new[] { "http"};
             return new Servant.Business.Objects.Site {
                     IisId = (int)site.Id,
@@ -143,15 +146,24 @@ namespace Servant.Web.Helpers
             public SiteNotFoundException(string message) : base(message) {}
         }
 
+        public static Site GetSiteByName(string name)
+        {
+            using(var manager = new Microsoft.Web.Administration.ServerManager())
+            {
+                return ParseSite(manager.Sites.SingleOrDefault(x => x.Name == name));
+            }
+        }
+
+        public static bool IsBindingInUse(string binding)
+        {
+            var bindingInformations = ConvertBindingsToBindingInformations(new[] {binding});
+            return GetBindingInUse(0, bindingInformations) != null;
+        }
+
         public static CreateSiteResult CreateSite(Site site)
         {
             using (var manager = new Microsoft.Web.Administration.ServerManager())
             {
-                // Check site name for duplicate
-                var existingSite = manager.Sites.SingleOrDefault(x => x.Name.ToLower() == site.Name.ToLower());
-                if(existingSite != null)
-                    return CreateSiteResult.NameAlreadyInUse;
-
                 var bindingInformations = ConvertBindingsToBindingInformations(site.HttpBindings);
                 
                 // Check bindings
