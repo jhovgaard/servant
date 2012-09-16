@@ -1,0 +1,51 @@
+﻿@using System
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Sites/_Details.cshtml";
+    ViewBag.Title = "Index";
+    ViewBag.ActiveMenuItem = "sites";
+    ViewBag.ActiveSubmenuItem = "errors";
+}   
+
+<h3>Exception details</h3>
+
+<p class="margin-top30">
+    @if (Model.Site == null)
+    {
+        @: This exception couldn't be attached to an IIS site 
+    } else {
+        @: This exception was thrown on the site <a href="/sites/@Model.Site.IisId/settings/">@Model.Site.Name</a>
+    }
+    on @Model.Exception.DateTime
+</p>
+
+<p>
+    <b>Exception:</b> @Model.Exception.Message
+    <br/>
+    <b>Type:</b> @Model.Exception.ExceptionType
+    <br/>
+    <b>Full exception:</b><br/>
+    <blockquote>
+        @Html.Raw(Model.Exception.FullMessage)
+    </blockquote>
+</p>
+
+<h3>Related http(s) requests</h3>
+<table class="table table-striped margin-top10">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th class="span6">URL</th>
+            <th>Status code</th>
+        </tr>
+
+    </thead>
+    @foreach (Servant.Business.Objects.LogEntry entry in Model.RelatedRequests)
+    {
+        <tr>
+            <td>@entry.DateTime</td>
+            <td><a href="/sites/@(entry.SiteIisId)/requests/@entry.Id/">@entry.Uri@entry.Querystring</a></td>
+            <td>@(entry.HttpStatusCode)</td>
+        </tr>
+    }
+</table>
