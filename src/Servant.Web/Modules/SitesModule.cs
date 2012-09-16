@@ -143,6 +143,10 @@ namespace Servant.Web.Modules
                         logEntries = logEntryService.GetLastMonthBySite(site);
                         Model.ActiveSection = "section3";
                         break;
+                    case StatsRange.AllTime:
+                        logEntries = logEntryService.GetBySite(site);
+                        Model.ActiveSection = "section4";
+                        break;
                 }
 
                 Model.HasEntries = logEntries.Any();

@@ -23,17 +23,17 @@ namespace Servant.Business.Services
 
         public IEnumerable<LogEntry> GetTodaysBySite(Site site)
         {
-            return Table.FindAll(Table.DateTime >= DateTime.UtcNow.Date).OrderbyDateTimeDescending().ToList<LogEntry>();
+            return Table.FindAll(Table.SiteIisId == site.IisId && Table.DateTime >= DateTime.UtcNow.Date).OrderbyDateTimeDescending().ToList<LogEntry>();
         }
 
         public IEnumerable<LogEntry> GetLastWeekBySite(Site site)
         {
-            return Table.FindAll(Table.DateTime >= DateTime.UtcNow.Date.AddDays(-7)).OrderbyDateTimeDescending().ToList<LogEntry>();
+            return Table.FindAll(Table.SiteIisId == site.IisId && Table.DateTime >= DateTime.UtcNow.Date.AddDays(-7)).OrderbyDateTimeDescending().ToList<LogEntry>();
         }
 
         public IEnumerable<LogEntry> GetLastMonthBySite(Site site)
         {
-            return Table.FindAll(Table.DateTime >= DateTime.UtcNow.Date.AddMonths(-1)).OrderbyDateTimeDescending().ToList<LogEntry>();
+            return Table.FindAll(Table.SiteIisId == site.IisId && Table.DateTime >= DateTime.UtcNow.Date.AddMonths(-1)).OrderbyDateTimeDescending().ToList<LogEntry>();
         }
 
         public IEnumerable<LogEntry> GetAllRelatedToException(int siteIisId, DateTime datetime)
@@ -41,6 +41,11 @@ namespace Servant.Business.Services
             return Table
                 .FindAll(Table.SiteIisId == siteIisId && Table.HttpStatusCode == 500 && Table.DateTime == datetime.ToString("yyyy-MM-dd HH:mm:ss")) // Because of bug in Simple.Data.Sqlite adapter
                 .ToList<LogEntry>(); 
+        }
+
+        public IEnumerable<LogEntry> GetBySite(Site site)
+        {
+            return Table.FindAllBySiteIisId(site.IisId).Cast<LogEntry>();
         }
     }
 }
