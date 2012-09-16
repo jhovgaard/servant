@@ -1,4 +1,5 @@
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+﻿
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
     Layout = "Shared/_Layout.cshtml";
     ViewBag.Title = "Index";
@@ -6,8 +7,6 @@
 }
 
 <h2>Websites</h2>
-
-
 
 <div class="margin-top30">
     <input type="text" class="input-medium span4" placeholder="Filter sites by name, application pool, etc." />
