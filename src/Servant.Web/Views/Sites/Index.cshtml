@@ -9,12 +9,12 @@
 <h2>Websites</h2>
 
 <div class="margin-top30">
-    <input type="text" class="input-medium span4" placeholder="Filter sites by name, application pool, etc." />
+    <input type="text" class="input-medium span4" placeholder="Filter sites by name, application pool, etc." id="filter" />
     <a href="/sites/create/" class="create-site pull-right">Create site</a>
 </div>
 
 
-<table class="table margin-top30">
+<table class="table margin-top30" id="sites">
     @foreach(Servant.Business.Objects.Site site in Model.Sites) {
         <tr>
             <td class="span1 valign-middle">
@@ -36,3 +36,11 @@
         </tr>
     }
 </table>
+
+@section javascript {
+    <script type="text/javascript">
+        $("#filter").keyup(function () {
+            $.uiTableFilter($("#sites"), this.value);
+        })
+    </script>
+}
