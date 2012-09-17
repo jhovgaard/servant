@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Helpers\ApplicationPoolHelper.cs" />
     <Compile Include="Helpers\EventLogHelper.cs" />
     <Compile Include="Helpers\FileSystemHelper.cs" />
     <Compile Include="Helpers\RequestLogHelper.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="Modules\HomeModule.cs" />
     <Compile Include="Modules\MaintenanceModule.cs" />
     <Compile Include="Modules\SitesModule.cs" />
+    <Compile Include="Modules\StatsModule.cs" />
     <Compile Include="Modules\TestModule.cs" />
     <Compile Include="Objects\Error.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -211,6 +213,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Servant.sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Stats\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Stats\CleanupApplicationPools.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

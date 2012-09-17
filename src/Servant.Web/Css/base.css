@@ -66,14 +66,20 @@
     background: url('/images/menu_marker.png') no-repeat center right;
 }
 
+
+#menu li.menu-performance a  {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
 #content 
 {
     margin-top: 13px;
 }
 #content .padding 
 {
-    padding-left: 20px;
-    padding-top: 15px;
+    /*padding-left: 20px;*/
+    padding-top: 19px;
 }
 
 

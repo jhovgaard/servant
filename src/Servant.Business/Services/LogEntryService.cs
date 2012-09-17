@@ -47,5 +47,15 @@ namespace Servant.Business.Services
         {
             return Table.FindAllBySiteIisId(site.IisId).Cast<LogEntry>();
         }
+
+        public int GetTotalCount()
+        {
+            return Table.All().Count();
+        }
+
+        public double GetAverageResponseTime()
+        {
+            return Table.All().Select(Table.TimeTaken.Average()).ToScalar();
+        }
     }
 }
