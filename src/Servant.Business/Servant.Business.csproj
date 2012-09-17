@@ -55,6 +55,7 @@
     <Compile Include="Objects\Reporting\MostActiveClient.cs" />
     <Compile Include="Objects\Reporting\MostActiveUrl.cs" />
     <Compile Include="Objects\Reporting\MostExpensiveRequest.cs" />
+    <Compile Include="Objects\Reporting\ServerStats.cs" />
     <Compile Include="Objects\Site.cs" />
     <Compile Include="Objects\ApplicationError.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

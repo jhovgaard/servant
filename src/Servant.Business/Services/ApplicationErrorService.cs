@@ -50,5 +50,10 @@ namespace Servant.Business.Services
         {
             return Table.FindAllBySiteIisId(site.IisId).OrderbyDateTimeDescending().Cast<ApplicationError>();
         }
+
+        public int GetTotalCount()
+        {
+            return Table.All().Count();
+        }
     }
 }
