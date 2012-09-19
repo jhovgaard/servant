@@ -20,5 +20,6 @@ namespace Servant.Business.Objects
         public int HttpSubStatusCode { get; set; }
         public int TimeTaken { get; set; }
         public int SiteIisId { get; set; }
+        public int LogRow { get; set; }
     }
 }

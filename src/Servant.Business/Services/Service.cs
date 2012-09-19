@@ -17,6 +17,7 @@ namespace Servant.Business.Services
         {
             TableName = tableName;
             var dbPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "servant.sqlite");
+
             Database = Simple.Data.Database.OpenFile(dbPath);
             if (string.IsNullOrEmpty(tableName))
                 tableName = typeof(T).Name.Pluralize();

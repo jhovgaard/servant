@@ -1,0 +1,53 @@
+﻿
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+    ViewBag.ActiveMenuItem = "sites";
+}
+
+<h2>Websites</h2>
+
+<div class="margin-top30">
+    <input type="text" class="input-medium span4" placeholder="Filter sites by name, application pool, etc." id="filter" />
+    <a href="/sites/create/" class="create-site pull-right">Create site</a>
+</div>
+
+
+<table class="table margin-top30" id="sites">
+    @foreach(Servant.Business.Objects.Site site in Model.Sites) {
+        <tr class="pointer">
+            <td class="span1 valign-middle">
+                @if(site.State == Servant.Business.Objects.Enums.SiteState.Started) {
+                    <img src="/images/icon_enabled.png"/>
+                } else {
+                    <img src="/images/icon_disabled.png"/>
+                }
+            </td>
+            <td>
+                <h4>@site.Name</h4>
+                <div class="site-details">@site.ApplicationPool | @site.SitePath</div>
+            </td>
+            <td class="span1 text-right valign-middle">
+                <a href="/sites/@site.IisId/settings/">
+                    <img src="/Images/icon_rightarrow.png"/>
+                </a>
+            </td>
+        </tr>
+    }
+</table>
+
+@section javascript {
+    <script type="text/javascript">
+        $(function() {
+            $("#filter").keyup(function() {
+                $.uiTableFilter($("#sites"), this.value);
+            });
+
+            $("#sites tr").click(function () {
+                var link = $(this).find("a");
+                window.location = link.attr("href");
+            });
+        });
+    </script>
+}
