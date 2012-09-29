@@ -26,4 +26,8 @@
         }
 
     });
+    
+    $(window).resize(function () {
+        $("#menu").height($(document).height());
+    });
 });
