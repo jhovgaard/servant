@@ -1,0 +1,78 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Shared/_Layout.cshtml";
+    ViewBag.Title = "Settings";
+    ViewBag.ActiveMenuItem = "settings";
+}
+
+<h2>Settings</h2>
+
+<div class="clear"></div>
+
+<form action="/settings/" method="POST">
+    <div class="row">
+        <div class="span9">
+            <h4 class="margin-top30">General</h4>
+    
+            <div class="control-group margin-top10">
+                <label for="binding">Servant binding</label>
+                <input type="text" class="input-medium span4" id="binding" name="binding" value="@Model.Settings.Hostname:@Model.Settings.Port" />
+                <p>Example: <code>servant.io</code> or <code>servant.io:440</code>. Default port is 80.
+                    <br/><span class="gray">Wildcard binding is currently not supported. Waiting for Nancy 0.13.</span>
+                </p>
+            </div>
+
+            <div class="control-group margin-top10">
+                <label for="debug">Debug mode</label>
+                <label class="checkbox">
+                    <input type="checkbox" name="debug" id="debug" @(Model.Settings.Debug == true ? Html.Raw("checked=\"checked\"") : null) />
+                    Enabled
+                </label>
+            </div>
+            
+            <div class="control-group margin-top10">
+                <label for="username">Username</label>  
+                <input type="text" class="input-medium span4" id="username" name="username" value="@Model.Settings.Username" />
+            </div>
+            
+            <div class="control-group margin-top10">
+                <label for="password">Password</label>
+                <input type="password" class="input-medium span4" id="password" name="password" value="" />
+                <p class="gray">Only enter a password if you want to change the current.</p>
+            </div>
+        </div>
+    
+        <div class="margin-top30 span10">
+            <input type="submit" class="btn btn-primary" value="Save settings" />
+        </div>
+    </div>
+</form>
+
+@section javascript {
+    <script type="text/javascript">
+        var binding = "@Model.OriginalBinding";
+        var repost = false;
+
+        $("form").submit(function () {
+            var form = $(this);
+            var newBinding = $("input[name=binding]").val();
+
+            if(binding != newBinding && !repost) {
+                var inputs = $(this).serialize();
+                $.post("/settings/", inputs, function (response) {
+                    if (response == true) {
+                        $(this).find("input[type=submit]").attr("disabled", "disabled");
+                        setTimeout(function() {
+                            window.location = "http://" + newBinding + "/settings/";
+                        }, 1000);
+                    } else {
+                        repost = true;
+                        form.submit();
+                    }
+                });
+                
+                return false;
+            }
+        });
+    </script>
+}
