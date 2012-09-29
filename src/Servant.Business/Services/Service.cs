@@ -39,6 +39,11 @@ namespace Servant.Business.Services
         //    Database.DeleteById(entity.Id);
         //}
 
+        public void DeleteAll()
+        {
+            Table.DeleteAll();
+        }
+
         public void Insert(T entity)
         {
             Table.Insert(entity);
@@ -46,18 +51,18 @@ namespace Servant.Business.Services
 
         public void Insert(IEnumerable<T> entities)
         {
-            //using (var transaction = Database.BeginTransaction())
-            //{
-            //    transaction[TableName].Insert(entities);
-            //    transaction.Commit();
-            //}
-            Table.Insert(entities);
+            using (var transaction = Database.BeginTransaction())
+            {
+                transaction[TableName].Insert(entities);
+                transaction.Commit();
+            }
+            //Table.Insert(entities);
             
         }
 
         public void Update(T entity)
         {
-            Table.Update(entity);
+            Table.UpdateAll(entity);
         }
     }
 }

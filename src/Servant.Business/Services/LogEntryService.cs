@@ -39,7 +39,7 @@ namespace Servant.Business.Services
         public IEnumerable<LogEntry> GetAllRelatedToException(int siteIisId, DateTime datetime)
         {
             return Table
-                .FindAll(Table.SiteIisId == siteIisId && Table.HttpStatusCode == 500 && Table.DateTime == datetime.ToString("yyyy-MM-dd HH:mm:ss")) // Because of bug in Simple.Data.Sqlite adapter
+                .FindAll(Table.SiteIisId == siteIisId && Table.HttpStatusCode == 500 && Table.DateTime == datetime.ToString("yyyy-MM-dd HH:mm:ss")) // string format because of bug in Simple.Data.Sqlite adapter
                 .ToList<LogEntry>(); 
         }
 
@@ -55,7 +55,11 @@ namespace Servant.Business.Services
 
         public double GetAverageResponseTime()
         {
-            return Table.All().Select(Table.TimeTaken.Average()).ToScalar();
+            var result = Table.All().Select(Table.TimeTaken.Average()).ToScalar();
+            if (result == null)
+                return 0;
+
+            return result;
         }
     }
 }
