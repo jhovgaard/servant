@@ -1,4 +1,5 @@
-﻿using Nancy.Authentication.Basic;
+﻿using Nancy;
+using Nancy.Authentication.Basic;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
 using Nancy.Cryptography;
@@ -8,6 +9,12 @@ namespace Servant.Manager
 {
     public class Bootstrapper : Nancy.DefaultNancyBootstrapper
     {
+        protected override TinyIoCContainer GetApplicationContainer()
+        {
+            return TinyIoCContainer.Current;
+        }
+
+
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
             base.ApplicationStartup(container, pipelines);

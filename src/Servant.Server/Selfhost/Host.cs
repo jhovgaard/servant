@@ -2,15 +2,16 @@
 using Nancy.Hosting.Self;
 using Servant.Business.Objects;
 using Servant.Business.Services;
+using Servant.Manager.Infrastructure;
 
 namespace Servant.Server.Selfhost
 {
-    public static class Host
+    public class Host : IHost
     {
         public static NancyHost ServantHost;
         public static string Binding;
 
-        public static void Start(Settings settings = null)
+        public void Start(Settings settings = null)
         {
             if(settings ==null)
             {
@@ -24,12 +25,12 @@ namespace Servant.Server.Selfhost
             ServantHost.Start();
         }
 
-        public static void Stop()
+        public void Stop()
         {
             ServantHost.Stop();
         }
 
-        public static void Kill()
+        public void Kill()
         {
             Stop();
             ServantHost = null;

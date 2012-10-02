@@ -1,5 +1,6 @@
 ﻿using System;
 using Servant.Business.Services;
+using Servant.Manager.Infrastructure;
 
 //using Servant.Server.Selfhost;
 
@@ -7,7 +8,7 @@ namespace Servant.Manager.Modules
 {
     public class SettingsModule : BaseModule
     {
-        public SettingsModule(SettingsService settingsService) : base("/settings/")
+        public SettingsModule(SettingsService settingsService, IHost host) : base("/settings/")
         {
             Get["/"] = p => {
                 var settings = settingsService.LocalSettings;
@@ -57,8 +58,8 @@ namespace Servant.Manager.Modules
                 
                     if(bindingIsChanged)
                     {
-                        //Host.Kill();
-                        //Host.Start();    
+                        host.Kill();
+                        host.Start();    
                         return true;
                     }
                 }
