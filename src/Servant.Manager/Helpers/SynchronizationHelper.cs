@@ -8,22 +8,16 @@ namespace Servant.Manager.Helpers
          public static void SyncServer()
          {
              var logEntryService = new LogEntryService();
+             var sites = SiteHelper.GetSites();
+             RequestLogHelper.FlushLog();
+             Thread.Sleep(20); // Venter på at IIS har skrevet loggen
 
-             new Thread(() =>
+             foreach (var site in sites)
              {
-                 var sites = SiteHelper.GetSites();
-                 RequestLogHelper.FlushLog();
-                 Thread.Sleep(20); // Venter på at IIS har skrevet loggen
-
-                 foreach (var site in sites)
-                 {
-                     var latestEntry = logEntryService.GetLatestEntry(site);
-                     RequestLogHelper.InsertNewInDbBySite(site, latestEntry);
-                     Thread.Sleep(2000);
-                 }
-
-                 EventLogHelper.SyncDatabaseWithServer();
-             }).Start();
+                 var latestEntry = logEntryService.GetLatestEntry(site);
+                 RequestLogHelper.InsertNewInDbBySite(site, latestEntry);
+                 Thread.Sleep(2000);
+             }
          }
     }
 }

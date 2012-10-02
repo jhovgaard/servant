@@ -86,10 +86,11 @@ namespace Servant.Manager.Helpers
         public static IEnumerable<ApplicationError> AttachSite(IEnumerable<ApplicationError> errors)
         {
             var sites = SiteHelper.GetSites().ToList();
-            foreach (var applicationError in errors) {
+            foreach (var applicationError in errors)
+            {
                 applicationError.Site = sites.SingleOrDefault(x => x.IisId == applicationError.SiteIisId);
                 yield return applicationError;
-            }
+            }    
         }
     }
 }

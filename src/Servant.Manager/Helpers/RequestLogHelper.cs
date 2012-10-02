@@ -15,13 +15,8 @@ namespace Servant.Manager.Helpers
         private static readonly LogEntryService LogEntryService = new LogEntryService();
         private static List<LogEntry>[] ParsedLogEntryLists { get; set; }
         private static ManualResetEvent[] resetEvents;
-        private const int FilesPerRound = 4;
+        private const int FilesPerRound = 6;
         private static int _filesInRound = 0;
-
-        public static void SyncDatabaseWithServer()
-        {
-            
-        }
 
         public static void InsertNewInDbBySite(Site site, LogEntry latestEntry) {
             var logfiles = GetLogFilesBySite(site).OrderByDescending(x => x.Path).ToList();
@@ -31,7 +26,7 @@ namespace Servant.Manager.Helpers
             if (!logfiles.Any())
                 return;
 
-            ThreadPool.SetMaxThreads(1, 4);
+            ThreadPool.SetMaxThreads(1, FilesPerRound);
 
             var rounds = logfiles.Count / FilesPerRound;
             for (var round = 0; round < rounds; round++) // Hver runde udgør 4 logfiler
@@ -44,9 +39,6 @@ namespace Servant.Manager.Helpers
                 for (int i = 0; i < logfilesForRound.Count; i++) // max 1-4
                 {
                     var logfile = logfilesForRound[i];
-                    if (logfile.Path.Contains("W3SVC2"))
-                        System.Console.WriteLine("FUCK!");
-
                     resetEvents[i] = new ManualResetEvent(false);
                     ThreadPool.QueueUserWorkItem(CallBack, new { Index = i, Logfile = logfile, LatestEntry = latestEntry, Site = site });
                 }
@@ -61,7 +53,7 @@ namespace Servant.Manager.Helpers
                 var service = new LogEntryService();
                 service.Insert(entries);
                 Console.WriteLine("Round {0}: Wrote {1} entries to db.", round, entries.Count);
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
         }
 
@@ -109,7 +101,7 @@ namespace Servant.Manager.Helpers
         {
             var systemDrive = Path.GetPathRoot(Environment.SystemDirectory).Substring(0, 2);
             var pathToLogs = Path.Combine(site.LogFileDirectory.Replace("%SystemDrive%", systemDrive), "W3SVC" + site.IisId);
-            var files = Directory.Exists(pathToLogs) ? Directory.GetFiles(pathToLogs).Distinct() : new string[] {};
+            var files = Directory.Exists(pathToLogs) ? Directory.GetFiles(pathToLogs, "*.log").Distinct() : new string[] {};
 
             foreach (var file in files)
             {
