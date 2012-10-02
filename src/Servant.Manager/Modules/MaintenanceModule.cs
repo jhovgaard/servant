@@ -8,9 +8,7 @@ namespace Servant.Manager.Modules
         public MaintenanceModule(LogEntryService logEntryService) :base("/maintenance/")
         {
             Get["/readlogs/"] = p => {
-                RequestLogHelper.SyncDatabaseWithServer();
                 EventLogHelper.SyncDatabaseWithServer();
-                
                 return "YOLO!";
             };
 

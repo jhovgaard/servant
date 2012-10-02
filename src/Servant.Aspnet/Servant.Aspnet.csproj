@@ -88,69 +88,30 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Css\base.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Css\bootstrap.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Css\metro.blue.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Css\metro.extended.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\fadeout_right.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\icon_add.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\icon_clock.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\icon_delete.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\icon_disabled.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\icon_enabled.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\icon_rightarrow.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\menu_about.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\menu_home.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\menu_marker.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\menu_performance.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\menu_settings.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\menu_sites.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\menu_stats.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\base.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery-1.8.0.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery.uitablefilter.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Css\base.css" />
+    <Content Include="Css\bootstrap.min.css" />
+    <Content Include="Css\metro.blue.css" />
+    <Content Include="Css\metro.extended.css" />
+    <Content Include="Css\Fonts\Roboto License.txt" />
+    <Content Include="Css\Fonts\Roboto-Light-webfont.svg" />
+    <Content Include="Css\Fonts\Roboto-Regular-webfont.svg" />
+    <Content Include="Images\fadeout_right.png" />
+    <Content Include="Images\icon_add.png" />
+    <Content Include="Images\icon_clock.png" />
+    <Content Include="Images\icon_delete.png" />
+    <Content Include="Images\icon_disabled.png" />
+    <Content Include="Images\icon_enabled.png" />
+    <Content Include="Images\icon_rightarrow.png" />
+    <Content Include="Images\menu_about.png" />
+    <Content Include="Images\menu_home.png" />
+    <Content Include="Images\menu_marker.png" />
+    <Content Include="Images\menu_performance.png" />
+    <Content Include="Images\menu_settings.png" />
+    <Content Include="Images\menu_sites.png" />
+    <Content Include="Images\menu_stats.png" />
+    <Content Include="Scripts\base.js" />
+    <Content Include="Scripts\jquery-1.8.0.min.js" />
+    <Content Include="Scripts\jquery.uitablefilter.js" />
     <Content Include="Web.config" />
     <Content Include="x64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -160,6 +121,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Host.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\Home\Models\IndexModel.cs" />
     <Compile Include="Views\Shared\Models\PageModel.cs" />
@@ -169,45 +132,25 @@
     <Content Include="Servant.sqlite">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Home\Index.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Settings\Index.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Shared\_Layout.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Sites\_Details.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Sites\Create.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Sites\Error.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Sites\Errors.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Sites\Index.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Sites\Request.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Sites\Settings.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Sites\Stats.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Stats\CleanupApplicationPools.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Stats\Index.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Settings\Index.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Sites\_Details.cshtml" />
+    <Content Include="Views\Sites\Create.cshtml" />
+    <Content Include="Views\Sites\Error.cshtml" />
+    <Content Include="Views\Sites\Errors.cshtml" />
+    <Content Include="Views\Sites\Index.cshtml" />
+    <Content Include="Views\Sites\Request.cshtml" />
+    <Content Include="Views\Sites\Settings.cshtml" />
+    <Content Include="Views\Sites\Stats.cshtml" />
+    <Content Include="Views\Stats\CleanupApplicationPools.cshtml" />
+    <Content Include="Views\Stats\Index.cshtml" />
+    <Content Include="Css\Fonts\Roboto-Light-webfont.eot" />
+    <Content Include="Css\Fonts\Roboto-Light-webfont.ttf" />
+    <Content Include="Css\Fonts\Roboto-Light-webfont.woff" />
+    <Content Include="Css\Fonts\Roboto-Regular-webfont.eot" />
+    <Content Include="Css\Fonts\Roboto-Regular-webfont.ttf" />
+    <Content Include="Css\Fonts\Roboto-Regular-webfont.woff" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

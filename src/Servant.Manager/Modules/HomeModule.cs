@@ -1,4 +1,5 @@
-﻿using Nancy;
+﻿using System.Linq;
+using Nancy;
 using Servant.Business.Services;
 using Servant.Manager.Helpers;
 
@@ -11,7 +12,7 @@ namespace Servant.Manager.Modules
             Get["/"] = p => {
                 var latestErrors = applicationErrorService.GetByDateTimeDescending(10);
                 latestErrors = EventLogHelper.AttachSite(latestErrors);
-                Model.UnhandledExceptions = latestErrors;
+                Model.UnhandledExceptions = latestErrors.ToList();
 
                 return View["Index", Model];
             };
