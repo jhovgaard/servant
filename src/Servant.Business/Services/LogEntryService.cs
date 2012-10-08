@@ -53,6 +53,15 @@ namespace Servant.Business.Services
             return Table.All().Count();
         }
 
+        public int GetTodayTotalCount()
+        {
+            var result = Table.All(Table.DateTime >= DateTime.UtcNow.Date).Select(Table.Id.Count()).ToScalar();
+            if (result == null)
+                return 0;
+
+            return (int)result;
+        }
+
         public double GetAverageResponseTime()
         {
             var result = Table.All().Select(Table.TimeTaken.Average()).ToScalar();

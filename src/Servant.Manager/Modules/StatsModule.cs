@@ -18,7 +18,7 @@ namespace Servant.Manager.Modules
                 serverStats.AverageResponeTime = (int)logEntryService.GetAverageResponseTime();
                 serverStats.TotalErrors = applicationErrorService.GetTotalCount();
                 serverStats.UnusedApplicationPools = ApplicationPoolHelper.GetUnusedApplicationPools().Count();
-
+                serverStats.TotalRequestsInLogFiles = RequestLogHelper.GetLogFilesForAllSites().Sum(x => x.TotalRequests);
                 Model.ServerStats = serverStats;
                 return View["Index", Model];
             };

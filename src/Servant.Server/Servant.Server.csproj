@@ -53,6 +53,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Nancy.Hosting.Self.0.12.1\lib\net40\Nancy.Hosting.Self.dll</HintPath>
     </Reference>
+    <Reference Include="Nancy.Validation.DataAnnotations">
+      <HintPath>..\packages\Nancy.Validation.DataAnnotations.0.12.1\lib\net40\Nancy.Validation.DataAnnotations.dll</HintPath>
+    </Reference>
     <Reference Include="Nancy.ViewEngines.Razor">
       <HintPath>..\packages\Nancy.Viewengines.Razor.0.12.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
     </Reference>
@@ -69,6 +72,7 @@
       <HintPath>..\packages\Simple.Data.Sqlite.0.16.0.0\lib\net40\Simple.Data.Sqlite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\packages\System.Data.SQLite.1.0.82.0\lib\net40\System.Data.SQLite.dll</HintPath>
@@ -129,7 +133,11 @@
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
     <PreBuildEvent>Copy “$(ProjectDir)x64\SQLite.Interop.dll” “$(ProjectDir)$(OutDir)SQLite.Interop.dll”
-
+Copy “$(SolutionDir)Servant.Aspnet\Servant.sqlite” “$(ProjectDir)$(OutDir)Servant.sqlite”
+xcopy "$(SolutionDir)Servant.Aspnet\Css" “$(ProjectDir)$(OutDir)Css” /e /y /i /r
+xcopy "$(SolutionDir)Servant.Aspnet\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r
+xcopy "$(SolutionDir)Servant.Aspnet\Scripts" “$(ProjectDir)$(OutDir)Scripts” /e /y /i /r
+xcopy "$(SolutionDir)Servant.Aspnet\Views" “$(ProjectDir)$(OutDir)Views” /e /y /i /r
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

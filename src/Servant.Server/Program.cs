@@ -11,23 +11,18 @@ namespace Servant.Server
 {
     class Program
     {
-        private static bool _isRunningDbSync;
 
         static void Init()
         {
-            TinyIoC.TinyIoCContainer.Current.Register<IHost, Host>();
+            TinyIoC.TinyIoCContainer.Current.Register<IHost, Host>().AsSingleton();
         }
-
 
         static void Main(string[] args)
         {
             Init();
 
             var settings = new SettingsService().LocalSettings;
-            var binding = settings.GetBinding();
             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
-
-            Console.WriteLine(settings.Debug);
 
             Console.WriteLine();
             Console.WriteLine("Welcome to Servant for IIS.");
@@ -55,12 +50,16 @@ namespace Servant.Server
             RegisterLogParser();
             
             host.Start();
-            
-            Console.WriteLine("You can now manage your server from " + binding);
+
+            if(settings.ParseLogs)
+                host.StartLogParsing();
+
+            Console.WriteLine("You can now manage your server from " + settings.ServantUrl);
 
             try
             {
-                var startInfo = new ProcessStartInfo("explorer.exe", binding);
+                var startupUrl = settings.SetupCompleted ? settings.ServantUrl : settings.ServantUrl + "setup/1/";
+                var startInfo = new ProcessStartInfo("explorer.exe", startupUrl);
                 Process.Start(startInfo);
             }
             catch (Exception e)
@@ -68,38 +67,9 @@ namespace Servant.Server
                 Console.WriteLine("Could not start browser: " + e.Message);
             }
 
-
-            var factory = new Quartz.Impl.StdSchedulerFactory();
-            var sched = factory.GetScheduler();
-            sched.Start();
-
-            var job = JobBuilder
-                .Create<SyncDatabaseJob>()
-                .WithIdentity("SyncDatabaseJob", null)
-                .Build();
-
-            var trigger = TriggerBuilder
-                .Create()
-                .WithIdentity("SyncDatabaseTrigger", null)
-                .WithSimpleSchedule(x => x.WithIntervalInMinutes(5))
-                .StartNow()
-                .Build();
-
-            sched.ScheduleJob(job, trigger);
+            Console.ReadLine();
         }
 
-        public class SyncDatabaseJob : IJob
-        {
-            public void Execute(IJobExecutionContext context)
-            {
-                if (_isRunningDbSync) return;
-
-                _isRunningDbSync = true;
-                Manager.Helpers.SynchronizationHelper.SyncServer();
-                Manager.Helpers.EventLogHelper.SyncDatabaseWithServer();
-                _isRunningDbSync = false;
-            }
-        }
 
         public static bool IsAnAdministrator()
         {

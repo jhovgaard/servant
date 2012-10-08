@@ -2,6 +2,7 @@
 {
     public class ServerStats
     {
+        public int TotalRequestsInLogFiles { get; set; }
         public int TotalRequests { get; set; }
         public string DataSent { get; set; }
         public string DataRecieved { get; set; }

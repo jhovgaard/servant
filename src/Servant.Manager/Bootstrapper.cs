@@ -1,8 +1,6 @@
-﻿using Nancy;
-using Nancy.Authentication.Basic;
+﻿using Nancy.Authentication.Basic;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
-using Nancy.Cryptography;
 using TinyIoC;
 
 namespace Servant.Manager
@@ -13,7 +11,6 @@ namespace Servant.Manager
         {
             return TinyIoCContainer.Current;
         }
-
 
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {

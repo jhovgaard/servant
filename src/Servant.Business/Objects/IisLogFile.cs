@@ -6,5 +6,6 @@ namespace Servant.Business.Objects
     {
         public string Path { get; set; }
         public DateTime LastWriteTime { get; set; }
+        public int TotalRequests { get; set; }
     }
 }

@@ -30,4 +30,38 @@
     $(window).resize(function () {
         $("#menu").height($(document).height());
     });
+
+    $(function() {
+        $("#menu").height($(document).height());
+    });
+    
+    // Form validation parser
+    if(errors != null) {
+        for (var error in errors) {
+            error = errors[error];
+            if (!error.IsGlobal) { // property
+                var input = $("input[name=" + error.PropertyName.toLowerCase() + "]");
+                var group = input.parents(".control-group");
+                group.addClass("error");
+
+                var helpSpan = group.find("span.help-inline, span.help-block");
+                if (!helpSpan.length) {
+                    var form = input.parents("form");
+                    if (form.hasClass("form-horizontal"))
+                        helpSpan = $('<span class="help-inline"/>');
+                    else
+                        helpSpan = $('<span class="help-block"/>');
+                    
+                    if(input.attr("type") == "checkbox") {
+                        var label = input.parents("label");
+                        label.after(helpSpan);
+                    } else {
+                        input.after(helpSpan);
+                    }
+                }
+                helpSpan.text(error.Message);
+                helpSpan.show();
+            }
+        }
+    }
 });
