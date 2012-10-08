@@ -1,0 +1,91 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    ViewBag.Title = "Servant - Setup";
+    Layout = "_Setup.cshtml";
+}
+<div class="row margin-top30">
+    <div class="span6 offset3 center">
+        <h3>Welcome to Servant!</h3> 
+        
+        <p>You've succcesfully installed Servant on your server and to be honest, we couldn't be happier! We hate to bug you, but we need a few details from you before we're ready.</p>
+        
+        <form action="/setup/1/" method="POST" class="margin-top30">
+            <div class="control-group">
+                <label for="servanturl">URL to Servant</label>
+                <div class="controls">
+                    <input type="text" tabindex="1" name="servanturl" id="servanturl" class="input-medium span4" value="@Model.Settings.ServantUrl" />
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div style="width: 240px; margin: auto;">
+                    <label class="checkbox">
+                        <input type="checkbox" tabindex="2" value="true" name="autostartlogparsing"@(Model.Settings.AutoStartLogParsing == true ? Html.Raw("checked=\"checked\"") : null) checked="checked" />
+                        Begin parsing my logs immediately
+                    </label>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="username">Username</label>
+                <div class="controls">
+                    <input type="text" tabindex="3" name="username" id="username" class="input-medium span4" value="@Model.Settings.Username" />
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="password">Password</label>
+                <div class="controls">
+                    <input type="password" tabindex="4" name="password" id="password" class="input-medium span4" value="" />
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div style="width: 300px; margin: auto;">
+                    <label class="checkbox">
+                        <input type="checkbox" tabindex="5" name="acceptterms" @((bool)Model.AcceptTerms ? Html.Raw("checked=\"checked\"") : null) />
+                        I agree and accept <a href="#">the terms and conditions for using Servant for IIS</a>.
+                    </label>
+                </div>
+            </div>
+            
+            <div class="controls margin-top30">
+                <input type="submit" tabindex="6" value="Start Servant now!" class="btn btn-primary"/>
+            </div>
+        </form>
+        <p></p>
+    </div>
+</div>
+
+@section javascript {
+    <script type="text/javascript">
+        var originalServantUrl = "@Model.OriginalServantUrl";
+        var repost = false;
+
+        $("form").submit(function () {
+            var form = $(this);
+            var newUrl = $("#servanturl").val();
+
+            if(originalServantUrl != newUrl && !repost) {
+                var inputs = $(this).serialize();
+                $.post(form.attr("action"), inputs, function (response) {
+                    if (response.Success) {
+                        $(this).find("input[type=submit]").attr("disabled", "disabled");
+                        setTimeout(function() {
+                            window.location = response.Url;
+                        }, 1000);
+                    } else {
+                        repost = true;
+                        form.submit();
+                    }
+                });
+                
+                return false;
+            }
+        });
+
+        $(function() {
+            $("#password").focus();
+        });
+    </script>
+}

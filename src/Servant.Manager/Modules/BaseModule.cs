@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using Nancy.Security;
-using Servant.Manager.Objects;
 using Nancy;
+using Nancy.Validation;
+using Servant.Business.Objects;
+using Servant.Business.Services;
 using Servant.Manager.Views.Shared.Models;
 
 namespace Servant.Manager.Modules
@@ -12,20 +15,22 @@ namespace Servant.Manager.Modules
         public dynamic Model = new ExpandoObject();
         protected PageModel Page { get; set; }
         public bool HasErrors { get { return Model.Errors.Count != 0; }}
+        private SettingsService _settingsService;
 
         public BaseModule()
         {
-            SetupModelDefaults();
-            this.RequiresAuthentication();
+            Setup();
         }
 
         public BaseModule(string modulePath) : base(modulePath)
         {
-            SetupModelDefaults();
+            Setup();
         }
             
-        public void SetupModelDefaults() 
+        public void Setup()
         {
+            _settingsService = TinyIoC.TinyIoCContainer.Current.Resolve<SettingsService>();
+
             Before += ctx =>
             {
                 Page = new PageModel
@@ -41,17 +46,33 @@ namespace Servant.Manager.Modules
             After += ctx =>
             {
                 Model.ErrorsAsJson = new Nancy.Json.JavaScriptSerializer().Serialize(Model.Errors);
+
+                var nonAuthenticatedModules = new List<Type> { typeof(SetupModule) };
+                if (!nonAuthenticatedModules.Contains(this.GetType()))
+                {
+                    this.RequiresAuthentication();
+
+                    if (!_settingsService.LocalSettings.SetupCompleted)
+                        ctx.Response = Response.AsRedirect("/setup/1/");
+                }
             };
+
+            
         }
 
         public void AddGlobalError(string message)
         {
-            Model.Errors.Add(new Error { IsGlobal = true, Message = message});
+            Model.Errors.Add(new Error(message));
         }
 
         public void AddPropertyError(string propertyName, string message)
         {
-            Model.Errors.Add(new Error { IsGlobal = false, PropertyName = propertyName, Message = message });
+            Model.Errors.Add(new Error(false,message,propertyName));
+        }
+
+        public void AddValidationErrors(ModelValidationResult result)
+        {
+            Model.Errors.AddRange(Helpers.ErrorHelper.ConvertValidationResultToErrorList(result));
         }
     }
 }

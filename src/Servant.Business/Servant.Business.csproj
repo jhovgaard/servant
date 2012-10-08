@@ -36,11 +36,15 @@
     <Reference Include="BCrypt.Net">
       <HintPath>..\packages\BCrypt-Official.0.1.107\lib\BCrypt.Net.dll</HintPath>
     </Reference>
+    <Reference Include="DataAnnotationsExtensions">
+      <HintPath>..\packages\DataAnnotationsExtensions.1.1.0.0\lib\NETFramework40\DataAnnotationsExtensions.dll</HintPath>
+    </Reference>
     <Reference Include="Simple.Data, Version=0.18.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Simple.Data.Core.0.18\lib\net40\Simple.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -51,11 +55,13 @@
   <ItemGroup>
     <Compile Include="Exceptions\SettingsException.cs" />
     <Compile Include="Helpers\SecurityHelper.cs" />
+    <Compile Include="Helpers\SettingsHelper.cs" />
     <Compile Include="Objects\Entity.cs" />
     <Compile Include="Objects\Enums\CreateSiteResult.cs" />
     <Compile Include="Objects\Enums\SiteStartResult.cs" />
     <Compile Include="Objects\Enums\SiteState.cs" />
     <Compile Include="Objects\Enums\StatsRange.cs" />
+    <Compile Include="Objects\Error.cs" />
     <Compile Include="Objects\IisLogFile.cs" />
     <Compile Include="Objects\LogEntry.cs" />
     <Compile Include="Objects\Reporting\MostActiveClient.cs" />
@@ -73,9 +79,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

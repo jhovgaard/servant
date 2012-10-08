@@ -9,14 +9,15 @@
 
 <div class="clear"></div>
 
-<form action="/settings/" method="POST">
-    <div class="row">
-        <div class="span9">
+<div class="row">
+    <div class="span9">
+        <form action="/settings/" method="POST">
+    
             <h4 class="margin-top30">General</h4>
     
             <div class="control-group margin-top10">
-                <label for="binding">Servant binding</label>
-                <input type="text" class="input-medium span4" id="binding" name="binding" value="@Model.Settings.Hostname:@Model.Settings.Port" />
+                <label for="servanturl">Servant URL</label>
+                <input type="text" class="input-medium span4" id="servanturl" name="servanturl" value="@Model.Settings.ServantUrl" />
                 <p>Example: <code>servant.io</code> or <code>servant.io:440</code>. Default port is 80.
                     <br/><span class="gray">Wildcard binding is currently not supported. Waiting for Nancy 0.13.</span>
                 </p>
@@ -24,12 +25,12 @@
 
             <div class="control-group margin-top10">
                 <label for="debug">Debug mode</label>
-                <label class="checkbox">
+                <label class="checkbox" style="text-align: left;">
                     <input type="checkbox" name="debug" id="debug" @(Model.Settings.Debug == true ? Html.Raw("checked=\"checked\"") : null) />
                     Enabled
                 </label>
             </div>
-            
+
             <div class="control-group margin-top10">
                 <label for="username">Username</label>  
                 <input type="text" class="input-medium span4" id="username" name="username" value="@Model.Settings.Username" />
@@ -40,37 +41,56 @@
                 <input type="password" class="input-medium span4" id="password" name="password" value="" />
                 <p class="gray">Only enter a password if you want to change the current.</p>
             </div>
-        </div>
     
-        <div class="margin-top30 span10">
-            <input type="submit" class="btn btn-primary" value="Save settings" />
-        </div>
+            <div class="margin-top30">
+                <input type="submit" class="btn btn-primary" value="Save settings" />
+            </div>
+        </form>
+        
+        <div class="clear"></div>
+        
+        <h4 class="margin-top30">Log parsing</h4>
+        <p class="margin-top10">Log parsing is currently <strong>@Html.Raw((bool)Model.Settings.ParseLogs ? "running" : "stopped")</strong>.</p>
+        
+        @if((bool)Model.Settings.ParseLogs)
+        {
+            <form method="POST" action="/settings/startlogparsing/">
+                <input type="hidden" value="false" name="start"/>
+                <input type="submit" class="btn btn-danger" value="Stop parsing"/>      
+            </form>
+        } else
+        {
+            <form method="POST" action="/settings/startlogparsing/">
+                <input type="hidden" value="true" name="start"/>
+                <input type="submit" class="btn btn-success" value="Start parsing"/>
+            </form>
+        }
     </div>
-</form>
+</div>
 
 @section javascript {
     <script type="text/javascript">
-        var binding = "@Model.OriginalBinding";
+        var originalServantUrl = "@Model.OriginalServantUrl";
         var repost = false;
 
         $("form").submit(function () {
             var form = $(this);
-            var newBinding = $("input[name=binding]").val();
+            var newUrl = $("#servanturl").val();
 
-            if(binding != newBinding && !repost) {
+            if (originalServantUrl != newUrl && !repost) {
                 var inputs = $(this).serialize();
-                $.post("/settings/", inputs, function (response) {
-                    if (response == true) {
+                $.post(form.attr("action"), inputs, function (response) {
+                    if (response.Success) {
                         $(this).find("input[type=submit]").attr("disabled", "disabled");
-                        setTimeout(function() {
-                            window.location = "http://" + newBinding + "/settings/";
+                        setTimeout(function () {
+                            window.location = response.Url;
                         }, 1000);
                     } else {
                         repost = true;
                         form.submit();
                     }
                 });
-                
+
                 return false;
             }
         });
