@@ -1,4 +1,8 @@
 ﻿using System;
+using Nancy;
+using Nancy.ModelBinding;
+using Nancy.Validation;
+using Servant.Business.Objects;
 using Servant.Business.Services;
 using Servant.Manager.Infrastructure;
 
@@ -12,50 +16,30 @@ namespace Servant.Manager.Modules
         {
             Get["/"] = p => {
                 var settings = settingsService.LocalSettings;
-                Model.OriginalBinding = settings.Hostname + ":" + settings.Port;
+                Model.OriginalServantUrl = settings.ServantUrl;
                 Model.Settings = settings;
 
                 return View["Index", Model];
             };
 
             Post["/"] = p => {
-              
-                string[] bindingInfo = Request.Form.Binding.ToString()
-                    .Replace("http://", "")
-                    .Split(':');
-                string newHostname = "";
-
-                if(bindingInfo == null)
-                    AddPropertyError("binding", "Servant binding can't be empty.");
-                else
-                    newHostname = bindingInfo[0];
-
-                if(string.IsNullOrWhiteSpace(newHostname))
-                    AddPropertyError("binding", "Binding is required.");
-                
-                if (string.IsNullOrWhiteSpace(Request.Form.Username))
-                    AddPropertyError("username", "Username is required.");
-
-                
-                var newPort = bindingInfo.Length > 1 ? Convert.ToInt32(bindingInfo[1]) : 80;
                 var settings = settingsService.LocalSettings;
-                var originalBinding = settings.Hostname + ":" + settings.Port;
+                var formSettings = this.Bind<Settings>();
+                formSettings.ServantUrl = Business.Helpers.SettingsHelper.FinializeUrl(formSettings.ServantUrl);
+
+                var validationResult = this.Validate(formSettings);
+
+                var bindingIsChanged = formSettings.ServantUrl != settings.ServantUrl;
                 
-                var bindingIsChanged = newHostname != settings.Hostname || newPort != settings.Port;
-
-                settings.Debug = Request.Form.Debug;
-                settings.Hostname = newHostname;
-                settings.Port = newPort;
-                settings.Username = Request.Form.Username;
-
-                if(!HasErrors)
+                if(validationResult.IsValid)
                 {
-                    if (!string.IsNullOrWhiteSpace(Request.Form.Password))
-                        settings.Password = Business.Helpers.SecurityHelper.HashPassword(Request.Form.Password);
-
+                    formSettings.Password = string.IsNullOrWhiteSpace(formSettings.Password) 
+                        ? settings.Password 
+                        : Business.Helpers.SecurityHelper.HashPassword(formSettings.Password);
+                    
                     settingsService.DeleteAll();
-                    settingsService.Insert(settings);
-                
+                    settingsService.Insert(formSettings);
+
                     if(bindingIsChanged)
                     {
                         host.Kill();
@@ -64,9 +48,29 @@ namespace Servant.Manager.Modules
                     }
                 }
 
-                Model.OriginalBinding = originalBinding;
-                Model.Settings = settings;
+                AddValidationErrors(validationResult);
+                Model.OriginalServantUrl = settings.ServantUrl;
+                Model.Settings = formSettings;
+
                 return View["Index", Model];
+            };
+
+            Post["/startlogparsing/"] = _ => {
+                
+                var settings = settingsService.LocalSettings;
+                var start = (bool) Request.Form.Start;
+                
+                if(!settings.ParseLogs && start)
+                    host.StartLogParsing();
+
+                if(settings.ParseLogs && !start)
+                    host.StopLogParsing();
+
+                settings.ParseLogs = start;
+                settingsService.DeleteAll();
+                settingsService.Insert(settings);
+
+                return Response.AsRedirect("/settings/");
             };
         }
     }

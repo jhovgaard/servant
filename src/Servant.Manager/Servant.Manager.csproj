@@ -43,10 +43,14 @@
     <Reference Include="Nancy.Authentication.Basic">
       <HintPath>..\packages\Nancy.Authentication.Basic.0.12.1\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
     </Reference>
+    <Reference Include="Nancy.Validation.DataAnnotations">
+      <HintPath>..\packages\Nancy.Validation.DataAnnotations.0.12.1\lib\net40\Nancy.Validation.DataAnnotations.dll</HintPath>
+    </Reference>
     <Reference Include="Nancy.ViewEngines.Razor">
       <HintPath>..\packages\Nancy.Viewengines.Razor.0.12.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -61,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Helpers\ApplicationPoolHelper.cs" />
+    <Compile Include="Helpers\ErrorHelper.cs" />
     <Compile Include="Helpers\EventLogHelper.cs" />
     <Compile Include="Helpers\FileSystemHelper.cs" />
     <Compile Include="Helpers\RequestLogHelper.cs" />
@@ -74,22 +79,14 @@
     <Compile Include="Modules\HomeModule.cs" />
     <Compile Include="Modules\MaintenanceModule.cs" />
     <Compile Include="Modules\SettingsModule.cs" />
+    <Compile Include="Modules\SetupModule.cs" />
     <Compile Include="Modules\SitesModule.cs" />
     <Compile Include="Modules\StatsModule.cs" />
     <Compile Include="Modules\TestModule.cs" />
-    <Compile Include="Objects\Error.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reports\AgentstringWithCount.cs" />
     <Compile Include="Views\Home\Models\IndexModel.cs" />
     <Compile Include="Views\Shared\Models\PageModel.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Servant.sqlite">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Servant-dev.sqlite" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

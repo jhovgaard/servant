@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using Servant.Business.Services;
+using Servant.Manager.Infrastructure;
 
 namespace Servant.Manager.Helpers
 {
@@ -7,6 +8,8 @@ namespace Servant.Manager.Helpers
     {
          public static void SyncServer()
          {
+             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+
              var logEntryService = new LogEntryService();
              var sites = SiteHelper.GetSites();
              RequestLogHelper.FlushLog();
@@ -14,6 +17,9 @@ namespace Servant.Manager.Helpers
 
              foreach (var site in sites)
              {
+                 if (!host.LogParsingStarted) // Sørger for at vi kan stoppes udefra.
+                     return;
+
                  var latestEntry = logEntryService.GetLatestEntry(site);
                  RequestLogHelper.InsertNewInDbBySite(site, latestEntry);
                  Thread.Sleep(2000);

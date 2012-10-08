@@ -7,6 +7,7 @@ using System.Threading;
 using MSUtil;
 using Servant.Business.Objects;
 using Servant.Business.Services;
+using Servant.Manager.Infrastructure;
 
 namespace Servant.Manager.Helpers
 {
@@ -18,7 +19,10 @@ namespace Servant.Manager.Helpers
         private const int FilesPerRound = 6;
         private static int _filesInRound = 0;
 
-        public static void InsertNewInDbBySite(Site site, LogEntry latestEntry) {
+        public static void InsertNewInDbBySite(Site site, LogEntry latestEntry)
+        {
+            var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+
             var logfiles = GetLogFilesBySite(site).OrderByDescending(x => x.Path).ToList();
             if (latestEntry != null)
                 logfiles = logfiles.Where(x => x.LastWriteTime.Date >= latestEntry.DateTime.Date).ToList();
@@ -31,6 +35,9 @@ namespace Servant.Manager.Helpers
             var rounds = logfiles.Count / FilesPerRound;
             for (var round = 0; round < rounds; round++) // Hver runde udgør 4 logfiler
             {
+                if (!host.LogParsingStarted) // Sørger for at vi kan afbryde parsing udefra.
+                    return;
+
                 var logfilesForRound = logfiles.Skip((round * FilesPerRound)).Take(FilesPerRound).ToList();
                 _filesInRound = logfilesForRound.Count;
                 ParsedLogEntryLists = new List<LogEntry>[logfilesForRound.Count];
@@ -92,9 +99,20 @@ namespace Servant.Manager.Helpers
             process.Dispose();
         }
 
-        private static DateTime GetLogFileDate(string path)
+        public static List<IisLogFile> GetLogFilesForAllSites()
         {
-            return new FileInfo(path).LastWriteTime;
+            var logfiles = new List<IisLogFile>();
+
+            var sw = new Stopwatch();
+
+            sw.Start();
+            var sites = SiteHelper.GetSites();
+            foreach(var site in sites)
+            {
+                logfiles.AddRange(GetLogFilesBySite(site));
+            }
+            sw.Stop();
+            return logfiles;
         }
 
         private static IEnumerable<IisLogFile> GetLogFilesBySite(Site site)
@@ -105,12 +123,16 @@ namespace Servant.Manager.Helpers
 
             foreach (var file in files)
             {
-                yield return new IisLogFile()
-                {
-                    Path = file,
-                    LastWriteTime = GetLogFileDate(file)
-                };
+                yield return GetIisLogFileByPath(file);
             }
+        }
+
+        private static IisLogFile GetIisLogFileByPath(string path)
+        {
+            var fileInfo = new FileInfo(path);
+            var lines = 0;//File.ReadLines(path).Count(x => !x.StartsWith("#"));
+            
+            return new IisLogFile {LastWriteTime = fileInfo.LastWriteTime, Path = path, TotalRequests = lines};
         }
 
         private static dynamic GetDbNullSafe(dynamic value)
