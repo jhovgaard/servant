@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using Nancy;
 using Servant.Business.Services;
 using Servant.Manager.Helpers;
@@ -10,15 +11,20 @@ namespace Servant.Manager.Modules
         public StatsModule(LogEntryService logEntryService, ApplicationErrorService applicationErrorService) : base("/stats/")
         {
             Get["/"] = p => {
+                var siteManager = new SiteManager();
+                
                 var serverStats = new Business.Objects.Reporting.ServerStats();
+                
                 serverStats.TotalRequests = logEntryService.GetTotalCount();
                 serverStats.DataRecieved = "Disabled";
                 serverStats.DataSent = "Disabled";
-                serverStats.TotalSites = SiteHelper.GetSites().Count();
+                serverStats.TotalSites = siteManager.GetSites().Count();
+
+
                 serverStats.AverageResponeTime = (int)logEntryService.GetAverageResponseTime();
+
                 serverStats.TotalErrors = applicationErrorService.GetTotalCount();
                 serverStats.UnusedApplicationPools = ApplicationPoolHelper.GetUnusedApplicationPools().Count();
-                serverStats.TotalRequestsInLogFiles = RequestLogHelper.GetLogFilesForAllSites().Sum(x => x.TotalRequests);
                 Model.ServerStats = serverStats;
                 return View["Index", Model];
             };

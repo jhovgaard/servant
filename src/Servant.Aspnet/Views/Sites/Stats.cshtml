@@ -3,7 +3,6 @@
 @inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
     Layout = "Sites/_Details.cshtml";
-    ViewBag.Title = "Index";
     ViewBag.ActiveMenuItem = "sites";
     ViewBag.ActiveSubmenuItem = "stats";
 }   
@@ -61,7 +60,7 @@
         {
             <tr>
                 <td>@entry.ClientIpAddress</td>
-                <td style="word-break:break-all ">@entry.LatestAgentstring</td>
+                <td style="word-break:break-all ">@entry.Agentstring</td>
                 <td>@entry.Count</td>
             </tr>
         }

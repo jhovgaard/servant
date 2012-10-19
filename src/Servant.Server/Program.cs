@@ -20,9 +20,11 @@ namespace Servant.Server
         static void Main(string[] args)
         {
             Init();
+            EnsureDatabaseExists();
 
             var settings = new SettingsService().LocalSettings;
             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+            var host1 = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
 
             Console.WriteLine();
             Console.WriteLine("Welcome to Servant for IIS.");
@@ -97,6 +99,16 @@ namespace Servant.Server
             reg.Start();
             reg.WaitForExit();
             reg.Close();
+        }
+
+        public static void EnsureDatabaseExists()
+        {
+            var dbPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "servant.sqlite");
+            if(!System.IO.File.Exists(dbPath))
+            {
+                var defaultDbPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "servant-default.sqlite");
+                System.IO.File.Copy(defaultDbPath, dbPath, false);
+            }
         }
     }
 }

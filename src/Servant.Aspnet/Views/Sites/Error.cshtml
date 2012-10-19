@@ -2,7 +2,6 @@
 @inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
     Layout = "Sites/_Details.cshtml";
-    ViewBag.Title = "Index";
     ViewBag.ActiveMenuItem = "sites";
     ViewBag.ActiveSubmenuItem = "errors";
 }   
@@ -31,21 +30,27 @@
 </p>
 
 <h3>Related http(s) requests</h3>
-<table class="table table-striped margin-top10">
-    <thead>
-        <tr>
-            <th>Timestamp</th>
-            <th class="span6">URL</th>
-            <th>Status code</th>
-        </tr>
+@if(Model.RelatedRequests.Count != 0)
+{
+    <table class="table table-striped margin-top10">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th class="span6">URL</th>
+                <th>Status code</th>
+            </tr>
 
-    </thead>
-    @foreach (Servant.Business.Objects.LogEntry entry in Model.RelatedRequests)
-    {
-        <tr>
-            <td>@entry.DateTime</td>
-            <td><a href="/sites/@(entry.SiteIisId)/requests/@entry.Id/">@entry.Uri@entry.Querystring</a></td>
-            <td>@(entry.HttpStatusCode)</td>
-        </tr>
-    }
-</table>
+        </thead>
+        @foreach (Servant.Business.Objects.LogEntry entry in Model.RelatedRequests)
+        {
+            <tr>
+                <td>@entry.DateTime</td>
+                <td><a href="/sites/@(entry.SiteIisId)/requests/@entry.Id/">@entry.Uri@entry.Querystring</a></td>
+                <td>@(entry.HttpStatusCode)</td>
+            </tr>
+        }
+    
+    </table>
+} else {
+    <p class="margin-top10">No requests could be related to this error.</p>
+}

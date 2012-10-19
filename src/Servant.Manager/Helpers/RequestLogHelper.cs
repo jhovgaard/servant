@@ -47,7 +47,7 @@ namespace Servant.Manager.Helpers
                 {
                     var logfile = logfilesForRound[i];
                     resetEvents[i] = new ManualResetEvent(false);
-                    ThreadPool.QueueUserWorkItem(CallBack, new { Index = i, Logfile = logfile, LatestEntry = latestEntry, Site = site });
+                    ThreadPool.QueueUserWorkItem(CallBack, new { Index = i, Logfile = logfile, LatestEntry = latestEntry, Site = site, Debug = host.Debug });
                 }
 
                 WaitHandle.WaitAll(resetEvents);
@@ -59,7 +59,9 @@ namespace Servant.Manager.Helpers
                 }
                 var service = new LogEntryService();
                 service.Insert(entries);
-                Console.WriteLine("Round {0}: Wrote {1} entries to db.", round, entries.Count);
+                if(host.Debug)
+                    Console.WriteLine("Round {0}: Wrote {1} entries to db.", round, entries.Count);
+
                 Thread.Sleep(500);
             }
         }
@@ -78,7 +80,8 @@ namespace Servant.Manager.Helpers
             List<LogEntry> result = ParseQueryToLogEntries(site.IisId, sql);
             ParsedLogEntryLists[index] = result;
             sw.Stop();
-            Console.WriteLine(logfile.Path + ": parsed in " + sw.ElapsedMilliseconds + "ms");
+            if(state.Debug)
+                Console.WriteLine(logfile.Path + ": parsed in " + sw.ElapsedMilliseconds + "ms");
             
             resetEvents[index].Set();
         }
@@ -102,16 +105,13 @@ namespace Servant.Manager.Helpers
         public static List<IisLogFile> GetLogFilesForAllSites()
         {
             var logfiles = new List<IisLogFile>();
+            var siteManager = new SiteManager();
 
-            var sw = new Stopwatch();
-
-            sw.Start();
-            var sites = SiteHelper.GetSites();
+            var sites = siteManager.GetSites();
             foreach(var site in sites)
             {
                 logfiles.AddRange(GetLogFilesBySite(site));
             }
-            sw.Stop();
             return logfiles;
         }
 

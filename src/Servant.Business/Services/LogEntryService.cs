@@ -1,74 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Dapper;
+using DapperExtensions;
 using Servant.Business.Objects;
 
 namespace Servant.Business.Services
 {
-    public class LogEntryService : Service<LogEntry>
+    public class LogEntryService : SqlLiteService<LogEntry>
     {
-        public LogEntryService() : base("LogEntries") {}
-
-        public LogEntry GetLatestEntry(Site site) {
-            return Table.FindAllBySiteIisId(site.IisId).OrderByDateTimeDescending().FirstOrDefault();
+        public LogEntry GetById(int id)
+        {
+            return Connection.Query<LogEntry>("SELECT * FROM LogEntries WHERE Id = @Id", new {id}).SingleOrDefault();
+        }
+        
+        public LogEntry GetLatestEntry(Site site)
+        {
+            return Connection.Query<LogEntry>(
+                    "SELECT * FROM LogEntries WHERE SiteIisId = @SiteIisId ORDER BY DateTime DESC LIMIT 1",
+                    new {SiteIisId = site.IisId}).FirstOrDefault();
         }
 
         public IEnumerable<LogEntry> GetLatestBySite(Site site, int max = 0)
         {
-            var entries = Table.FindAllBySiteIisId(site.IisId).OrderbyDateTimeDescending();
-            if (max != 0)
-                entries = entries.Take(max);
+            var sql = "SELECT * FROM LogEntries WHERE SiteIisId = @SiteIisId ORDER BY DateTime DESC";
+            if(max != 0)
+                sql = sql + " LIMIT " + max;
 
-            return entries;
+            return Connection.Query<LogEntry>(sql, new { SiteIisId = site.IisId });
         }
 
-        public IEnumerable<LogEntry> GetTodaysBySite(Site site)
+        public IEnumerable<Objects.Reporting.MostActiveClient> GetMostActiveClientsBySite(int iisSiteId, DateTime oldest)
         {
-            return Table.FindAll(Table.SiteIisId == site.IisId && Table.DateTime >= DateTime.UtcNow.Date).OrderbyDateTimeDescending().ToList<LogEntry>();
+            var result = Connection.Query<Objects.Reporting.MostActiveClient>(
+                "SELECT ClientIpAddress, ifnull(Agentstring, '[Empty]') as Agentstring, Count(ClientIpAddress) AS Count FROM LogEntries WHERE SiteIisId = @siteIisId AND DateTime >= @oldestDate GROUP BY  ClientIpAddress, Agentstring Order by Count(ClientIpAddress) DESC LIMIT 5",
+                new { SiteIisId = iisSiteId, OldestDate = oldest }).ToList();
+
+            return result;
         }
 
-        public IEnumerable<LogEntry> GetLastWeekBySite(Site site)
+        public IEnumerable<Objects.Reporting.MostExpensiveRequest> GetMostExpensiveRequestsBySite(int iisSiteId, DateTime oldest)
         {
-            return Table.FindAll(Table.SiteIisId == site.IisId && Table.DateTime >= DateTime.UtcNow.Date.AddDays(-7)).OrderbyDateTimeDescending().ToList<LogEntry>();
+            var sql = "SELECT Uri, Querystring, TimeTaken, Avg(TimeTaken) AS AverageTimeTaken, Count(Uri) AS Count FROM LogEntries WHERE SiteIisId = @SiteIisId AND DateTime >= @oldestDate GROUP BY Uri, Querystring HAVING Count > 10 Order by AverageTimeTaken DESC LIMIT 5";
+            return Connection.Query<Objects.Reporting.MostExpensiveRequest>(sql, new { SiteIisId = iisSiteId, OldestDate = oldest });
         }
 
-        public IEnumerable<LogEntry> GetLastMonthBySite(Site site)
+        public IEnumerable<Objects.Reporting.MostActiveUrl> GetMostActiveUrlsBySite(int iisSiteId, DateTime oldest)
         {
-            return Table.FindAll(Table.SiteIisId == site.IisId && Table.DateTime >= DateTime.UtcNow.Date.AddMonths(-1)).OrderbyDateTimeDescending().ToList<LogEntry>();
+            var sql = "SELECT Uri, Querystring, Count(Uri) AS Count FROM LogEntries WHERE SiteIisId = @SiteIisId AND DateTime >= @oldestDate GROUP BY Uri, Querystring Order by Count DESC LIMIT 5";
+            return Connection.Query<Objects.Reporting.MostActiveUrl>(sql, new { SiteIisId = iisSiteId, OldestDate = oldest });
         }
 
         public IEnumerable<LogEntry> GetAllRelatedToException(int siteIisId, DateTime datetime)
         {
-            return Table
-                .FindAll(Table.SiteIisId == siteIisId && Table.HttpStatusCode == 500 && Table.DateTime == datetime.ToString("yyyy-MM-dd HH:mm:ss")) // string format because of bug in Simple.Data.Sqlite adapter
-                .ToList<LogEntry>(); 
+            var sql = "SELECT * FROM LogEntries WHERE SiteIisId = @SiteIisId AND HttpStatusCode = @HttpStatusCode AND DateTime == @DateTime;";
+            return Connection.Query<LogEntry>(sql, new { SiteIisId = siteIisId, HttpStatusCode = 500, DateTime = datetime });
         }
 
         public IEnumerable<LogEntry> GetBySite(Site site)
         {
-            return Table.FindAllBySiteIisId(site.IisId).Cast<LogEntry>();
+            var sql = "SELECT * FROM LogEntries WHERE SiteIisId = @SiteIisId";
+            return Connection.Query<LogEntry>(sql, new {SiteIisId = site.IisId});
         }
 
-        public int GetTotalCount()
+        public int GetTotalCount(DateTime? oldest = null)
         {
-            return Table.All().Count();
+            var sql = "SELECT COUNT(*) FROM LogEntries";
+
+            if (oldest != null)
+                sql = sql + " WHERE DateTime >= @oldest";
+
+            return (int) Connection.Query<long>(sql, oldest != null ? new {Oldest = oldest.Value }: null).Single();
         }
 
-        public int GetTodayTotalCount()
+        public double GetAverageResponseTime(DateTime? oldest = null)
         {
-            var result = Table.All(Table.DateTime >= DateTime.UtcNow.Date).Select(Table.Id.Count()).ToScalar();
-            if (result == null)
-                return 0;
+            var sql = "SELECT avg(TimeTaken) FROM LogEntries";
 
-            return (int)result;
-        }
+            if (oldest != null)
+                sql = sql + " WHERE DateTime >= @oldest";
 
-        public double GetAverageResponseTime()
-        {
-            var result = Table.All().Select(Table.TimeTaken.Average()).ToScalar();
-            if (result == null)
-                return 0;
-
-            return result;
+            return Connection.Query<double>(sql, oldest != null ? new { Oldest = oldest.Value } : null).Single();
         }
     }
 }

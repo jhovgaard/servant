@@ -12,6 +12,6 @@ namespace Servant.Business.Objects
         public DateTime DateTime { get; set; }
         public string FullMessage { get; set; }
 
-        public Site Site { get; set; }
+        public virtual Site Site { get; set; }
     }
 }

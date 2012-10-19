@@ -11,9 +11,10 @@ namespace Servant.Manager.Modules
 {
     public class SetupModule : BaseModule 
     {
-        public SetupModule(SettingsService settingsService, IHost host)
+        public SetupModule(SettingsService settingsService)
         {
             var settings = settingsService.LocalSettings;
+            var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
 
             if(!settings.SetupCompleted)
             {
@@ -57,27 +58,18 @@ namespace Servant.Manager.Modules
                             new System.Threading.Thread(() =>
                             {
                                 System.Threading.Thread.Sleep(50);
-                                try
-                                {
-                                    host.Kill();
-                                    host.Start();
-                                }
-                                catch (Exception)
-                                {
-                                }
-                                
+                                host.Kill();
+                                host.Start();
                             }).Start();
-                            
-                            return new {Success = true, Url = formSettings.ServantUrl };
+
+                            return Response.AsRedirect(new System.Uri(formSettings.ServantUrl).ToString());
                         }
 
                         return Response.AsRedirect("/");
                     }
-                    else
-                    {
-                        formSettings.ServantUrl = originalInputtedServantUrl;
-                    }
                     
+                    formSettings.ServantUrl = originalInputtedServantUrl;
+
                     Model.OriginalServantUrl = settings.ServantUrl;
                     Model.Settings = formSettings;
                     Model.AcceptTerms = Request.Form.AcceptTerms;

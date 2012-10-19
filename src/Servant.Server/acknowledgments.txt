@@ -4,3 +4,4 @@ Servant for IIS is using the following open source projects:
 - Simple.Data, Simple.Data.Sqlite under the MIT license: http://www.opensource.org/licenses/mit-license.php
 - SQLite under public domain: http://www.sqlite.org/copyright.html
 - BCrypt.net under the New BSD License: http://bcrypt.codeplex.com/license
+- Windows 8 Icons under the Creative Commons Attribution-NoDerivs 3.0 Unported license: http://creativecommons.org/licenses/by-nd/3.0/

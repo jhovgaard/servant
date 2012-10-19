@@ -79,6 +79,7 @@
 {
     /*padding-left: 20px;*/
     padding-top: 19px;
+    padding-bottom: 20px;
 }
 
 
@@ -87,6 +88,7 @@
 .margin-top30 { margin-top: 30px; }
 .margin-left10 { margin-left: 10px; }
 .valign-middle { vertical-align: middle !important; }
+.valign-top { vertical-align: top !important; }
 .pointer { cursor: pointer; }
 .gray { color:#939393}
 

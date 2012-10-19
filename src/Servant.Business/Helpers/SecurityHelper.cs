@@ -1,4 +1,5 @@
-﻿using Servant.Business.Exceptions;
+﻿using System.Text;
+using Servant.Business.Exceptions;
 
 namespace Servant.Business.Helpers
 {
@@ -6,7 +7,9 @@ namespace Servant.Business.Helpers
     {
          public static string HashPassword(string password)
          {
-             return BCrypt.Net.BCrypt.HashPassword(password);
+             var algorithm = new System.Security.Cryptography.SHA512Managed();
+             var hashByte = algorithm.ComputeHash(Encoding.UTF8.GetBytes(password));
+             return hashByte.ToString();
          }
 
          public static bool IsPasswordValid(string password, string hash)
@@ -14,7 +17,7 @@ namespace Servant.Business.Helpers
              if(hash == null)
                  throw new SettingsException("The database doesn't contain a password.");
 
-             return BCrypt.Net.BCrypt.Verify(password, hash);
+             return HashPassword(password) == hash;
          }
     }
 }

@@ -2,7 +2,6 @@
 @inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
     Layout = "Shared/_Layout.cshtml";
-    ViewBag.Title = "Index";
     ViewBag.ActiveMenuItem = "stats";
 }
 
@@ -14,7 +13,7 @@
     <table class="table span5">
         <tr>
             <td>Parsed requests</td>
-            <td>@Model.ServerStats.TotalRequests / @Model.ServerStats.TotalRequestsInLogFiles</td>
+            <td>@Model.ServerStats.TotalRequests</td>
         </tr>
         <tr>
             <td>Data recieved</td>

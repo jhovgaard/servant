@@ -1,9 +1,11 @@
-﻿namespace Servant.Business.Objects.Reporting
+﻿using System;
+
+namespace Servant.Business.Objects.Reporting
 {
     public class MostActiveClient
     {
-        public int Count { get; set; }
-        public string LatestAgentstring { get; set; }
+        public Int64 Count { get; set; }
+        public string Agentstring { get; set; }
         public string ClientIpAddress { get; set; }
     }
 }

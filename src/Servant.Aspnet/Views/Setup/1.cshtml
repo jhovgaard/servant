@@ -1,6 +1,5 @@
 ﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
-    ViewBag.Title = "Servant - Setup";
     Layout = "_Setup.cshtml";
 }
 <div class="row margin-top30">
@@ -20,7 +19,7 @@
             <div class="control-group">
                 <div style="width: 240px; margin: auto;">
                     <label class="checkbox">
-                        <input type="checkbox" tabindex="2" value="true" name="autostartlogparsing"@(Model.Settings.AutoStartLogParsing == true ? Html.Raw("checked=\"checked\"") : null) checked="checked" />
+                        <input type="checkbox" tabindex="2" value="true" name="parselogs"@(Model.Settings.ParseLogs == true ? Html.Raw("checked=\"checked\"") : null) checked="checked" />
                         Begin parsing my logs immediately
                     </label>
                 </div>
@@ -62,30 +61,9 @@
         var originalServantUrl = "@Model.OriginalServantUrl";
         var repost = false;
 
-        $("form").submit(function () {
-            var form = $(this);
-            var newUrl = $("#servanturl").val();
-
-            if(originalServantUrl != newUrl && !repost) {
-                var inputs = $(this).serialize();
-                $.post(form.attr("action"), inputs, function (response) {
-                    if (response.Success) {
-                        $(this).find("input[type=submit]").attr("disabled", "disabled");
-                        setTimeout(function() {
-                            window.location = response.Url;
-                        }, 1000);
-                    } else {
-                        repost = true;
-                        form.submit();
-                    }
-                });
-                
-                return false;
-            }
-        });
-
         $(function() {
             $("#password").focus();
         });
     </script>
+    <script src="/scripts/serveraddresschanger.js"></script>
 }

@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Servant.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="C5">
       <HintPath>..\packages\Quartz.2.0.1\lib\net40\C5.dll</HintPath>
@@ -96,9 +99,11 @@
     <Compile Include="Selfhost\Host.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="acknowledgments.txt" />
     <Content Include="LogParser.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Servant.ico" />
     <Content Include="x64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -133,7 +138,7 @@
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
     <PreBuildEvent>Copy “$(ProjectDir)x64\SQLite.Interop.dll” “$(ProjectDir)$(OutDir)SQLite.Interop.dll”
-Copy “$(SolutionDir)Servant.Aspnet\Servant.sqlite” “$(ProjectDir)$(OutDir)Servant.sqlite”
+Copy “$(SolutionDir)Servant.Aspnet\servant-default.sqlite” “$(ProjectDir)$(OutDir)servant-default.sqlite”
 xcopy "$(SolutionDir)Servant.Aspnet\Css" “$(ProjectDir)$(OutDir)Css” /e /y /i /r
 xcopy "$(SolutionDir)Servant.Aspnet\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r
 xcopy "$(SolutionDir)Servant.Aspnet\Scripts" “$(ProjectDir)$(OutDir)Scripts” /e /y /i /r

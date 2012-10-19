@@ -1,6 +1,7 @@
 ﻿h1,h2,h3,h4,h5,h6 
 {
     text-transform: none;
+    text-shadow: rgba(0, 0, 0, .01) 0 0 1px
 }
 
 input
