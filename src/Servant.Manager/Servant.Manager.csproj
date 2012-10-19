@@ -69,12 +69,11 @@
     <Compile Include="Helpers\EventLogHelper.cs" />
     <Compile Include="Helpers\FileSystemHelper.cs" />
     <Compile Include="Helpers\RequestLogHelper.cs" />
-    <Compile Include="Helpers\SiteHelper.cs" />
+    <Compile Include="Helpers\SiteManager.cs" />
     <Compile Include="Helpers\SynchronizationHelper.cs" />
     <Compile Include="Infrastructure\IHost.cs" />
     <Compile Include="Infrastructure\UserIdentity.cs" />
     <Compile Include="Infrastructure\UserValidator.cs" />
-    <Compile Include="Modules\AuthenticationModule.cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\HomeModule.cs" />
     <Compile Include="Modules\MaintenanceModule.cs" />

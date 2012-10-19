@@ -38,29 +38,6 @@
     <script src="/Scripts/base.js" type="text/javascript"></script>
     <script type="text/javascript">
         var errors = @Html.Raw(Model.ErrorsAsJson);
-
-        $(function() {
-            for(var error in errors)
-            {
-                error = errors[error];
-                if(!error.IsGlobal) { // property
-                    var input = $("input[name=" + error.PropertyName + "]");
-                    console.log(input);
-                    var group = input.parents(".control-group");
-                    console.log(group);
-                    group.addClass("error");
-
-                    var helpSpan = group.find("span.help-inline, span.help-block");
-                    if(!helpSpan.length) {
-                        helpSpan = $('<span class="help-inline"/>');
-                        input.after(helpSpan);
-                        //input.parent().append(helpSpan);
-                    }
-                    helpSpan.text(error.Message);
-                    helpSpan.show();
-                }
-            }
-        });
     </script>
     @RenderSection("javascript", false)
 </html>

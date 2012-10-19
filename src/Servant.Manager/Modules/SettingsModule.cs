@@ -1,5 +1,4 @@
-﻿using System;
-using Nancy;
+﻿using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Validation;
 using Servant.Business.Objects;
@@ -12,8 +11,10 @@ namespace Servant.Manager.Modules
 {
     public class SettingsModule : BaseModule
     {
-        public SettingsModule(SettingsService settingsService, IHost host) : base("/settings/")
+        public SettingsModule(SettingsService settingsService) : base("/settings/")
         {
+            var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+
             Get["/"] = p => {
                 var settings = settingsService.LocalSettings;
                 Model.OriginalServantUrl = settings.ServantUrl;
@@ -36,15 +37,26 @@ namespace Servant.Manager.Modules
                     formSettings.Password = string.IsNullOrWhiteSpace(formSettings.Password) 
                         ? settings.Password 
                         : Business.Helpers.SecurityHelper.HashPassword(formSettings.Password);
-                    
+
+                    formSettings.SetupCompleted = true;
+                    formSettings.ParseLogs = settings.ParseLogs;
+
                     settingsService.DeleteAll();
                     settingsService.Insert(formSettings);
 
+                    host.LoadSettings();
+
                     if(bindingIsChanged)
                     {
-                        host.Kill();
-                        host.Start();    
-                        return true;
+                        new System.Threading.Thread(() =>
+                        {
+                            System.Threading.Thread.Sleep(50);
+                            host.Kill();
+                            host.Start();
+                        }).Start();
+                        
+                        return Response.AsRedirect(new System.Uri(formSettings.ServantUrl + "settings/").ToString());
+                        return new { Success = true, Url = formSettings.ServantUrl };
                     }
                 }
 

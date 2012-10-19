@@ -40,7 +40,16 @@
         for (var error in errors) {
             error = errors[error];
             if (!error.IsGlobal) { // property
-                var input = $("input[name=" + error.PropertyName.toLowerCase() + "]");
+                var input;
+                var firstIndexChar = error.PropertyName.indexOf("[");
+                if (firstIndexChar > -1) {
+                    var propertyName = error.PropertyName.substring(0, firstIndexChar);
+                    var index = error.PropertyName.substring(firstIndexChar+1, error.PropertyName.indexOf("]"));
+                    input = $($("input[name=" + propertyName + "]")[index]);
+                } else {
+                    input = $("input[name=" + error.PropertyName.toLowerCase() + "]");
+                }
+
                 var group = input.parents(".control-group");
                 group.addClass("error");
 

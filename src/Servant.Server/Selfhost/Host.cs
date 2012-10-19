@@ -11,9 +11,11 @@ namespace Servant.Server.Selfhost
     {
         private NancyHost ServantHost { get; set; }
         public bool LogParsingStarted { get; set; }
+        public bool Debug { get; set; }
         public DateTime StartupTime { get; set; }
         private static bool _isRunningDbSync;
         private IScheduler Scheduler { get; set; }
+        private static Settings _localSettings;
 
         public Host()
         {
@@ -23,19 +25,21 @@ namespace Servant.Server.Selfhost
 
         public void Start(Settings settings = null)
         {
-            if(settings == null)
-            {
-                var settingsService = new SettingsService();
-                settings = settingsService.LocalSettings;    
-            }
+            _localSettings = settings;
+
+            if (settings == null)
+                LoadSettings();
             
             if (ServantHost == null)
-                ServantHost = new NancyHost(new Uri(settings.ServantUrl));
+                ServantHost = new NancyHost(new Uri(_localSettings.ServantUrl));
             
             ServantHost.Start();
 
-            if(settings.ParseLogs)
+            if(_localSettings.ParseLogs)
                 InitScheduler();
+
+            if(Debug)
+                Console.WriteLine("Host started on {0}", _localSettings.ServantUrl);
         }
 
         public void InitScheduler()
@@ -48,11 +52,12 @@ namespace Servant.Server.Selfhost
 
         private void UnscheduleJob()
         {
-            Scheduler.UnscheduleJob(new TriggerKey("SyncDatabaseTrigger"));
+            Scheduler.Clear();
         }
 
         private void ScheduleJob()
         {
+            UnscheduleJob();
             var job = JobBuilder
                 .Create<SyncDatabaseJob>()
                 .WithIdentity("SyncDatabaseJob", null)
@@ -80,6 +85,8 @@ namespace Servant.Server.Selfhost
         {
             Stop();
             ServantHost = null;
+            if(Debug)
+                Console.WriteLine("Host was killed.");
         }
 
         public void StartLogParsing()
@@ -93,27 +100,41 @@ namespace Servant.Server.Selfhost
             LogParsingStarted = true;
             ScheduleJob();
 
-            Console.WriteLine("Log parsing started.");
+            if(_localSettings.Debug)
+                Console.WriteLine("Log parsing started.");
         }
 
         public void StopLogParsing()
         {
-            Console.WriteLine("Stopping log parsing...");
+            if (_localSettings.Debug)
+                Console.WriteLine("Stopping log parsing...");
+
             LogParsingStarted = false;
             UnscheduleJob();
-            Console.WriteLine("Log parsing stopped.");
+
+            if (_localSettings.Debug)
+                Console.WriteLine("Log parsing stopped.");
+        }
+
+        public void LoadSettings()
+        {
+            var settingsService = new SettingsService();
+            _localSettings = settingsService.LocalSettings;
+            Debug = _localSettings.Debug;
         }
 
         public class SyncDatabaseJob : IJob
         {
             public void Execute(IJobExecutionContext context)
             {
-                Console.WriteLine("Executing SyncDatabaseJob");
+                if (_localSettings.Debug)
+                    Console.WriteLine("Executing SyncDatabaseJob");
+
                 if (_isRunningDbSync) return;
 
                 _isRunningDbSync = true;
-                Manager.Helpers.SynchronizationHelper.SyncServer();
                 Manager.Helpers.EventLogHelper.SyncDatabaseWithServer();
+                Manager.Helpers.SynchronizationHelper.SyncServer();
                 _isRunningDbSync = false;
             }
         }
