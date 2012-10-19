@@ -1,7 +1,6 @@
 ﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
     Layout = "Shared/_Layout.cshtml";
-    ViewBag.Title = "Settings";
     ViewBag.ActiveMenuItem = "settings";
 }
 
@@ -26,7 +25,7 @@
             <div class="control-group margin-top10">
                 <label for="debug">Debug mode</label>
                 <label class="checkbox" style="text-align: left;">
-                    <input type="checkbox" name="debug" id="debug" @(Model.Settings.Debug == true ? Html.Raw("checked=\"checked\"") : null) />
+                    <input type="checkbox" name="debug" id="debug" value="true" @(Model.Settings.Debug == true ? Html.Raw("checked=\"checked\"") : null) />
                     Enabled
                 </label>
             </div>
@@ -72,27 +71,6 @@
     <script type="text/javascript">
         var originalServantUrl = "@Model.OriginalServantUrl";
         var repost = false;
-
-        $("form").submit(function () {
-            var form = $(this);
-            var newUrl = $("#servanturl").val();
-
-            if (originalServantUrl != newUrl && !repost) {
-                var inputs = $(this).serialize();
-                $.post(form.attr("action"), inputs, function (response) {
-                    if (response.Success) {
-                        $(this).find("input[type=submit]").attr("disabled", "disabled");
-                        setTimeout(function () {
-                            window.location = response.Url;
-                        }, 1000);
-                    } else {
-                        repost = true;
-                        form.submit();
-                    }
-                });
-
-                return false;
-            }
-        });
     </script>
+    <script src="/scripts/serveraddresschanger.js"></script>
 }

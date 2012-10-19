@@ -31,6 +31,9 @@ namespace Servant.Manager.Modules
         {
             _settingsService = TinyIoC.TinyIoCContainer.Current.Resolve<SettingsService>();
 
+            var nonAuthenticatedModules = new List<Type> { typeof(SetupModule) };
+            var requiresAuthentication = !nonAuthenticatedModules.Contains(this.GetType());
+
             Before += ctx =>
             {
                 Page = new PageModel
@@ -40,24 +43,23 @@ namespace Servant.Manager.Modules
 
                 Model.Page = Page;
                 Model.Errors = new List<Error>();
+
                 return null;
             };
 
             After += ctx =>
             {
                 Model.ErrorsAsJson = new Nancy.Json.JavaScriptSerializer().Serialize(Model.Errors);
-
-                var nonAuthenticatedModules = new List<Type> { typeof(SetupModule) };
-                if (!nonAuthenticatedModules.Contains(this.GetType()))
-                {
-                    this.RequiresAuthentication();
-
-                    if (!_settingsService.LocalSettings.SetupCompleted)
-                        ctx.Response = Response.AsRedirect("/setup/1/");
-                }
+                if (!_settingsService.LocalSettings.SetupCompleted && requiresAuthentication)
+                    ctx.Response = Response.AsRedirect("/setup/1/");
             };
 
-            
+
+            if (requiresAuthentication)
+            {
+                //this.RequiresAuthentication();
+            }
+
         }
 
         public void AddGlobalError(string message)

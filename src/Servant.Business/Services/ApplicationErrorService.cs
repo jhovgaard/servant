@@ -1,59 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dapper;
 using Servant.Business.Objects; 
 
 namespace Servant.Business.Services
 {
-    public class ApplicationErrorService : Service<ApplicationError>
+    public class ApplicationErrorService : SqlLiteService<ApplicationError>
     {
-        public ApplicationErrorService() : base("ApplicationErrors") { }
+        public ApplicationError GetById(int id)
+        {
+            return Connection.Query<ApplicationError>("SELECT * FROM ApplicationErrors WHERE Id = @Id", new { id }).SingleOrDefault();
+        }
 
         public IEnumerable<ApplicationError> GetByDateTimeDescending(int max = 0)
         {
-            var errors = Table
-                .All()
-                .OrderByDateTimeDescending();
+            var sql = "SELECT * FROM ApplicationErrors ORDER BY DateTime DESC";
 
             if (max != 0)
-                errors = errors.Take(max);
+                sql = sql + " LIMIT @max";
 
-            return errors.Cast<ApplicationError>();
+            return Connection.Query<ApplicationError>(sql, new {max});
         }
 
-        public ApplicationError GetLatest() {
-            IEnumerable<ApplicationError> errors = Table
-                .All()
-                .OrderByDateTimeDescending()
-                .Take(1)
-                .Cast<ApplicationError>();
-
-            return errors.SingleOrDefault();
-        }
-
-        public IEnumerable<ApplicationError> GetTodaysBySite(Site site)
+        public ApplicationError GetLatest()
         {
-            return Table.All().Where(Table.SiteIisId == site.IisId && Table.DateTime >= DateTime.UtcNow.Date).OrderbyDateTimeDescending().Cast<ApplicationError>();
+            var sql = "SELECT * FROM ApplicationErrors ORDER BY DateTime DESC LIMIT 1";
+            return Connection.Query<ApplicationError>(sql).SingleOrDefault();
         }
 
-        public IEnumerable<ApplicationError> GetLastWeekBySite(Site site)
+        public IEnumerable<ApplicationError> GetBySite(int siteIisId, DateTime oldest)
         {
-            return Table.All().Where(Table.SiteIisId == site.IisId && Table.DateTime >= DateTime.UtcNow.Date.AddDays(-7)).OrderbyDateTimeDescending().Cast<ApplicationError>();
+            var sql = "SELECT * FROM ApplicationErrors WHERE SiteIisId = @SiteIisId AND DateTime > @Oldest ORDER BY DateTime DESC";
+            return Connection.Query<ApplicationError>(sql, new {siteIisId, oldest});
         }
 
-        public IEnumerable<LogEntry> GetLastMonthBySite(Site site)
+        public IEnumerable<ApplicationError> GetBySite(int siteIisId)
         {
-            return Table.FindAll(Table.DateTime >= DateTime.UtcNow.Date.AddMonths(-1)).OrderbyDateTimeDescending().Cast<ApplicationError>();
+            var sql = "SELECT * FROM ApplicationErrors WHERE SiteIisId = @SiteIisId ORDER BY DateTime DESC";
+            return Connection.Query<ApplicationError>(sql, new { siteIisId });
         }
 
-        public IEnumerable<ApplicationError> GetBySite(Site site)
+        public int GetTotalCount(DateTime? oldest = null)
         {
-            return Table.FindAllBySiteIisId(site.IisId).OrderbyDateTimeDescending().Cast<ApplicationError>();
-        }
+            var sql = "SELECT COUNT(*) FROM ApplicationErrors";
 
-        public int GetTotalCount()
-        {
-            return Table.All().Count();
+            if (oldest != null)
+                sql = sql + " WHERE DateTime >= @oldest";
+
+            return (int)Connection.Query<long>(sql, oldest != null ? new { Oldest = oldest.Value } : null).Single();
         }
     }
 }

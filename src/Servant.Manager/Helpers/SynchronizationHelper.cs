@@ -11,7 +11,8 @@ namespace Servant.Manager.Helpers
              var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
 
              var logEntryService = new LogEntryService();
-             var sites = SiteHelper.GetSites();
+             var siteManager = new SiteManager();
+             var sites = siteManager.GetSites();
              RequestLogHelper.FlushLog();
              Thread.Sleep(20); // Venter på at IIS har skrevet loggen
 

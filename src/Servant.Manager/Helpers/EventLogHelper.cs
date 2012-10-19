@@ -83,14 +83,16 @@ namespace Servant.Manager.Helpers
             return entries.Select(eventLogEntry => ParseEntry(eventLogEntry));
         }
 
-        public static IEnumerable<ApplicationError> AttachSite(IEnumerable<ApplicationError> errors)
+        public static List<ApplicationError> AttachSite(IEnumerable<ApplicationError> errors)
         {
-            var sites = SiteHelper.GetSites().ToList();
+            var siteManager = new SiteManager();
+            var sites = siteManager.GetSites().ToList();
             foreach (var applicationError in errors)
             {
                 applicationError.Site = sites.SingleOrDefault(x => x.IisId == applicationError.SiteIisId);
-                yield return applicationError;
-            }    
+            }
+
+            return errors.ToList();
         }
     }
 }
