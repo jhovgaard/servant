@@ -91,6 +91,7 @@
 .valign-top { vertical-align: top !important; }
 .pointer { cursor: pointer; }
 .gray { color:#939393}
+.break-all-words { word-break: break-all }
 
 .nowrap-limit590 
 {

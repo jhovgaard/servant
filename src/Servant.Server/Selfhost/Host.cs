@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Timers;
 using Nancy.Hosting.Self;
-using Quartz;
 using Servant.Business.Objects;
 using Servant.Business.Services;
 using Servant.Manager.Infrastructure;
@@ -13,14 +13,15 @@ namespace Servant.Server.Selfhost
         public bool LogParsingStarted { get; set; }
         public bool Debug { get; set; }
         public DateTime StartupTime { get; set; }
-        private static bool _isRunningDbSync;
-        private IScheduler Scheduler { get; set; }
         private static Settings _localSettings;
+        private static Timer _timer;
 
         public Host()
         {
             LogParsingStarted = false;
             StartupTime = DateTime.Now;
+            _timer = new Timer(1000);
+            _timer.Elapsed += SyncDatabaseJob;
         }
 
         public void Start(Settings settings = null)
@@ -36,44 +37,10 @@ namespace Servant.Server.Selfhost
             ServantHost.Start();
 
             if(_localSettings.ParseLogs)
-                InitScheduler();
+                _timer.Start();
 
             if(Debug)
                 Console.WriteLine("Host started on {0}", _localSettings.ServantUrl);
-        }
-
-        public void InitScheduler()
-        {
-            var factory = new Quartz.Impl.StdSchedulerFactory();
-
-            Scheduler = factory.GetScheduler();
-            Scheduler.Start();
-        }
-
-        private void UnscheduleJob()
-        {
-            Scheduler.Clear();
-        }
-
-        private void ScheduleJob()
-        {
-            UnscheduleJob();
-            var job = JobBuilder
-                .Create<SyncDatabaseJob>()
-                .WithIdentity("SyncDatabaseJob", null)
-                .RequestRecovery(false)
-                .Build();
-
-            var trigger = TriggerBuilder
-                .Create()
-                .WithIdentity("SyncDatabaseTrigger", null)
-                .ForJob("SyncDatabaseJob")
-                .WithSchedule(DailyTimeIntervalScheduleBuilder.Create().WithIntervalInSeconds(60))
-                .StartNow()
-                .Build();
-
-            Scheduler.ScheduleJob(job, trigger);
-            Scheduler.TriggerJob(new JobKey("SyncDatabaseJob"));
         }
 
         public void Stop()
@@ -91,15 +58,12 @@ namespace Servant.Server.Selfhost
 
         public void StartLogParsing()
         {
-            if(Scheduler == null)
-                InitScheduler();
-
             if(LogParsingStarted)
                 throw new Exception("Log parsing already started.");
             
             LogParsingStarted = true;
-            ScheduleJob();
-
+            _timer.Start();
+            
             if(_localSettings.Debug)
                 Console.WriteLine("Log parsing started.");
         }
@@ -110,7 +74,7 @@ namespace Servant.Server.Selfhost
                 Console.WriteLine("Stopping log parsing...");
 
             LogParsingStarted = false;
-            UnscheduleJob();
+            _timer.Stop();
 
             if (_localSettings.Debug)
                 Console.WriteLine("Log parsing stopped.");
@@ -123,21 +87,24 @@ namespace Servant.Server.Selfhost
             Debug = _localSettings.Debug;
         }
 
-        public class SyncDatabaseJob : IJob
+        void SyncDatabaseJob(object sender, ElapsedEventArgs e)
         {
-            public void Execute(IJobExecutionContext context)
+            _timer.Stop();
+            if (_localSettings.Debug)
+                Console.WriteLine("Started SyncDatabaseJob (IsRunning: {0})", LogParsingStarted);
+           
+            try
             {
-                if (_localSettings.Debug)
-                    Console.WriteLine("Executing SyncDatabaseJob");
-
-                if (_isRunningDbSync) return;
-
-                _isRunningDbSync = true;
-                Manager.Helpers.EventLogHelper.SyncDatabaseWithServer();
+                Manager.Helpers.EventLogHelper.SyncServer();
                 Manager.Helpers.SynchronizationHelper.SyncServer();
-                _isRunningDbSync = false;
             }
-        }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error on SyncDatabaseJob ({0}: {1}", ex.GetType(), ex.Message);
+            }
 
+            if (LogParsingStarted)
+                _timer.Start();
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Validation;
+using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Services;
 using Nancy.Validation.DataAnnotations;
@@ -13,6 +14,8 @@ namespace Servant.Manager.Modules
     {
         public SetupModule(SettingsService settingsService)
         {
+            
+            
             var settings = settingsService.LocalSettings;
             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
 
@@ -28,7 +31,7 @@ namespace Servant.Manager.Modules
                 Post["/setup/1/"] = _ => {
                     var formSettings = this.Bind<Settings>();
                     var originalInputtedServantUrl = formSettings.ServantUrl;
-                    formSettings.ServantUrl = Business.Helpers.SettingsHelper.FinializeUrl(formSettings.ServantUrl);
+                    formSettings.ServantUrl = BindingHelper.FinializeBinding(formSettings.ServantUrl);
                     
                     var validationResult = this.Validate(formSettings);
 
@@ -55,18 +58,14 @@ namespace Servant.Manager.Modules
 
                         if (bindingIsChanged)
                         {
-                            new System.Threading.Thread(() =>
-                            {
-                                System.Threading.Thread.Sleep(50);
-                                host.Kill();
-                                host.Start();
-                            }).Start();
-
-                            return Response.AsRedirect(new System.Uri(formSettings.ServantUrl).ToString());
+                            After += ctx => ctx.Items.Add("RebootNancyHost", true);
+                            return Response.AsRedirect(formSettings.ServantUrl);
                         }
 
                         return Response.AsRedirect("/");
                     }
+
+                    
                     
                     formSettings.ServantUrl = originalInputtedServantUrl;
 

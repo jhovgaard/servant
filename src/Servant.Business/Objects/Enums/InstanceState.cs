@@ -1,6 +1,6 @@
 ﻿namespace Servant.Business.Objects.Enums
 {
-    public enum SiteState
+    public enum InstanceState
     {
         Started,
         Starting,

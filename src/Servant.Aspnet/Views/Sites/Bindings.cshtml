@@ -1,0 +1,21 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+
+<h4 class="margin-top30">Bindings<img src="/images/icon_add.png" class="margin-left10 pointer" id="add-binding" /></h4>
+<p class="margin-top10">Example: <code>servant.io</code> or <code>servant.io:440</code></p>
+<table  id="bindings">
+    @if(Model.Bindings == null)
+    {
+        <tr>
+            <td class="control-group"><input type="text" class="input-medium span4" name="bindings" value="" /></td>
+            <td class="valign-top" style="padding-top: 7px;"><img src="/Images/icon_delete.png" class="remove-binding pointer" /></td>
+        </tr>
+    } else {
+        @foreach (var binding in Model.Bindings)
+        {
+            <tr>
+                <td class="control-group"><input type="text" class="input-medium span4" name="bindings" value="@binding" /></td>
+                <td class="valign-top" style="padding-top: 7px;"><img src="/Images/icon_delete.png" class="remove-binding pointer @Html.Raw(Model.Bindings.Length == 1 ? " hide" : "")" /></td>
+            </tr>
+        }
+    }
+</table>

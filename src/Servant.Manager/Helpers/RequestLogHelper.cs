@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using MSUtil;
 using Servant.Business.Objects;
 using Servant.Business.Services;
 using Servant.Manager.Infrastructure;
@@ -14,76 +13,43 @@ namespace Servant.Manager.Helpers
     public static class RequestLogHelper
     {
         private static readonly LogEntryService LogEntryService = new LogEntryService();
-        private static List<LogEntry>[] ParsedLogEntryLists { get; set; }
-        private static ManualResetEvent[] resetEvents;
-        private const int FilesPerRound = 6;
-        private static int _filesInRound = 0;
 
         public static void InsertNewInDbBySite(Site site, LogEntry latestEntry)
         {
             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
 
-            var logfiles = GetLogFilesBySite(site).OrderByDescending(x => x.Path).ToList();
+            var logfiles = GetLogFilesBySite(site).ToList();
             if (latestEntry != null)
-                logfiles = logfiles.Where(x => x.LastWriteTime.Date >= latestEntry.DateTime.Date).ToList();
+            {
+                var alreadyParsedLogFiles = LogEntryService.GetParsedLogfilesBySite(site.IisId).Where(x => x != latestEntry.LogFilename);
+                logfiles = logfiles.Where(x => !alreadyParsedLogFiles.Contains(Path.GetFileName(x.Path))).ToList();
+            }
+
+            logfiles = logfiles.OrderByDescending(x => x.Path).ToList();
 
             if (!logfiles.Any())
                 return;
 
-            ThreadPool.SetMaxThreads(1, FilesPerRound);
+            if (!host.LogParsingStarted) // Sørger for at vi kan afbryde parsing udefra.
+                return;
 
-            var rounds = logfiles.Count / FilesPerRound;
-            for (var round = 0; round < rounds; round++) // Hver runde udgør 4 logfiler
+            var service = new LogEntryService();
+
+            foreach (var iisLogFile in logfiles)
             {
                 if (!host.LogParsingStarted) // Sørger for at vi kan afbryde parsing udefra.
-                    return;
+                    break;
 
-                var logfilesForRound = logfiles.Skip((round * FilesPerRound)).Take(FilesPerRound).ToList();
-                _filesInRound = logfilesForRound.Count;
-                ParsedLogEntryLists = new List<LogEntry>[logfilesForRound.Count];
-                resetEvents = new ManualResetEvent[_filesInRound];
+                var logRowToSkip = 0;
+                if (latestEntry != null && latestEntry.DateTime.Date == iisLogFile.LastModified.Date)
+                    logRowToSkip = latestEntry.LogRow;
 
-                for (int i = 0; i < logfilesForRound.Count; i++) // max 1-4
-                {
-                    var logfile = logfilesForRound[i];
-                    resetEvents[i] = new ManualResetEvent(false);
-                    ThreadPool.QueueUserWorkItem(CallBack, new { Index = i, Logfile = logfile, LatestEntry = latestEntry, Site = site, Debug = host.Debug });
-                }
-
-                WaitHandle.WaitAll(resetEvents);
-
-                var entries = new List<LogEntry>();
-                foreach (var list in ParsedLogEntryLists)
-                {
-                    entries.AddRange(list);
-                }
-                var service = new LogEntryService();
+                var entries = Business.LogParser.ParseFile(iisLogFile.Path, site.IisId, logRowToSkip).ToList();
                 service.Insert(entries);
-                if(host.Debug)
-                    Console.WriteLine("Round {0}: Wrote {1} entries to db.", round, entries.Count);
 
-                Thread.Sleep(500);
+                if (host.Debug)
+                    Console.WriteLine("{0}: Wrote {1} entries to db. () {2}", site.Name, entries.Count, System.IO.Path.GetFileName(iisLogFile.Path));
             }
-        }
-
-        private static void CallBack(dynamic state)
-        {
-            var logfile = state.Logfile;
-            var latestEntry = state.LatestEntry;
-            var site = state.Site;
-            var sw = new Stopwatch();
-            sw.Start();
-            var sql = @"SELECT LogRow, TO_TIMESTAMP(date, time) as date-time, s-ip, cs-method, cs-uri-stem, cs-uri-query, s-port, cs-username, c-ip, cs(User-Agent), sc-status, sc-substatus, time-taken FROM " + logfile.Path;
-            if (latestEntry != null && latestEntry.DateTime.Date == logfile.LastWriteTime.Date)
-                sql += " WHERE time > '" + latestEntry.DateTime.ToLongTimeString() + "' and logrow > " + latestEntry.LogRow;
-            var index = (int)state.Index;
-            List<LogEntry> result = ParseQueryToLogEntries(site.IisId, sql);
-            ParsedLogEntryLists[index] = result;
-            sw.Stop();
-            if(state.Debug)
-                Console.WriteLine(logfile.Path + ": parsed in " + sw.ElapsedMilliseconds + "ms");
-            
-            resetEvents[index].Set();
         }
 
         public static void FlushLog()
@@ -132,7 +98,7 @@ namespace Servant.Manager.Helpers
             var fileInfo = new FileInfo(path);
             var lines = 0;//File.ReadLines(path).Count(x => !x.StartsWith("#"));
             
-            return new IisLogFile {LastWriteTime = fileInfo.LastWriteTime, Path = path, TotalRequests = lines};
+            return new IisLogFile {CreationDate = fileInfo.CreationTime.ToUniversalTime(), LastModified = fileInfo.LastWriteTimeUtc, Path = path, TotalRequests = lines};
         }
 
         private static dynamic GetDbNullSafe(dynamic value)
@@ -140,43 +106,6 @@ namespace Servant.Manager.Helpers
             if (value.ToString() == string.Empty)
                 return string.Empty;
             return value;
-        }
-
-        private static List<LogEntry> ParseQueryToLogEntries(int iisSiteId, string sqlQuery)
-        {
-            var parser = new LogQueryClass();
-            var rows = parser.Execute(sqlQuery);
-
-            var sw = new Stopwatch();
-
-            var result = new List<LogEntry>();
-            while (!rows.atEnd())
-            {
-                sw.Start();
-                var row = rows.getRecord();
-                var entry = new LogEntry
-                {
-                    SiteIisId = iisSiteId,
-                    DateTime = row.getValue("date-time"),
-                    ServerIpAddress = row.getValue("s-ip"),
-                    HttpMethod = row.getValue("cs-method"),
-                    Uri = row.getValue("cs-uri-stem"),
-                    Querystring = GetDbNullSafe(row.getValue("cs-uri-query")),
-                    Port = row.getValue("s-port"),
-                    Username = GetDbNullSafe(row.getValue("cs-username")),
-                    ClientIpAddress = row.getValue("c-ip"),
-                    Agentstring = GetDbNullSafe(row.getValue("cs(User-Agent)")),
-                    HttpStatusCode = row.getValue("sc-status"),
-                    HttpSubStatusCode = row.getValue("sc-substatus"),
-                    TimeTaken = row.getValue("time-taken"),
-                    LogRow = row.getValue("logrow")
-                };
-                sw.Stop();
-                result.Add(entry);
-                rows.moveNext();
-            }
-            rows.close();
-            return result;
         }
 
         public static IEnumerable<LogEntry> GetByRelatedException(ApplicationError exception)

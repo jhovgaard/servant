@@ -21,5 +21,6 @@ namespace Servant.Business.Objects
         public int TimeTaken { get; set; }
         public int SiteIisId { get; set; }
         public int LogRow { get; set; }
+        public string LogFilename { get; set; }
     }
 }

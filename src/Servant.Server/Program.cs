@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
-using Quartz;
 using Servant.Business.Services;
 using Servant.Manager.Infrastructure;
 using Servant.Server.Selfhost;
@@ -24,7 +24,6 @@ namespace Servant.Server
 
             var settings = new SettingsService().LocalSettings;
             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
-            var host1 = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
 
             Console.WriteLine();
             Console.WriteLine("Welcome to Servant for IIS.");
@@ -49,8 +48,19 @@ namespace Servant.Server
                 return;
             }
 
-            RegisterLogParser();
-            
+            if (!IsIisInstalled())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Error: ");
+                Console.ResetColor();
+                Console.Write("IIS needs to be installed to use Servant.");
+                Console.WriteLine();
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
+
+                return;
+            }
+
             host.Start();
 
             if(settings.ParseLogs)
@@ -80,27 +90,6 @@ namespace Servant.Server
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
-        public static void RegisterLogParser()
-        {
-            //'/s' : indicates regsvr32.exe to run silently.
-            var dllPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logparser.dll");
-            var fileinfo = "/s \"" + dllPath + "\"";
-
-            var reg = new Process {
-                StartInfo = {
-                        FileName = "regsvr32.exe",
-                        Arguments = fileinfo,
-                        UseShellExecute = false,
-                        CreateNoWindow = false,
-                        RedirectStandardOutput = true,
-                        WindowStyle = ProcessWindowStyle.Normal
-                    }
-            };
-            reg.Start();
-            reg.WaitForExit();
-            reg.Close();
-        }
-
         public static void EnsureDatabaseExists()
         {
             var dbPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "servant.sqlite");
@@ -108,6 +97,21 @@ namespace Servant.Server
             {
                 var defaultDbPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "servant-default.sqlite");
                 System.IO.File.Copy(defaultDbPath, dbPath, false);
+            }
+        }
+
+        public static bool IsIisInstalled()
+        {
+            using(var manager = new Microsoft.Web.Administration.ServerManager()) {
+                try
+                {
+                    var test = manager.Sites.First();
+                    return true;
+                }
+                catch (COMException)
+                {
+                    return false;
+                }
             }
         }
     }
