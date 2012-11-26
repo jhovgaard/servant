@@ -66,12 +66,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\SettingsException.cs" />
+    <Compile Include="Extensions\SqliteHelpers.cs" />
     <Compile Include="Helpers\SecurityHelper.cs" />
-    <Compile Include="Helpers\SettingsHelper.cs" />
+    <Compile Include="Helpers\BindingHelper.cs" />
+    <Compile Include="LogParser.cs" />
     <Compile Include="Objects\Entity.cs" />
     <Compile Include="Objects\Enums\CreateSiteResult.cs" />
     <Compile Include="Objects\Enums\SiteStartResult.cs" />
-    <Compile Include="Objects\Enums\SiteState.cs" />
+    <Compile Include="Objects\Enums\InstanceState.cs" />
     <Compile Include="Objects\Enums\StatsRange.cs" />
     <Compile Include="Objects\Error.cs" />
     <Compile Include="Objects\IisLogFile.cs" />

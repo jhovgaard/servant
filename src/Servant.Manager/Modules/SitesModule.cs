@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Servant.Business.Objects.Reporting;
@@ -48,14 +49,24 @@ namespace Servant.Manager.Modules
                 if(site.SitePath != null && !FileSystemHelper.DirectoryExists(site.SitePath))
                     AddPropertyError("sitepath", "The entered directory doesn't exist.");
 
-                if(site.HttpBindings == null)
-                    AddPropertyError("httpbindings", "Minimum 1 binding is required.");
+                if(site.Bindings == null)
+                    AddPropertyError("bindings", "Minimum 1 binding is required.");
                 else
                 {
-                    foreach(var binding in site.HttpBindings)
+                    for (int i = 0; i < site.Bindings.Length; i++)
                     {
-                        if(siteManager.IsBindingInUse(binding))
-                            AddPropertyError("httpbindings", string.Format("The binding {0} is already in use.", binding));
+                        var binding = site.Bindings[i];
+                        var finalizedBinding = BindingHelper.SafeFinializeBinding(binding);
+
+                        if (finalizedBinding == null)
+                        {
+                            AddPropertyError("bindings[" + i + "]", "The binding is invalid.");
+                            continue;
+                        }
+
+                        if (siteManager.IsBindingInUse(binding))
+                            AddPropertyError("httpbindings",
+                                             string.Format("The binding {0} is already in use.", binding));
                     }
                 }
                 
@@ -81,9 +92,8 @@ namespace Servant.Manager.Modules
 
             Get[@"/(?<Id>[\d]{1,4})/settings/"] = p =>
             {
-                
-                var site = siteManager.GetSiteById(p.Id);
-                                                       ;
+                Site site = siteManager.GetSiteById(p.Id);
+
                 Model.Site = site;
                 Model.ApplicationPools = siteManager.GetApplicationPools();
                 return View["Settings", Model];
@@ -95,16 +105,16 @@ namespace Servant.Manager.Modules
                 
                 site.Name = Request.Form.SiteName;
                 site.SitePath = Request.Form.SitePath;
-                site.HttpBindings = Request.Form.Bindings.ToString().Split(',');
+                site.Bindings = Request.Form.Bindings.ToString().Split(',');
                 site.ApplicationPool = Request.Form.ApplicationPool;
 
-                if (site.HttpBindings == null)
+                if (site.Bindings == null)
                     AddPropertyError("bindings", "Minimum 1 binding is required.");
                 else
                 {
-                    for(var i = 0; i < site.HttpBindings.Length; i++)
+                    for(var i = 0; i < site.Bindings.Length; i++)
                     {
-                        var binding = site.HttpBindings[i];
+                        var binding = site.Bindings[i];
                         if (siteManager.IsBindingInUse(binding, site.IisId))
                             AddPropertyError("bindings[" + i + "]", string.Format("The binding {0} is already in use.", binding));
                     }
@@ -162,12 +172,20 @@ namespace Servant.Manager.Modules
                         break;
                 }
 
-                var totalRequests = logEntryService.GetTotalCount(oldestDate);
-                Model.TotalRequests = totalRequests;
-                Model.HasEntries = totalRequests != 0;
-                Model.MostActiveClients = logEntryService.GetMostActiveClientsBySite(site.IisId, oldestDate).ToList();
-                Model.MostExpensiveRequests = logEntryService.GetMostExpensiveRequestsBySite(site.IisId, oldestDate).ToList();
-                Model.MostActiveUrls = logEntryService.GetMostActiveUrlsBySite(site.IisId, oldestDate).ToList();
+                var hasAnyStats = logEntryService.GetCountBySite(site.IisId) != 0;
+                Model.HasAnyStats = hasAnyStats;
+
+                if(hasAnyStats)
+                {
+                    var totalRequests = logEntryService.GetCountBySite(site.IisId, oldestDate);
+                    Model.LatestEntries = logEntryService.GetLatestBySite(site, 5);
+                    Model.TotalRequests = totalRequests;
+                    Model.HasEntries = totalRequests != 0;
+                    Model.MostActiveClients = logEntryService.GetMostActiveClientsBySite(site.IisId, oldestDate).ToList();
+                    Model.MostExpensiveRequests = logEntryService.GetMostExpensiveRequestsBySite(site.IisId, oldestDate).ToList();
+                    Model.MostActiveUrls = logEntryService.GetMostActiveUrlsBySite(site.IisId, oldestDate).ToList();
+                }
+
 
                 Model.Site = site;
                 return View["Stats", Model];
@@ -184,6 +202,7 @@ namespace Servant.Manager.Modules
                 Model.Range = range;
                 
                 Site site = siteManager.GetSiteById(p.Id);
+                var hasAnyErrors = applicationErrorService.GetCountBySite(site.IisId) != 0;
 
                 IEnumerable<ApplicationError> errors = null;
                 switch (range)
@@ -206,6 +225,7 @@ namespace Servant.Manager.Modules
                         break;
                 }
 
+                Model.HasAnyErrors = hasAnyErrors;
                 Model.Site = site;
                 Model.Exceptions = errors.ToList();
                 
@@ -215,7 +235,7 @@ namespace Servant.Manager.Modules
             Get[@"/(?<Id>[\d]{1,4})/errors/(?<EventLogId>[\d]{1,7})/"] = p =>{
                 Site site = siteManager.GetSiteById(p.Id);
                 ApplicationError exception = applicationErrorService.GetById(p.EventLogId);
-                var relatedRequests = logEntryService.GetAllRelatedToException(site.IisId, exception.DateTime);
+                var relatedRequests = logEntryService.GetAllRelatedToException(site.IisId, exception.DateTime.ToUniversalTime());
                 Model.Site = site;
                 Model.Exception = exception;
                 Model.RelatedRequests = relatedRequests;

@@ -40,7 +40,7 @@ namespace Servant.Manager.Helpers
             var log = new EventLog("application");
             var entries = log.Entries
                 .Cast<EventLogEntry>()
-                .Where(x => x.Source.Contains("ASP.NET"));
+                .Where(x => x.Source.Contains("ASP.NET") && (x.EntryType == EventLogEntryType.Warning || x.EntryType == EventLogEntryType.Error) && x.CategoryNumber != 1);
 
             return entries;
         }
@@ -67,7 +67,7 @@ namespace Servant.Manager.Helpers
             
         }
 
-        public static void SyncDatabaseWithServer()
+        public static void SyncServer()
         {
             var latestError = ApplicationErrorService.GetLatest();
             var newErrors = GetNewByLatestError(latestError);

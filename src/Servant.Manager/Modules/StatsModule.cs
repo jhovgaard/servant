@@ -16,8 +16,8 @@ namespace Servant.Manager.Modules
                 var serverStats = new Business.Objects.Reporting.ServerStats();
                 
                 serverStats.TotalRequests = logEntryService.GetTotalCount();
-                serverStats.DataRecieved = "Disabled";
-                serverStats.DataSent = "Disabled";
+                serverStats.DataRecieved = "Not available";
+                serverStats.DataSent = "Not available";
                 serverStats.TotalSites = siteManager.GetSites().Count();
 
 

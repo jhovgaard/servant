@@ -23,7 +23,6 @@ namespace Servant.Manager.Helpers
 
                  var latestEntry = logEntryService.GetLatestEntry(site);
                  RequestLogHelper.InsertNewInDbBySite(site, latestEntry);
-                 Thread.Sleep(2000);
              }
          }
     }

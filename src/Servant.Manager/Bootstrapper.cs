@@ -1,6 +1,7 @@
 ﻿using Nancy.Authentication.Basic;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
+using Servant.Manager.Infrastructure;
 using TinyIoC;
 
 namespace Servant.Manager
@@ -19,6 +20,21 @@ namespace Servant.Manager
                 if (nancyContext.Response.ContentType == "text/html")
                     nancyContext.Response.ContentType = "text/html; charset=utf8";
             });
+            
+            pipelines.AfterRequest.InsertAfter("RebootHandler", ctx => {
+                if(ctx.Items.ContainsKey("RebootNancyHost"))
+                {
+                    new System.Threading.Thread(() =>
+                                                    {
+                                                        System.Threading.Thread.Sleep(10);
+                                                        var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+                                                        host.Kill();
+                                                        host.Start();
+                                                    }).Start();                    
+                }
+            });
+
+            
         }
 
         protected override void ConfigureConventions(NancyConventions nancyConventions)

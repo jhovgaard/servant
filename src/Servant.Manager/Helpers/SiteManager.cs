@@ -27,26 +27,29 @@ namespace Servant.Manager.Helpers
         public Servant.Business.Objects.Site GetSiteById(int iisId) 
         {
             var iisSite = _manager.Sites.SingleOrDefault(x => x.Id == iisId);
-
+            
             return iisSite == null
                 ? null
                 : ParseSite(iisSite);
         }
 
-        private static Servant.Business.Objects.Site ParseSite(Microsoft.Web.Administration.Site site)
+        private Servant.Business.Objects.Site ParseSite(Microsoft.Web.Administration.Site site)
         {
             if (site == null)
                 return null;
 
+            var applicationPoolState = _manager.ApplicationPools[site.Applications[0].ApplicationPoolName].State;
+
             var allowedProtocols = new[] { "http"};
-            return new Servant.Business.Objects.Site {
+            return new Site {
                     IisId = (int)site.Id,
                     Name = site.Name,
                     ApplicationPool = site.Applications[0].ApplicationPoolName,
                     SitePath = site.Applications[0].VirtualDirectories[0].PhysicalPath,
-                    State = (SiteState)Enum.Parse(typeof(Servant.Business.Objects.Enums.SiteState), site.State.ToString()),
+                    SiteState = (InstanceState)Enum.Parse(typeof(InstanceState), site.State.ToString()),
+                    ApplicationPoolState = (InstanceState)Enum.Parse(typeof(InstanceState),  applicationPoolState.ToString()),
                     LogFileDirectory = site.LogFile.Directory,
-                    HttpBindings = site.Bindings
+                    Bindings = site.Bindings
                         .ToList()
                         .Where(x => allowedProtocols.Contains(x.Protocol))
                         .Select(x => (string.IsNullOrEmpty(x.Host) ? "*" : x.Host) + ":" + x.EndPoint.Port)
@@ -90,7 +93,7 @@ namespace Servant.Manager.Helpers
             application.ApplicationPoolName = site.ApplicationPool;
 
             // Normalizing and preparing bindings
-            var bindingsToAdd = ConvertBindingsToBindingInformations(site.HttpBindings);
+            var bindingsToAdd = ConvertBindingsToBindingInformations(site.Bindings);
                 
             // Commits bindings
             iisSite.Bindings.Clear();
@@ -153,7 +156,7 @@ namespace Servant.Manager.Helpers
 
         public CreateSiteResult CreateSite(Site site)
         {
-            var bindingInformations = ConvertBindingsToBindingInformations(site.HttpBindings);
+            var bindingInformations = ConvertBindingsToBindingInformations(site.Bindings);
                 
             // Check bindings
             var bindingInUse = GetBindingInUse(0, bindingInformations); // 0 never exists
@@ -172,8 +175,18 @@ namespace Servant.Manager.Helpers
             // Set/create application pool
             if (string.IsNullOrWhiteSpace(site.ApplicationPool)) // Auto create application pool
             {
-                _manager.ApplicationPools.Add(site.Name);
-                iisSite.ApplicationDefaults.ApplicationPoolName = site.Name;
+                var appPoolName = site.Name;
+                var existingApplicationPoolNames = _manager.ApplicationPools.Select(x => x.Name).ToList();
+                var newNameCount = 1;
+
+                while(existingApplicationPoolNames.Contains(appPoolName))
+                {
+                    appPoolName = site.Name + "_" + newNameCount;
+                    newNameCount++;
+                }
+
+                _manager.ApplicationPools.Add(appPoolName);
+                iisSite.ApplicationDefaults.ApplicationPoolName = appPoolName;
             }
             else
             {

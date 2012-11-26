@@ -32,17 +32,6 @@ namespace Servant.Business.Services
             Connection.Insert(entity);
         }
 
-        public void Insert(IEnumerable<T> entities)
-        {
-            using(var transaction = Connection.BeginTransaction())
-            {
-                foreach (var entity in entities)
-                    Connection.Insert(entity);        
-
-                transaction.Commit();
-            }
-        }
-
         public void Delete(T entity)
         {
             Connection.Delete(entity);
