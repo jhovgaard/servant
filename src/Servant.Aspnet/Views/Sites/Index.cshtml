@@ -17,7 +17,7 @@
     @foreach(Servant.Business.Objects.Site site in Model.Sites) {
         <tr class="pointer">
             <td class="span1 valign-middle">
-                @if(site.State == Servant.Business.Objects.Enums.SiteState.Started) {
+                @if(site.SiteState == Servant.Business.Objects.Enums.InstanceState.Started) {
                     <img src="/images/icon_enabled.png"/>
                 } else {
                     <img src="/images/icon_disabled.png"/>

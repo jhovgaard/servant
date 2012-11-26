@@ -8,9 +8,12 @@
 
 
 <h4>Status</h4>
-<p class="margin-top10">Site is currently <b>@Model.Site.State.ToString().ToLower()</b>.</p>
-@if (Model.Site.State == Servant.Business.Objects.Enums.SiteState.Started)
+<p class="margin-top10">Site is currently <b>@Model.Site.SiteState.ToString().ToLower()</b>.</p>
+@if (Model.Site.SiteState == Servant.Business.Objects.Enums.InstanceState.Started)
 {
+    if(Model.Site.ApplicationPoolState != Servant.Business.Objects.Enums.InstanceState.Started) {
+        <p class="text-error">Warning: The application pool isn't running!</p>
+    }
     <form action="/sites/@Model.Site.IisId/stop/" method="POST" id="stop-site-form">
         <input type="submit" class="btn btn-danger" value="Stop site" class="margin-top10"/>
     </form>    
@@ -61,17 +64,7 @@ else
         </div>
     
         <div class="span5">
-            <h4 class="margin-top30">Bindings<img src="/images/icon_add.png" class="margin-left10 pointer" id="add-binding" /></h4>
-            <p class="margin-top10">Example: <code>servant.io</code> or <code>servant.io:440</code></p>
-            <table  id="bindings">
-                @foreach (var binding in Model.Site.HttpBindings)
-                {
-                    <tr>
-                        <td class="control-group"><input type="text" class="input-medium span4" name="bindings" value="@binding" /></td>
-                        <td class="valign-top" style="padding-top: 7px;"><img src="/Images/icon_delete.png" class="remove-binding pointer @Html.Raw(Model.Site.HttpBindings.Length == 1 ? " hide" : "")" /></td>
-                    </tr>
-                }
-            </table>
+            @Html.Partial("Bindings", Model.Site)
         </div>
         
         <div class="margin-top30 span10">

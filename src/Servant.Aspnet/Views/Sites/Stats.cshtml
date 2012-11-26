@@ -7,105 +7,116 @@
     ViewBag.ActiveSubmenuItem = "stats";
 }   
 
-<ul class="sections active-@Model.ActiveSection">
-    <li class="section1"><a href="/sites/@Model.Site.IisId/stats/">Today</a></li>
-    <li class="section2"><a href="/sites/@Model.Site.IisId/stats/?r=lastweek">Last week</a></li>
-    <li class="section3"><a href="/sites/@Model.Site.IisId/stats/?r=lastmonth">Last month</a></li>
-    <li class="section4"><a href="/sites/@Model.Site.IisId/stats/?r=alltime">All time</a></li>
-</ul>    
-
-<div class="clear"></div>
-
-@if(!Model.HasEntries)
+@if (!Model.HasAnyStats)
 {
-    <h4 class="margin-top30">Sorry, there's like no requests for the selected period.</h4>
-} else {
-    <p class="gray margin-top10"><strong>@Model.TotalRequests</strong> requests in this period.</p>
+    <h4>Sorry, there is no stats available for this site.</h4>
+} else
+{
 
-    if (Model.Range == StatsRange.Today) {
-    <h3 class="margin-top30">Latest requests</h3>
-    <span>IIS logs flushed @DateTime.Now.ToString("hh:mm:ss")</span>
-    <table class="table table-striped margin-top10">
-        <thead>
-            <tr>
-                <th>Timestamp</th>
-                <th class="span6">URL</th>
-                <th>Execution time</th>
-            </tr>
+    <ul class="sections active-@Model.ActiveSection">
+        <li class="section1"><a href="/sites/@Model.Site.IisId/stats/">Today</a></li>
+        <li class="section2"><a href="/sites/@Model.Site.IisId/stats/?r=lastweek">Last week</a></li>
+        <li class="section3"><a href="/sites/@Model.Site.IisId/stats/?r=lastmonth">Last month</a></li>
+        <li class="section4"><a href="/sites/@Model.Site.IisId/stats/?r=alltime">All time</a></li>
+    </ul>
 
-        </thead>
-        @foreach (Servant.Business.Objects.LogEntry entry in Model.LatestEntries)
-        {
-            <tr>
-                <td><span class="time-diff">@entry.DateTime</span></td>
-                <td>@entry.Uri@entry.Querystring</td>
-                <td>@(entry.TimeTaken)ms</td>
-            </tr>
-        }
-    </table>
-    }
+    <div class="clear"></div>
 
-
-    <h3 class="margin-top30">Most active clients</h3>
-    <table class="table table-striped margin-top10">
-        <thead>
-            <tr>
-                <th class="span1">IP Address</th>
-                <th class="span4">Agent string</th>
-                <th class="span1"># of requests</th>
-            </tr>
-
-        </thead>
-        @foreach (var entry in Model.MostActiveClients)
-        {
-            <tr>
-                <td>@entry.ClientIpAddress</td>
-                <td style="word-break:break-all ">@entry.Agentstring</td>
-                <td>@entry.Count</td>
-            </tr>
-        }
-    </table>
-
-
-
-<h3 class="margin-top30">Most expensive requests</h3>
-<table class="table table-striped margin-top10">
-    <thead>
-        <tr>
-            <th class="span4">URL</th>
-            <th class="span2">Avg execution time</th>
-            <th class="span1"># of requests</th>
-        </tr>
-
-    </thead>
-    @foreach (var entry in Model.MostExpensiveRequests)
+    if (!Model.HasEntries)
     {
-        <tr>
-            <td>@entry.Uri@entry.Querystring</td>
-            <td>@(entry.AverageTimeTaken)ms</td>
-            <td>@entry.Count</td>
-        </tr>
+        <h4 class="margin-top30">Sorry, there's like no requests for the selected period.</h4>
     }
-</table>
+    else
+    {
+        <p class="gray margin-top10"><strong>@Model.TotalRequests</strong> requests in this period.</p>
+        <p class="gray margin-top10">All timestamps are in local server time (Converted from UTC).</p>
 
-
-
-
-<h3 class="margin-top30">Most popular URLs</h3>
-    <table class="table table-striped margin-top10">
-        <thead>
-            <tr>
-                <th class="span6">URL</th>
-                <th class="span1"># of requests</th>
-            </tr>
-
-        </thead>
-        @foreach (var entry in Model.MostActiveUrls)
+        if (Model.Range == StatsRange.Today)
         {
-            <tr>
-                <td>@entry.Uri@entry.Querystring</td>
-                <td>@entry.Count</td>
-            </tr>
+            <h3 class="margin-top30">Latest requests</h3>
+            <span>Page was loaded on: @DateTime.Now.ToString("hh:mm:ss")</span>
+            <table class="table table-striped margin-top10">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th class="span6">URL</th>
+                        <th>Execution time</th>
+                    </tr>
+
+                </thead>
+                @foreach (Servant.Business.Objects.LogEntry entry in Model.LatestEntries)
+                {
+                    <tr>
+                        <td><span class="time-diff">@entry.DateTime.ToLocalTime()</span></td>
+                    <td class="break-all-words"><a href="/sites/@Model.Site.IisId/requests/@entry.Id/">@entry.Uri@entry.Querystring</a></td>
+                        <td>@(entry.TimeTaken)ms</td>
+                    </tr>
+                }
+            </table>
         }
-    </table>
+
+
+        <h3 class="margin-top30">Most active clients</h3>
+        <table class="table table-striped margin-top10">
+            <thead>
+                <tr>
+                    <th class="span1">IP Address</th>
+                    <th class="span4">Agent string</th>
+                    <th class="span1"># of requests</th>
+                </tr>
+
+            </thead>
+            @foreach (var entry in Model.MostActiveClients)
+            {
+                <tr>
+                    <td>@entry.ClientIpAddress</td>
+                    <td class="break-all-words">@entry.Agentstring</td>
+                    <td>@entry.Count</td>
+                </tr>
+            }
+        </table>
+
+
+
+        <h3 class="margin-top30">Most expensive requests</h3>
+        <table class="table table-striped margin-top10">
+            <thead>
+                <tr>
+                    <th class="span4">URL</th>
+                    <th class="span2">Avg execution time</th>
+                    <th class="span1"># of requests</th>
+                </tr>
+
+            </thead>
+            @foreach (var entry in Model.MostExpensiveRequests)
+            {
+                <tr>
+                    <td class="break-all-words">@entry.Uri@entry.Querystring</td>
+                    <td>@(entry.AverageTimeTaken)ms</td>
+                    <td>@entry.Count</td>
+                </tr>
+            }
+        </table>
+
+
+
+
+        <h3 class="margin-top30">Most popular URLs</h3>
+        <table class="table table-striped margin-top10">
+            <thead>
+                <tr>
+                    <th class="span6">URL</th>
+                    <th class="span1"># of requests</th>
+                </tr>
+
+            </thead>
+            @foreach (var entry in Model.MostActiveUrls)
+            {
+                <tr>
+                    <td class="break-all-words">@entry.Uri@entry.Querystring</td>
+                    <td>@entry.Count</td>
+                </tr>
+            }
+        </table>
+    }
 }

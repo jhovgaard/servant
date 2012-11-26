@@ -6,9 +6,9 @@
     ViewBag.ActiveMenuItem = "sites";
     ViewBag.ActiveSubmenuItem = "errors";
 }   
-@if(Model.Exceptions.Count == 0)
+@if(!Model.HasAnyErrors)
 {
-    <h4>Yay! We didn't find any errors for this site.</h4>
+    <h4>Not a single error was detected on this site.</h4>
 } else {
 <ul class="sections active-@Model.ActiveSection">
     <li class="section2"><a href="/sites/@Model.Site.IisId/errors/?r=today">Today</a></li>

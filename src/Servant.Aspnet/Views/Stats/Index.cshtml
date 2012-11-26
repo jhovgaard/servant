@@ -32,7 +32,16 @@
     <table class="table span5">
         <tr>
             <td>Average response time</td>
-            <td>@(Model.ServerStats.AverageResponeTime)ms</td>
+            <td>
+                @if(Model.ServerStats.AverageResponeTime == 0)
+                {
+                    @:Not available
+                } else
+                {
+                    @Model.ServerStats.AverageResponeTime@:ms    
+                }
+                
+            </td>
         </tr>
         <tr>
             <td># of errors</td>

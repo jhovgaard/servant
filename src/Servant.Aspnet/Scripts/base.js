@@ -10,6 +10,8 @@
         var bindings = $("#bindings");
         var newBinding = bindings.find("tr:last").clone();
         newBinding.find("td input").val("");
+        newBinding.find("td").removeClass("error");
+        newBinding.find("td span.help-block, td span.help-inline").remove();
         bindings.append(newBinding);
         bindings.find("tr td img").removeClass("hide");
         newBinding.find("td input").focus();

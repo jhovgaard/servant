@@ -57,7 +57,7 @@ namespace Servant.Manager.Modules
 
             if (requiresAuthentication)
             {
-                //this.RequiresAuthentication();
+                this.RequiresAuthentication();
             }
 
         }

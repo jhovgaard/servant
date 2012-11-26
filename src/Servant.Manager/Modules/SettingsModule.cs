@@ -1,6 +1,7 @@
 ﻿using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Validation;
+using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Services;
 using Servant.Manager.Infrastructure;
@@ -26,7 +27,7 @@ namespace Servant.Manager.Modules
             Post["/"] = p => {
                 var settings = settingsService.LocalSettings;
                 var formSettings = this.Bind<Settings>();
-                formSettings.ServantUrl = Business.Helpers.SettingsHelper.FinializeUrl(formSettings.ServantUrl);
+                formSettings.ServantUrl = BindingHelper.FinializeBinding(formSettings.ServantUrl);
 
                 var validationResult = this.Validate(formSettings);
 
@@ -56,7 +57,6 @@ namespace Servant.Manager.Modules
                         }).Start();
                         
                         return Response.AsRedirect(new System.Uri(formSettings.ServantUrl + "settings/").ToString());
-                        return new { Success = true, Url = formSettings.ServantUrl };
                     }
                 }
 
