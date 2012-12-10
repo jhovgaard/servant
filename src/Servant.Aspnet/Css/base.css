@@ -9,6 +9,8 @@
     height: 100%;
 }
 
+#message { display: none; }
+
 #menu 
 {
     background-color: #1ba1e2;

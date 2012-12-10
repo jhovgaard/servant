@@ -18,8 +18,8 @@
                     <ul class="active-@ViewBag.ActiveMenuItem">
                         <li class="menu-home"><a href="/">Home</a></li>
                         <li class="menu-sites"><a href="/sites/">Sites</a></li>
-                        <li class="menu-stats"><a href="/stats/">Stats</a></li>
-                        <li class="menu-performance"><a href="#">Performance</a></li>
+                        @*<li class="menu-stats"><a href="/stats/">Stats</a></li>
+                        <li class="menu-performance"><a href="#">Performance</a></li>*@
                         <li class="menu-settings"><a href="/settings/">Settings</a></li>
                         @*<li class="menu-about"><a href="#">About</a></li>*@
                         @*<li class="menu-logout"><a href="/logout/">Log out</a></li>*@
@@ -27,7 +27,12 @@
                 </div>
                 <div class="span10" id="content">
                     <div class="padding">
-                        @RenderBody()  
+                        <div class="alert" id="message">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <div class="text">@Model.Message</div>
+                              
+                        </div>
+                        @RenderBody()
                     </div>
                 </div>
             </div>
@@ -35,9 +40,11 @@
     </body>
     <script src="/scripts/jquery-1.8.0.min.js"></script>
     <script src="/Scripts/jquery.uitablefilter.js"></script>
+    <script src="/Scripts/bootstrap.min.js"></script>
     <script src="/Scripts/base.js" type="text/javascript"></script>
     <script type="text/javascript">
         var errors = @Html.Raw(Model.ErrorsAsJson);
+        var message = "@Html.Raw(Model.Message)";
     </script>
     @RenderSection("javascript", false)
 </html>
