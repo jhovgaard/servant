@@ -1,6 +1,7 @@
 ﻿using Nancy.Authentication.Basic;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
+using Nancy.Session;
 using Servant.Manager.Infrastructure;
 using TinyIoC;
 
@@ -13,6 +14,7 @@ namespace Servant.Manager
             base.ApplicationStartup(container, pipelines);
 
             pipelines.EnableBasicAuthentication(new BasicAuthenticationConfiguration(container.Resolve<IUserValidator>(), "Servant"));
+            CookieBasedSessions.Enable(pipelines);
 
             // Irriterede mig at den ikke returnerede UTF8
             pipelines.AfterRequest.InsertAfter("EncodingFix", nancyContext =>

@@ -48,23 +48,30 @@
         
         <div class="clear"></div>
         
-        <h4 class="margin-top30">Log parsing</h4>
-        <p class="margin-top10">Log parsing is currently <strong>@Html.Raw((bool)Model.Settings.ParseLogs ? "running" : "stopped")</strong>.</p>
+        <h4 class="margin-top30">Error monitoring</h4>
+        
+        <p class="margin-top10">Error monitoring checks your IIS for new application errors every 5 minutes. 
+            Error monitoring is currently <strong>@Html.Raw((bool)Model.Settings.ParseLogs ? "activated" : "deactived")</strong>.</p>
         
         @if((bool)Model.Settings.ParseLogs)
         {
             <form method="POST" action="/settings/startlogparsing/">
                 <input type="hidden" value="false" name="start"/>
-                <input type="submit" class="btn btn-danger" value="Stop parsing"/>      
+                <input type="submit" class="btn btn-danger" value="Deactivate"/>      
             </form>
         } else
         {
             <form method="POST" action="/settings/startlogparsing/">
                 <input type="hidden" value="true" name="start"/>
-                <input type="submit" class="btn btn-success" value="Start parsing"/>
+                <input type="submit" class="btn btn-success" value="Activate"/>
             </form>
         }
     </div>
+            
+    <div class="clear"></div>
+        
+    <h4 class="margin-top30">Error monitoring</h4>
+
 </div>
 
 @section javascript {

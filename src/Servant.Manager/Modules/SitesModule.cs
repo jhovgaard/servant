@@ -133,15 +133,31 @@ namespace Servant.Manager.Modules
             {
                 Site site = siteManager.GetSiteById(p.Id);
                 siteManager.StopSite(site);
+                AddMessage("Site has been stopped.");
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
             Post[@"/(?<Id>[\d]{1,4})/start/"] = p =>
             {
                 Site site = siteManager.GetSiteById(p.Id);
-                
-                
                 siteManager.StartSite(site);
+                AddMessage("Site has been started.");
+                return new RedirectResponse("/sites/" + site.IisId + "/settings/");
+            };
+
+            Post[@"/(?<Id>[\d]{1,4})/restart/"] = p =>
+            {
+                Site site = siteManager.GetSiteById(p.Id);
+                siteManager.RestartSite(site.IisId);
+                AddMessage("Site has been restarted.");
+                return new RedirectResponse("/sites/" + site.IisId + "/settings/");
+            };
+
+            Post[@"/(?<Id>[\d]{1,4})/recycle/"] = p =>
+            {
+                Site site = siteManager.GetSiteById(p.Id);
+                siteManager.RecycleApplicationPoolBySite(site.IisId);
+                AddMessage("Application pool has been recycled.");
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
@@ -191,7 +207,9 @@ namespace Servant.Manager.Modules
                 return View["Stats", Model];
             };
 
-            Get[@"/(?<Id>[\d]{1,4})/errors/"] = p => {
+            Get[@"/(?<Id>[\d]{1,4})/errors/"] = p => {                
+                EventLogHelper.SyncServer();
+
                 StatsRange range;
                 var rValue = Request.Query["r"];
                 if(rValue == null)
