@@ -46,6 +46,7 @@ namespace Servant.Manager.Modules
                     settingsService.Insert(formSettings);
 
                     host.LoadSettings();
+                    AddMessage("Settings have been saved.");
 
                     if(bindingIsChanged)
                     {

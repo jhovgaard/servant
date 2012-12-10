@@ -59,6 +59,9 @@
   <ItemGroup>
     <Content Include="base.css" />
     <Content Include="bootstrap.min.css" />
+    <Content Include="Cosmo\Css\bootstrap-responsive.min.css" />
+    <Content Include="Cosmo\Css\bootstrap.min.css" />
+    <Content Include="Cosmo\Default.html" />
     <Content Include="Default.htm" />
     <Content Include="favicon.ico" />
     <Content Include="Fonts\Roboto License.txt" />

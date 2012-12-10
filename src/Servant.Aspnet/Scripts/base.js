@@ -35,6 +35,12 @@
 
     $(function() {
         $("#menu").height($(document).height());
+        
+        if (message.length) {
+            var container = $("#message");
+            container.find("div.text").html(message);
+            container.fadeIn();
+        }
     });
     
     // Form validation parser

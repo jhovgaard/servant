@@ -213,5 +213,17 @@ namespace Servant.Manager.Helpers
         {
             _manager.Dispose();
         }
+
+        public void RestartSite(int iisSiteId)
+        {
+            var site = GetSiteById(iisSiteId);
+            StopSite(site);
+            StartSite(site);
+        }
+
+        public void RecycleApplicationPoolBySite(int iisSiteId)
+        {
+            _manager.ApplicationPools[_manager.Sites[iisSiteId].Applications[0].ApplicationPoolName].Recycle();
+        }
     }
 }

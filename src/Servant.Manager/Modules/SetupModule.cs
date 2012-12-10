@@ -32,7 +32,8 @@ namespace Servant.Manager.Modules
                     var formSettings = this.Bind<Settings>();
                     var originalInputtedServantUrl = formSettings.ServantUrl;
                     formSettings.ServantUrl = BindingHelper.FinializeBinding(formSettings.ServantUrl);
-                    
+                    formSettings.ParseLogs = true;
+
                     var validationResult = this.Validate(formSettings);
 
                     var bindingIsChanged = formSettings.ServantUrl != settings.ServantUrl;

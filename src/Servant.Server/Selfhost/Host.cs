@@ -20,7 +20,7 @@ namespace Servant.Server.Selfhost
         {
             LogParsingStarted = false;
             StartupTime = DateTime.Now;
-            _timer = new Timer(1000);
+            _timer = new Timer(60000);
             _timer.Elapsed += SyncDatabaseJob;
         }
 
@@ -96,7 +96,7 @@ namespace Servant.Server.Selfhost
             try
             {
                 Manager.Helpers.EventLogHelper.SyncServer();
-                Manager.Helpers.SynchronizationHelper.SyncServer();
+                //Manager.Helpers.SynchronizationHelper.SyncServer();
             }
             catch (Exception ex)
             {
