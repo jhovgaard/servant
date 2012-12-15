@@ -1,15 +1,25 @@
-﻿using Servant.Business.Objects;
+﻿using System;
+using Servant.Business.Objects;
 
 namespace Servant.Business.Services
 {
     public class SettingsService : Service<Settings>
     {
-        public SettingsService() : base("Settings") { }
+        public SettingsService() : base("Settings")
+        {
+            Guid = Guid.NewGuid();
 
+        }
+        public Guid Guid { get; set; }
+
+        private Settings _settings;
         public Settings LocalSettings
         {
             get
             {
+                if (_settings != null)
+                    return _settings;
+
                 var settings = Table.All().FirstOrDefault();
                 if(settings == null)
                 {
@@ -24,9 +34,14 @@ namespace Servant.Business.Services
                                    };
                     Insert(settings);
                 }
-
+                _settings = settings;
                 return settings;
             }
+        }
+
+        public void ReloadLocalSettings()
+        {
+            _settings = null;
         }
     }
 }

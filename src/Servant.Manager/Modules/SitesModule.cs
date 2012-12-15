@@ -161,6 +161,14 @@ namespace Servant.Manager.Modules
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
+            Post[@"/(?<Id>[\d]{1,4})/delete/"] = p =>
+            {
+                Site site = siteManager.GetSiteById(p.Id);
+                siteManager.DeleteSite(site.IisId);
+                AddMessage("The site {0} was deleted.", site.Name);
+                return new RedirectResponse("/sites/");
+            };
+
             Get[@"/(?<Id>[\d]{1,4})/stats/"] = p =>
             {
                 StatsRange range;
