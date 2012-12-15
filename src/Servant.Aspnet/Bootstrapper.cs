@@ -10,8 +10,8 @@ namespace Servant.Aspnet
         
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
-            base.ApplicationStartup(container, pipelines);
             TinyIoCContainer.Current.Register<IHost, Host>();
+            base.ApplicationStartup(container, pipelines);
         }
     }
 }

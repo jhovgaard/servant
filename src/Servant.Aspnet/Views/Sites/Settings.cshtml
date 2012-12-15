@@ -34,6 +34,7 @@ else
 }
 
 <form action="/sites/@Model.Site.IisId/settings/" method="POST">
+
     <div class="row">
         <div class="span5">
             <h4 class="margin-top30">General</h4>
@@ -68,16 +69,26 @@ else
                     }
 
                 </select>
+            </div>       
+            <div class="margin-top30">
+                <input type="submit" class="btn btn-primary" value="Save settings" />
             </div>
         </div>
-    
         <div class="span5">
             @Html.Partial("Bindings", Model.Site)
         </div>
-        
-        <div class="margin-top30 span10">
-            <input type="submit" class="btn btn-primary" value="Save settings" />
-        </div>
     </div>
 </form>
+
+<div class="row">
+    <div class="span10">
+        <h4 class="margin-top30">Delete site</h4>
+        <small>By clicking the button below the site will be deleted from IIS. The site's content will remain on the filesystem. If the application pool is only used by this application it will also be deleted.</small> 
+        <div class="margin-top10">
+            <form action="/sites/@Model.Site.IisId/delete/" method="POST" id="delete-site-form">
+                <input type="submit" class="btn btn-danger" value="Click here to delete @Model.Site.Name" class="margin-top10"/>
+            </form>
+        </div>
+    </div>
+</div>
  

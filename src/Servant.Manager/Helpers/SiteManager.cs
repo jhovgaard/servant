@@ -24,6 +24,11 @@ namespace Servant.Manager.Helpers
             }
         }
 
+        public Microsoft.Web.Administration.Site GetIisSiteById(int iisId)
+        {
+            return _manager.Sites.SingleOrDefault(x => x.Id == iisId);
+        }
+
         public Servant.Business.Objects.Site GetSiteById(int iisId) 
         {
             var iisSite = _manager.Sites.SingleOrDefault(x => x.Id == iisId);
@@ -223,7 +228,27 @@ namespace Servant.Manager.Helpers
 
         public void RecycleApplicationPoolBySite(int iisSiteId)
         {
-            _manager.ApplicationPools[_manager.Sites[iisSiteId].Applications[0].ApplicationPoolName].Recycle();
+            var site = GetIisSiteById(iisSiteId);
+            _manager.ApplicationPools[site.Applications[0].ApplicationPoolName].Recycle();
+        }
+
+        public void DeleteSite(int iisId)
+        {
+            var siteToDelete = GetIisSiteById(iisId);
+            var applicationPoolname = siteToDelete.Applications[0].ApplicationPoolName;
+
+            var sitesWithApplicationPoolname =
+                from site in _manager.Sites
+                let application = site.Applications[0]
+                where application.ApplicationPoolName == applicationPoolname
+                select site;
+
+            siteToDelete.Delete();
+        
+            if (sitesWithApplicationPoolname.Count() == 1)
+                _manager.ApplicationPools[applicationPoolname].Delete();
+
+            _manager.CommitChanges();
         }
     }
 }

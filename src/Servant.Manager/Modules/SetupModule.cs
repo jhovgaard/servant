@@ -12,12 +12,11 @@ namespace Servant.Manager.Modules
 {
     public class SetupModule : BaseModule 
     {
-        public SetupModule(SettingsService settingsService)
+        public SetupModule()
         {
-            
-            
-            var settings = settingsService.LocalSettings;
+            var settingsService = TinyIoC.TinyIoCContainer.Current.Resolve<SettingsService>();
             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+            var settings = settingsService.LocalSettings;
 
             if(!settings.SetupCompleted)
             {
@@ -49,12 +48,13 @@ namespace Servant.Manager.Modules
 
                     if(!HasErrors)
                     {
-                        formSettings.Password = Business.Helpers.SecurityHelper.HashPassword(formSettings.Password);
+                        formSettings.Password = SecurityHelper.HashPassword(formSettings.Password);
                         formSettings.SetupCompleted = true;
                         settingsService.DeleteAll();
                         settingsService.Insert(formSettings);
-                        
-                        if(!settings.ParseLogs && formSettings.ParseLogs) 
+                        settingsService.ReloadLocalSettings();
+
+                        if (!settings.ParseLogs && formSettings.ParseLogs) 
                             host.StartLogParsing();
 
                         if (bindingIsChanged)

@@ -1,7 +1,11 @@
-﻿using Nancy.Authentication.Basic;
+﻿using System;
+using System.Diagnostics;
+using Nancy;
+using Nancy.Authentication.Basic;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
 using Nancy.Session;
+using Servant.Business.Services;
 using Servant.Manager.Infrastructure;
 using TinyIoC;
 
@@ -11,11 +15,25 @@ namespace Servant.Manager
     {
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
+            TinyIoC.TinyIoCContainer.Current.Register<SettingsService>().AsSingleton();
+
             base.ApplicationStartup(container, pipelines);
+
+            var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
 
             pipelines.EnableBasicAuthentication(new BasicAuthenticationConfiguration(container.Resolve<IUserValidator>(), "Servant"));
             CookieBasedSessions.Enable(pipelines);
+            
+            var sw = new Stopwatch();
 
+            pipelines.BeforeRequest.InsertBefore("Debugging", nancyContext => 
+            {
+                sw.Reset();
+                sw.Start();
+                
+                return nancyContext.Response;
+            });
+            
             // Irriterede mig at den ikke returnerede UTF8
             pipelines.AfterRequest.InsertAfter("EncodingFix", nancyContext =>
             {
@@ -29,10 +47,20 @@ namespace Servant.Manager
                     new System.Threading.Thread(() =>
                                                     {
                                                         System.Threading.Thread.Sleep(10);
-                                                        var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
                                                         host.Kill();
                                                         host.Start();
                                                     }).Start();                    
+                }
+            });
+
+            pipelines.AfterRequest.InsertAfter("RebootHandler", ctx =>
+            {
+                sw.Stop();
+                if (host.Debug)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine(DateTime.Now.ToLongTimeString() + ": " + ctx.Request.Method + " " + ctx.Request.Url + "(" + sw.ElapsedMilliseconds + "ms)");
+                    Console.ResetColor();
                 }
             });
 
