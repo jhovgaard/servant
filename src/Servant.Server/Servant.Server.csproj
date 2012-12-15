@@ -16,7 +16,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -26,7 +26,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -93,9 +93,6 @@
   <ItemGroup>
     <Content Include="acknowledgments.txt" />
     <Content Include="Servant.ico" />
-    <Content Include="x64\SQLite.Interop.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="x86\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -115,7 +112,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PreBuildEvent>Copy “$(ProjectDir)x64\SQLite.Interop.dll” “$(ProjectDir)$(OutDir)SQLite.Interop.dll”
+    <PreBuildEvent>Copy “$(ProjectDir)x86\SQLite.Interop.dll” “$(ProjectDir)$(OutDir)SQLite.Interop.dll”
 Copy “$(SolutionDir)Servant.Aspnet\servant-default.sqlite” “$(ProjectDir)$(OutDir)servant-default.sqlite”
 xcopy "$(SolutionDir)Servant.Aspnet\Css" “$(ProjectDir)$(OutDir)Css” /e /y /i /r
 xcopy "$(SolutionDir)Servant.Aspnet\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r

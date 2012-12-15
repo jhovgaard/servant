@@ -87,9 +87,9 @@ namespace Servant.Manager.Modules
             Model.Errors.AddRange(Helpers.ErrorHelper.ConvertValidationResultToErrorList(result));
         }
 
-        public void AddMessage(string message)
+        public void AddMessage(string message, params string[] args)
         {
-            Session[MessageKey] = message;
+            Session[MessageKey] = string.Format(message, args);
         }
     }
 }

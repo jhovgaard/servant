@@ -1,6 +1,12 @@
 ﻿$(function () {
     $("#stop-site-form").submit(function () {
-        var confirmed = confirm("Are you sure you want to complete stop this site?");
+        var confirmed = confirm("Are you sure you want to completely stop this site?");
+        if (!confirmed)
+            return false;
+    });
+    
+    $("#delete-site-form").submit(function () {
+        var confirmed = confirm("Are you sure you want to delete this site? This action cannot be undone.");
         if (!confirmed)
             return false;
     });

@@ -12,7 +12,9 @@ namespace Servant.Manager.Modules
 {
     public class SettingsModule : BaseModule
     {
-        public SettingsModule(SettingsService settingsService) : base("/settings/")
+        private SettingsService settingsService = TinyIoC.TinyIoCContainer.Current.Resolve<SettingsService>();
+
+        public SettingsModule() : base("/settings/")
         {
             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
 
@@ -44,7 +46,8 @@ namespace Servant.Manager.Modules
 
                     settingsService.DeleteAll();
                     settingsService.Insert(formSettings);
-
+                    settingsService.ReloadLocalSettings();
+                    
                     host.LoadSettings();
                     AddMessage("Settings have been saved.");
 
@@ -82,6 +85,7 @@ namespace Servant.Manager.Modules
                 settings.ParseLogs = start;
                 settingsService.DeleteAll();
                 settingsService.Insert(settings);
+                settingsService.ReloadLocalSettings();
 
                 return Response.AsRedirect("/settings/");
             };
