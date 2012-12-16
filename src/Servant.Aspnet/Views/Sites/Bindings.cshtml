@@ -1,20 +1,24 @@
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+﻿@using System.Collections.Generic
+@using System.Linq
+@using Servant.Business.Objects
+@using Servant.Business.Objects.Enums
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 
 <h4 class="margin-top30">Bindings<img src="/images/icon_add.png" class="margin-left10 pointer" id="add-binding" /></h4>
-<p class="margin-top10">Example: <code>servant.io</code> or <code>servant.io:440</code></p>
+<p class="margin-top10">Example: <code>servant.io</code></p>
 <table  id="bindings">
-    @if(Model.Bindings == null)
+    @if (Model.RawBindings == null)
     {
         <tr>
-            <td class="control-group"><input type="text" class="input-medium span4" name="bindings" value="" /></td>
-            <td class="valign-top" style="padding-top: 7px;"><img src="/Images/icon_delete.png" class="remove-binding pointer" /></td>
+            <td class="control-group"><input type="text" class="input-medium span4" name="rawbindings" value="" /></td>
+            <td class="valign-top" style="padding-top: 7px;"><img src="/Images/icon_delete.png" class="remove-binding pointer hide" /></td>
         </tr>
     } else {
-        @foreach (var binding in Model.Bindings)
+        @foreach (var binding in Model.RawBindings)
         {
-            <tr>
-                <td class="control-group"><input type="text" class="input-medium span4" name="bindings" value="@binding" /></td>
-                <td class="valign-top" style="padding-top: 7px;"><img src="/Images/icon_delete.png" class="remove-binding pointer @Html.Raw(Model.Bindings.Length == 1 ? " hide" : "")" /></td>
+            <tr @Html.Raw(binding.ToString().StartsWith("https://") ? "class=\"hide\"" : "")>
+                <td class="control-group"><input type="text" class="input-medium span4" name="rawbindings" value="@binding" /></td>
+                <td class="valign-top" style="padding-top: 7px;"><img src="/Images/icon_delete.png" class="remove-binding pointer @Html.Raw((((string[]) Model.RawBindings).Count(x => x.StartsWith("http://"))) == 1 ? " hide" : "")" /></td>
             </tr>
         }
     }
