@@ -1,4 +1,5 @@
-﻿using Servant.Business.Objects.Enums;
+﻿using System.Collections.Generic;
+using Servant.Business.Objects.Enums;
 
 namespace Servant.Business.Objects
 {
@@ -11,6 +12,7 @@ namespace Servant.Business.Objects
         public InstanceState SiteState { get; set; }
         public InstanceState ApplicationPoolState { get; set; }
         public string LogFileDirectory { get; set; }
-        public string[] Bindings { get; set; }
+        public List<Binding> Bindings { get; set; }
+        public string[] RawBindings { get; set; }
     }
 }
