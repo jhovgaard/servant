@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
-using Servant.Business.Objects.Reporting;
 using Servant.Business.Services;
 using Nancy.Responses;
 using Nancy.ModelBinding;
@@ -36,6 +34,7 @@ namespace Servant.Manager.Modules
                 var site = this.Bind<Site>();
                 Model.Site = site;
                 Model.ApplicationPools = siteManager.GetApplicationPools();
+                site.RawBindings = Request.Form.RawBindings.ToString().Split(',');
 
                 if(string.IsNullOrWhiteSpace(site.Name))
                     AddPropertyError("name", "Name is required.");
@@ -49,27 +48,28 @@ namespace Servant.Manager.Modules
                 if(site.SitePath != null && !FileSystemHelper.DirectoryExists(site.SitePath))
                     AddPropertyError("sitepath", "The entered directory doesn't exist.");
 
-                if(site.Bindings == null)
+                if(site.RawBindings == null)
                     AddPropertyError("bindings", "Minimum 1 binding is required.");
                 else
                 {
-                    for (int i = 0; i < site.Bindings.Length; i++)
+                    for (int i = 0; i < site.RawBindings.Length; i++)
                     {
-                        var binding = site.Bindings[i];
+                        var binding = site.RawBindings[i];
                         var finalizedBinding = BindingHelper.SafeFinializeBinding(binding);
 
                         if (finalizedBinding == null)
                         {
-                            AddPropertyError("bindings[" + i + "]", "The binding is invalid.");
+                            AddPropertyError("rawbindings[" + i + "]", "The binding is invalid.");
                             continue;
                         }
 
                         if (siteManager.IsBindingInUse(binding))
-                            AddPropertyError("httpbindings",
-                                             string.Format("The binding {0} is already in use.", binding));
+                            AddPropertyError("rawbindings", string.Format("The binding {0} is already in use.", binding));
                     }
                 }
-                
+
+                site.Bindings = BindingHelper.ConvertRawBindings(Request.Form.RawBindings);
+
                 if(!HasErrors)
                 {
                     var result = siteManager.CreateSite(site);
@@ -93,6 +93,7 @@ namespace Servant.Manager.Modules
             Get[@"/(?<Id>[\d]{1,4})/settings/"] = p =>
             {
                 Site site = siteManager.GetSiteById(p.Id);
+                site.RawBindings = site.Bindings.Select(x => x.ToString()).ToArray();
 
                 Model.Site = site;
                 Model.ApplicationPools = siteManager.GetApplicationPools();
@@ -105,18 +106,21 @@ namespace Servant.Manager.Modules
                 
                 site.Name = Request.Form.SiteName;
                 site.SitePath = Request.Form.SitePath;
-                site.Bindings = Request.Form.Bindings.ToString().Split(',');
                 site.ApplicationPool = Request.Form.ApplicationPool;
-
+                site.RawBindings = Request.Form.RawBindings.ToString().Split(',');
                 if (site.Bindings == null)
                     AddPropertyError("bindings", "Minimum 1 binding is required.");
                 else
                 {
-                    for(var i = 0; i < site.Bindings.Length; i++)
+                    for(var i = 0; i < site.RawBindings.Length; i++)
                     {
-                        var binding = site.Bindings[i];
-                        if (siteManager.IsBindingInUse(binding, site.IisId))
-                            AddPropertyError("bindings[" + i + "]", string.Format("The binding {0} is already in use.", binding));
+                        var binding = site.RawBindings[i];
+                        var finializedBinding = BindingHelper.SafeFinializeBinding(binding);
+                        
+                        if(finializedBinding == null)
+                            AddPropertyError("rawbindings[" + i + "]", string.Format("The binding {0} is invalid.", binding));
+                        else if (siteManager.IsBindingInUse(binding, site.IisId))
+                            AddPropertyError("rawbindings[" + i + "]", string.Format("The binding {0} is already in use.", binding));
                     }
                 }
 
@@ -124,7 +128,10 @@ namespace Servant.Manager.Modules
                 Model.Site = site;
 
                 if(!HasErrors)
+                {
+                    site.Bindings = BindingHelper.ConvertRawBindings(site.RawBindings);
                     siteManager.UpdateSite(site);
+                }
 
                 return View["Settings", Model];
             };
@@ -229,7 +236,7 @@ namespace Servant.Manager.Modules
                 
                 Site site = siteManager.GetSiteById(p.Id);
                 var hasAnyErrors = applicationErrorService.GetCountBySite(site.IisId) != 0;
-
+                
                 IEnumerable<ApplicationError> errors = null;
                 switch (range)
                 {

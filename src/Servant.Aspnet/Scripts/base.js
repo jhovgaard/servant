@@ -14,7 +14,7 @@
 
     $("#add-binding").click(function () {
         var bindings = $("#bindings");
-        var newBinding = bindings.find("tr:last").clone();
+        var newBinding = bindings.find("tr:visible:last").clone();
         newBinding.find("td input").val("");
         newBinding.find("td").removeClass("error");
         newBinding.find("td span.help-block, td span.help-inline").remove();
@@ -25,11 +25,11 @@
     });
 
     $("#bindings").on("click", "tr td img.remove-binding", function () {
-        if ($("#bindings tr").length > 1) {
+        if ($("#bindings tr:visible").length > 1) {
             $(this).parent().parent().remove();
         }
 
-        if ($("#bindings tr").length == 1) {
+        if ($("#bindings tr:visible").length == 1) {
             $("#bindings tr td img").addClass("hide");
         }
 

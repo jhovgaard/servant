@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using Servant.Business.Helpers;
+using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Site = Servant.Business.Objects.Site;
 
@@ -45,7 +48,7 @@ namespace Servant.Manager.Helpers
 
             var applicationPoolState = _manager.ApplicationPools[site.Applications[0].ApplicationPoolName].State;
 
-            var allowedProtocols = new[] { "http"};
+            var allowedProtocols = new[] { "http", "https"};
             return new Site {
                     IisId = (int)site.Id,
                     Name = site.Name,
@@ -54,12 +57,41 @@ namespace Servant.Manager.Helpers
                     SiteState = (InstanceState)Enum.Parse(typeof(InstanceState), site.State.ToString()),
                     ApplicationPoolState = (InstanceState)Enum.Parse(typeof(InstanceState),  applicationPoolState.ToString()),
                     LogFileDirectory = site.LogFile.Directory,
-                    Bindings = site.Bindings
-                        .ToList()
-                        .Where(x => allowedProtocols.Contains(x.Protocol))
-                        .Select(x => (string.IsNullOrEmpty(x.Host) ? "*" : x.Host) + ":" + x.EndPoint.Port)
-                        .ToArray()
+                    Bindings = GetBindings(site).ToList()
                 };
+        }
+
+        private IEnumerable<Binding> GetBindings(Microsoft.Web.Administration.Site iisSite)
+        {
+            var allowedProtocols = new[] { "http", "https" };
+            var certificates = GetCertificates();
+            
+            foreach (var binding in iisSite.Bindings.Where(x => allowedProtocols.Contains(x.Protocol)))
+            {
+                var servantBinding = new Binding();
+
+                if (binding.Protocol == "https" && binding.CertificateHash != null)
+                {
+                    var certificate = certificates.SingleOrDefault(cert => cert.GetCertHash().SequenceEqual(binding.CertificateHash));
+                    if (certificate != null)
+                    {
+                        servantBinding.CertificateName = certificate.FriendlyName;
+                        servantBinding.CertificateHash = binding.CertificateHash;    
+                    }
+                }
+                servantBinding.Protocol = (Protocol) Enum.Parse(typeof(Protocol), binding.Protocol);
+                servantBinding.Hostname = binding.Host;
+                servantBinding.Port = binding.EndPoint.Port;
+
+                yield return servantBinding;
+            }
+        }
+
+        public List<X509Certificate2> GetCertificates()
+        {
+            var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            store.Open(OpenFlags.OpenExistingOnly);
+            return store.Certificates.Cast<X509Certificate2>().ToList();
         }
 
         public static string GetSitename(Servant.Business.Objects.Site site) {
@@ -69,21 +101,11 @@ namespace Servant.Manager.Helpers
             return site.Name;
         }
 
-        private static IEnumerable<string> ConvertBindingsToBindingInformations(string[] bindings)
+        private static IEnumerable<string> ConvertBindingsToBindingInformations(IEnumerable<Binding> bindings)
         {
-            var bindingsToAdd = new List<string>();
-            foreach (var binding in bindings.Where(x => !string.IsNullOrWhiteSpace(x)))
-            {
-                var hostInfos = binding
-                    .ToLower()
-                    .Replace("http://", string.Empty)
-                    .Replace("https://", string.Empty)
-                    .Split(':');
-                var host = hostInfos[0];
-                var port = hostInfos.Length == 1 ? 80 : Convert.ToInt32(hostInfos[1]);
-
-                bindingsToAdd.Add(string.Format("*:{0}:{1}", port, host));
-            }
+            var bindingsToAdd = bindings
+                .Select(binding => string.Format("*:{0}:{1}", binding.Port, binding.Hostname))
+                .ToList();
 
             return bindingsToAdd.Distinct();
         }
@@ -97,13 +119,12 @@ namespace Servant.Manager.Helpers
             iisSite.Name = site.Name;
             application.ApplicationPoolName = site.ApplicationPool;
 
-            // Normalizing and preparing bindings
-            var bindingsToAdd = ConvertBindingsToBindingInformations(site.Bindings);
-                
             // Commits bindings
             iisSite.Bindings.Clear();
-            foreach (var binding in bindingsToAdd)
-                iisSite.Bindings.Add(binding, "http");
+            foreach (var binding in site.Bindings)
+            {
+                iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.Protocol.ToString());
+            }
                 
             _manager.CommitChanges();
         }
@@ -148,12 +169,13 @@ namespace Servant.Manager.Helpers
             return ParseSite(_manager.Sites.SingleOrDefault(x => x.Name == name));
         }
 
-
-        public bool IsBindingInUse(string binding)
+        public bool IsBindingInUse(string rawBinding, int iisSiteId = 0)
         {
-            return IsBindingInUse(binding, 0);
+            var binding = BindingHelper.ConvertToBinding(BindingHelper.FinializeBinding(rawBinding));
+            return IsBindingInUse(binding, iisSiteId);
         }
-        public bool IsBindingInUse(string binding, int iisSiteId)
+
+        public bool IsBindingInUse(Binding binding, int iisSiteId = 0)
         {
             var bindingInformations = ConvertBindingsToBindingInformations(new[] {binding});
             return GetBindingInUse(iisSiteId, bindingInformations) != null;
@@ -161,7 +183,7 @@ namespace Servant.Manager.Helpers
 
         public CreateSiteResult CreateSite(Site site)
         {
-            var bindingInformations = ConvertBindingsToBindingInformations(site.Bindings);
+            var bindingInformations = site.Bindings.Select(x=> x.ToIisBindingInformation()).ToList();
                 
             // Check bindings
             var bindingInUse = GetBindingInUse(0, bindingInformations); // 0 never exists

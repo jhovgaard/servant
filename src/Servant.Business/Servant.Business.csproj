@@ -70,8 +70,10 @@
     <Compile Include="Helpers\SecurityHelper.cs" />
     <Compile Include="Helpers\BindingHelper.cs" />
     <Compile Include="LogParser.cs" />
+    <Compile Include="Objects\Binding.cs" />
     <Compile Include="Objects\Entity.cs" />
     <Compile Include="Objects\Enums\CreateSiteResult.cs" />
+    <Compile Include="Objects\Enums\Protocol.cs" />
     <Compile Include="Objects\Enums\SiteStartResult.cs" />
     <Compile Include="Objects\Enums\InstanceState.cs" />
     <Compile Include="Objects\Enums\StatsRange.cs" />
