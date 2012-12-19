@@ -40,18 +40,6 @@ namespace Servant.Manager
                 if (nancyContext.Response.ContentType == "text/html")
                     nancyContext.Response.ContentType = "text/html; charset=utf8";
             });
-            
-            pipelines.AfterRequest.InsertAfter("RebootHandler", ctx => {
-                if(ctx.Items.ContainsKey("RebootNancyHost"))
-                {
-                    new System.Threading.Thread(() =>
-                                                    {
-                                                        System.Threading.Thread.Sleep(10);
-                                                        host.Kill();
-                                                        host.Start();
-                                                    }).Start();                    
-                }
-            });
 
             pipelines.AfterRequest.InsertAfter("RebootHandler", ctx =>
             {

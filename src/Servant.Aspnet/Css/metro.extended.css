@@ -28,7 +28,7 @@ input.input-medium:focus, select.input-medium:focus
     box-shadow: none !important;
 }
 
-input.btn
+.btn
 {
     font-size: 16px;
     text-shadow: none;
@@ -38,7 +38,7 @@ input.btn
     border-radius: 0;
 }
 
-input.btn-primary {
+.btn-primary {
     background-color: #1ba1e2;
 }
 

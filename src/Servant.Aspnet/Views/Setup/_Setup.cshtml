@@ -25,6 +25,7 @@
     <script src="/Scripts/base.js" type="text/javascript"></script>
     <script type="text/javascript">
         var errors = @Html.Raw(Model.ErrorsAsJson);
+        var message = "";
     </script>
     @RenderSection("javascript", false)
 </html>
