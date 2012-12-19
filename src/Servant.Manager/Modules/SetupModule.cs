@@ -18,6 +18,25 @@ namespace Servant.Manager.Modules
             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
             var settings = settingsService.LocalSettings;
 
+            Get["/setup/confirm/"] = _ =>
+            {
+                string url = Request.Query.Url;
+                Model.Url = url;
+
+                return View["confirm", Model];
+            };
+
+            Get["/setup/restartservant/"] = _ =>
+            {
+                new System.Threading.Thread(() =>
+                    {
+                        host.LoadSettings();
+                        host.Kill();
+                        host.Start();        
+                    }).Start();
+                return true;
+            };
+
             if(!settings.SetupCompleted)
             {
                 Get["/setup/1/"] = _ => {
@@ -57,17 +76,9 @@ namespace Servant.Manager.Modules
                         if (!settings.ParseLogs && formSettings.ParseLogs) 
                             host.StartLogParsing();
 
-                        if (bindingIsChanged)
-                        {
-                            After += ctx => ctx.Items.Add("RebootNancyHost", true);
-                            return Response.AsRedirect(formSettings.ServantUrl);
-                        }
-
-                        return Response.AsRedirect("/");
+                        return Response.AsRedirect("/setup/confirm/?url=" + Uri.EscapeDataString(formSettings.ServantUrl));
                     }
 
-                    
-                    
                     formSettings.ServantUrl = originalInputtedServantUrl;
 
                     Model.OriginalServantUrl = settings.ServantUrl;

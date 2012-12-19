@@ -1,0 +1,20 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "_Setup.cshtml";
+}
+
+<div class="row margin-top30">
+    <div class="span6 offset3 center">
+        <h3>Servant is ready!</h3> 
+        <p class="margin-top10">
+            <a href="@Model.Url"4 class="btn btn-primary">Click here to login</a>
+        </p>
+    </div>
+</div>
+@section javascript {
+    <script>
+        $(function() {
+            $.get("/setup/restartservant/");
+        });
+    </script>
+}

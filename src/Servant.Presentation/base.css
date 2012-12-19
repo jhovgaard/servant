@@ -1,6 +1,7 @@
 ﻿body {
     background-color: white;
     padding: 80px 0 20px;
+    overflow-y: scroll;
 }
 
 h3 {
