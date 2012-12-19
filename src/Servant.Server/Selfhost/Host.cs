@@ -39,13 +39,13 @@ namespace Servant.Server.Selfhost
             if(_localSettings.ParseLogs)
                 _timer.Start();
 
-            if(Debug)
-                Console.WriteLine("Host started on {0}", _localSettings.ServantUrl);
+            Console.WriteLine("Host started on {0}", _localSettings.ServantUrl);
         }
 
         public void Stop()
         {
             ServantHost.Stop();
+            Console.WriteLine("Servant was stopped.");
         }
 
         public void Kill()
