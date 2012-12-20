@@ -12,11 +12,11 @@ namespace Servant.Manager.Modules
 {
     public class SettingsModule : BaseModule
     {
-        private SettingsService settingsService = TinyIoC.TinyIoCContainer.Current.Resolve<SettingsService>();
+        private SettingsService settingsService = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SettingsService>();
 
         public SettingsModule() : base("/settings/")
         {
-            var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+            var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
 
             Get["/"] = p => {
                 var settings = settingsService.LocalSettings;
@@ -60,7 +60,7 @@ namespace Servant.Manager.Modules
                             host.Start();
                         }).Start();
                         
-                        return Response.AsRedirect(new System.Uri(formSettings.ServantUrl + "settings/").ToString());
+                        return Response.AsRedirect(formSettings.ServantUrl + "settings/");
                     }
                 }
 

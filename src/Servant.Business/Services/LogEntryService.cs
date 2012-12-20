@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dapper;
-using DapperExtensions;
 using Servant.Business.Extensions;
 using Servant.Business.Objects;
 

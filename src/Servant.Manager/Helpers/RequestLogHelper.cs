@@ -16,7 +16,7 @@ namespace Servant.Manager.Helpers
 
         public static void InsertNewInDbBySite(Site site, LogEntry latestEntry)
         {
-            var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+            var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
 
             var logfiles = GetLogFilesBySite(site).ToList();
             if (latestEntry != null)

@@ -32,7 +32,7 @@ namespace Servant.Server.Selfhost
                 LoadSettings();
             
             if (ServantHost == null)
-                ServantHost = new NancyHost(new Uri(_localSettings.ServantUrl));
+                ServantHost = new NancyHost(new Uri(_localSettings.ServantUrl.Replace("*", "localhost")));
             
             ServantHost.Start();
 

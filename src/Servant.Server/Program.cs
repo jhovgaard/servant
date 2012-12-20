@@ -14,7 +14,7 @@ namespace Servant.Server
 
         static void Init()
         {
-            TinyIoC.TinyIoCContainer.Current.Register<IHost, Host>().AsSingleton();
+            Nancy.TinyIoc.TinyIoCContainer.Current.Register<IHost, Host>().AsSingleton();
         }
 
         static void Main(string[] args)
@@ -23,7 +23,7 @@ namespace Servant.Server
             EnsureDatabaseExists();
 
             var settings = new SettingsService().LocalSettings;
-            var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+            var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
 
             Console.WriteLine();
             Console.WriteLine("Welcome to Servant for IIS.");

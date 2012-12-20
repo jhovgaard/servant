@@ -39,15 +39,12 @@
     <Reference Include="Dapper">
       <HintPath>..\packages\Dapper.1.12.1\lib\net40\Dapper.dll</HintPath>
     </Reference>
-    <Reference Include="DapperExtensions">
-      <HintPath>..\packages\DapperExtensions.1.3.2\lib\net40\DapperExtensions.dll</HintPath>
+    <Reference Include="DapperExtensions, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DapperExtensions.1.4.0\lib\net40\DapperExtensions.dll</HintPath>
     </Reference>
     <Reference Include="DataAnnotationsExtensions">
       <HintPath>..\packages\DataAnnotationsExtensions.1.1.0.0\lib\NETFramework40\DataAnnotationsExtensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Simple.Data, Version=0.18.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Simple.Data.Core.0.18\lib\net40\Simple.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -89,9 +86,9 @@
     <Compile Include="Objects\ApplicationError.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ApplicationErrorService.cs" />
+    <Compile Include="Services\ServantClassMapper.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\LogEntryService.cs" />
-    <Compile Include="Services\Service.cs" />
     <Compile Include="Services\SqlLiteService.cs" />
   </ItemGroup>
   <ItemGroup>

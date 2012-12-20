@@ -1,7 +1,6 @@
-﻿using Nancy;
-using Nancy.Bootstrapper;
+﻿using Nancy.Bootstrapper;
+using Nancy.TinyIoc;
 using Servant.Manager.Infrastructure;
-using TinyIoC;
 
 namespace Servant.Aspnet
 {

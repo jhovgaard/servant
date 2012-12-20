@@ -31,7 +31,7 @@ namespace Servant.Manager.Modules
             
         public void Setup()
         {
-            _settingsService = TinyIoC.TinyIoCContainer.Current.Resolve<SettingsService>();
+            _settingsService = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SettingsService>();
 
             var nonAuthenticatedModules = new List<Type> { typeof(SetupModule) };
             var requiresAuthentication = !nonAuthenticatedModules.Contains(this.GetType());
