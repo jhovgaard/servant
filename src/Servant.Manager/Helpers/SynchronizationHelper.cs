@@ -8,7 +8,7 @@ namespace Servant.Manager.Helpers
     {
          public static void SyncServer()
          {
-             var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+             var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
 
              var logEntryService = new LogEntryService();
              var siteManager = new SiteManager();

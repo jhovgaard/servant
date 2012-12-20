@@ -5,9 +5,9 @@ using Nancy.Authentication.Basic;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
 using Nancy.Session;
+using Nancy.TinyIoc;
 using Servant.Business.Services;
 using Servant.Manager.Infrastructure;
-using TinyIoC;
 
 namespace Servant.Manager
 {
@@ -15,11 +15,11 @@ namespace Servant.Manager
     {
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
-            TinyIoC.TinyIoCContainer.Current.Register<SettingsService>().AsSingleton();
+            TinyIoCContainer.Current.Register<SettingsService>().AsSingleton();
 
             base.ApplicationStartup(container, pipelines);
 
-            var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+            var host = TinyIoCContainer.Current.Resolve<IHost>();
 
             pipelines.EnableBasicAuthentication(new BasicAuthenticationConfiguration(container.Resolve<IUserValidator>(), "Servant"));
             CookieBasedSessions.Enable(pipelines);

@@ -15,11 +15,11 @@ namespace Servant.Business.Helpers
             {
                 binding = FinializeBinding(binding);
             }
-            catch (UriFormatException uriEx)
+            catch (UriFormatException)
             {
                 return null;
             }
-            catch (ArgumentException argEx)
+            catch (ArgumentException)
             {
                 return null;
             }
@@ -38,7 +38,7 @@ namespace Servant.Business.Helpers
 
             return String.Format("{0}://{1}:{2}{3}",
                                  (Protocol) Enum.Parse(typeof(Protocol), uri.Scheme),
-                                 uri.Host,
+                                 uri.Host.Replace(WildcardIdentifier, "*"),
                                  uri.Port,
                                  uri.AbsolutePath);
         }

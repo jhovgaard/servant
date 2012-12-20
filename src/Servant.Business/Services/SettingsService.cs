@@ -1,17 +1,11 @@
-﻿using System;
+﻿using System.Linq;
+using Dapper;
 using Servant.Business.Objects;
 
 namespace Servant.Business.Services
 {
-    public class SettingsService : Service<Settings>
+    public class SettingsService : SqlLiteService<Settings>
     {
-        public SettingsService() : base("Settings")
-        {
-            Guid = Guid.NewGuid();
-
-        }
-        public Guid Guid { get; set; }
-
         private Settings _settings;
         public Settings LocalSettings
         {
@@ -20,7 +14,7 @@ namespace Servant.Business.Services
                 if (_settings != null)
                     return _settings;
 
-                var settings = Table.All().FirstOrDefault();
+                var settings = Connection.Query<Settings>("SELECT * FROM Settings LIMIT 1").FirstOrDefault();
                 if(settings == null)
                 {
                     settings = new Settings
@@ -42,6 +36,18 @@ namespace Servant.Business.Services
         public void ReloadLocalSettings()
         {
             _settings = null;
+        }
+
+        public void DeleteAll()
+        {
+            Connection.Execute("DELETE FROM Settings");
+        }
+
+        public new void Insert(Settings settings)
+        {
+            Connection.Execute(
+                "INSERT INTO Settings (ServantUrl, Debug, Username, Password, SetupCompleted, ParseLogs) VALUES(@ServantUrl, @Debug, @Username, @Password, @SetupCompleted, @ParseLogs)",
+                settings);
         }
     }
 }

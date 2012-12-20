@@ -14,8 +14,8 @@ namespace Servant.Manager.Modules
     {
         public SetupModule()
         {
-            var settingsService = TinyIoC.TinyIoCContainer.Current.Resolve<SettingsService>();
-            var host = TinyIoC.TinyIoCContainer.Current.Resolve<IHost>();
+            var settingsService = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SettingsService>();
+            var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
             var settings = settingsService.LocalSettings;
 
             Get["/setup/confirm/"] = _ =>
