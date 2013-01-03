@@ -24,9 +24,10 @@ namespace Servant.Manager.Modules
             };
 
             Get["/create/"] = p => {
-                var site = new Site();
+                var site = new Site() { RawBindings = new[] {""} };
                 Model.Site = site;
                 Model.ApplicationPools = siteManager.GetApplicationPools();
+                Model.Certificates = siteManager.GetCertificates().Select(x => x.FriendlyName);
                 return View["Create", Model];
             };
             
@@ -34,6 +35,7 @@ namespace Servant.Manager.Modules
                 var site = this.Bind<Site>();
                 Model.Site = site;
                 Model.ApplicationPools = siteManager.GetApplicationPools();
+                Model.Certificates = siteManager.GetCertificates().Select(x => x.FriendlyName);
                 site.RawBindings = Request.Form.RawBindings.ToString().Split(',');
 
                 if(string.IsNullOrWhiteSpace(site.Name))
@@ -95,6 +97,7 @@ namespace Servant.Manager.Modules
                 Site site = siteManager.GetSiteById(p.Id);
                 site.RawBindings = site.Bindings.Select(x => x.ToString()).ToArray();
 
+                Model.Certificates = siteManager.GetCertificates().Select(x => x.FriendlyName);
                 Model.Site = site;
                 Model.ApplicationPools = siteManager.GetApplicationPools();
                 return View["Settings", Model];

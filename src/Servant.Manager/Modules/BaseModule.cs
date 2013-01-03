@@ -7,6 +7,7 @@ using Nancy;
 using Nancy.Validation;
 using Servant.Business.Objects;
 using Servant.Business.Services;
+using Servant.Manager.Helpers;
 using Servant.Manager.Views.Shared.Models;
 
 namespace Servant.Manager.Modules
@@ -17,7 +18,9 @@ namespace Servant.Manager.Modules
         protected PageModel Page { get; set; }
         public bool HasErrors { get { return Model.Errors.Count != 0; }}
         private SettingsService _settingsService;
+        private SiteManager _siteManager;
         private const string MessageKey = "Message";
+        private const string MessageTypeKey = "MessageType";
 
         public BaseModule()
         {
@@ -32,15 +35,19 @@ namespace Servant.Manager.Modules
         public void Setup()
         {
             _settingsService = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SettingsService>();
+            _siteManager = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SiteManager>();
 
             var nonAuthenticatedModules = new List<Type> { typeof(SetupModule) };
             var requiresAuthentication = !nonAuthenticatedModules.Contains(this.GetType());
 
             Before += ctx =>
             {
+
+                Model.Title = "Servant for IIS";
                 Page = new PageModel
                 {
-                    Servername = System.Environment.MachineName
+                    Servername = System.Environment.MachineName,
+                    Sites = _siteManager.GetSites()
                 };
 
                 Model.Page = Page;
@@ -57,6 +64,7 @@ namespace Servant.Manager.Modules
                 if (!redirectStatusCodes.Contains(ctx.Response.StatusCode))
                 {
                     Model.Message = Session[MessageKey];
+                    Model.MessageType = Session[MessageTypeKey];
                     Session[MessageKey] = null;
                 }
                 
@@ -87,9 +95,22 @@ namespace Servant.Manager.Modules
             Model.Errors.AddRange(Helpers.ErrorHelper.ConvertValidationResultToErrorList(result));
         }
 
+        public enum MessageType
+        {
+            Success,
+            Error,
+            Info
+        }
+
         public void AddMessage(string message, params string[] args)
         {
+            AddMessage(message, MessageType.Info, args);
+        }
+
+        public void AddMessage(string message, MessageType type = MessageType.Info, params string[] args)
+        {
             Session[MessageKey] = string.Format(message, args);
+            Session[MessageTypeKey] = type;
         }
     }
 }

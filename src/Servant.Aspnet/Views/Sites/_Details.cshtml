@@ -3,15 +3,15 @@
     Layout = "Shared/_Layout.cshtml";
 }
 
-<h2><a href="/sites/">Websites</a> - @Model.Site.Name</h2>
 
-<ul class="submenu active-@ViewBag.ActiveSubmenuItem">
-    <li><a class="submenu-settings" href="/sites/@Model.Site.IisId/settings/">Settings</a></li>
-    @*<li><a class="submenu-deployment" href="/sites/@Model.Site.IisId/deployment/">Deployment</a></li>*@
-    @*<li><a class="submenu-stats" href="/sites/@Model.Site.IisId/stats/">Statistics</a></li>*@
-    <li><a class="submenu-errors" href="/sites/@Model.Site.IisId/errors/">Errors</a></li>
-</ul>
-<div class="clear"></div>
+<div id="topmenu">
+    <ul class="active-@ViewBag.ActiveSubmenuItem">
+        <li><h1><a href="/sites/@Model.Site.IisId/settings/">@Model.Site.Name</a></h1></li>
+        <li class="settings"><a href="/sites/@Model.Site.IisId/settings/">Settings</a></li>
+        <li class="errors"><a href="/sites/@Model.Site.IisId/errors/">Errors</a></li>
+    </ul>
+</div>
+
 @RenderBody()
 
 @section javascript {

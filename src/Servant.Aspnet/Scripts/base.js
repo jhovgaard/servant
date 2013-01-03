@@ -11,10 +11,15 @@
             return false;
     });
 
-
+    $("#bindings").on("change", "tr td input[name=https]", function () {
+        var $certificate = $(this).parent().parent().parent().find("select");
+        console.log($certificate);
+        $certificate.toggle();
+    });
+    
     $("#add-binding").click(function () {
         var bindings = $("#bindings");
-        var newBinding = bindings.find("tr:visible:last").clone();
+        var newBinding = bindings.find("tbody:visible:last").clone();
         newBinding.find("td input").val("");
         newBinding.find("td").removeClass("error");
         newBinding.find("td span.help-block, td span.help-inline").remove();
@@ -25,8 +30,8 @@
     });
 
     $("#bindings").on("click", "tr td img.remove-binding", function () {
-        if ($("#bindings tr:visible").length > 1) {
-            $(this).parent().parent().remove();
+        if ($("#bindings tbody:visible").length > 1) {
+            $(this).parent().parent().parent().remove();
         }
 
         if ($("#bindings tr:visible").length == 1) {
