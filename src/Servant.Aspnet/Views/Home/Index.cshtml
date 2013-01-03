@@ -4,20 +4,27 @@
     ViewBag.ActiveMenuItem = "home";
 }
 
-<h2 class="center">Welcome to <strong>Servant for IIS</strong></h2>
-<hr/>
-@*<h3 class="margin-top30">Today's big numbers</h3>  
+<h1 class="pushdown-short">Welcome to <strong>Servant for IIS</strong></h1>
 
-<div class="margin-top10">
-    @Model.TotalRequestsToday requests served<br/>
-</div>
+<p class="pushdown-long indent">
+    Hi Administrator!<br/>
+    <br/>
+    We’re happy to help you manage your IIS. If you have any questions feel free to contact the team at hello@servant.io. <br/>
+    Found a bug or have a suggestion? Click the feedback button in the bottom right corner and let us know!
+</p>
 
-<hr/>*@
-
-<h3>Latest errors</h3>
+<h2 class="bug">Latest unhandled exceptions</h2>
 @if(Model.UnhandledExceptions.Count != 0)
 {
-    <table class="table table-striped margin-top10">
+    <table>
+        <thead>
+            <tr>
+                <th>Site</th>
+                <th>Exception</th>
+                <th>Timestamp</th>
+
+            </tr>
+        </thead>
         @foreach(Servant.Business.Objects.ApplicationError error in Model.UnhandledExceptions) {
             <tr>
                 <td style="min-width: 60px">

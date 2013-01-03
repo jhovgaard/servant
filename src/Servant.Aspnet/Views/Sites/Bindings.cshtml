@@ -1,25 +1,26 @@
-﻿@using System.Collections.Generic
-@using System.Linq
-@using Servant.Business.Objects
-@using Servant.Business.Objects.Enums
+﻿@using System.Linq
 @inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
-
-<h4 class="margin-top30">Bindings<img src="/images/icon_add.png" class="margin-left10 pointer" id="add-binding" /></h4>
-<p class="margin-top10">Example: <code>servant.io</code></p>
-<table  id="bindings">
-    @if (Model.RawBindings == null)
+<table id="bindings" class="pushdown-short">
+    @foreach (var binding in Model.Site.RawBindings)
     {
+        <tbody>
         <tr>
-            <td class="control-group"><input type="text" class="input-medium span4" name="rawbindings" value="" /></td>
-            <td class="valign-top" style="padding-top: 7px;"><img src="/Images/icon_delete.png" class="remove-binding pointer hide" /></td>
+            <td style="width: 73px; padding-top: 15px; vertical-align: top;">
+                <label>HTTPS <input type="checkbox" name="https" /></label>
+            </td>
+            <td>
+                <input type="text" name="rawbindings" value="@binding" style="width: 100%;" />
+                <select style="width: 100%; border-top: 0; display: none;" name="certificate">
+                    @foreach (var certificate in Model.Certificates)
+                    {
+                        <option>@certificate</option>
+                    }
+                </select>
+            </td>
+            <td style="width: 30px; text-align: center; padding-top: 15px; vertical-align: top;"><img src="/Images/icon-delete.png" class="remove-binding pointer @Html.Raw((((string[]) Model.Site.RawBindings).Count()) == 1 ? " hide" : "")" /></td>
         </tr>
-    } else {
-        @foreach (var binding in Model.RawBindings)
-        {
-            <tr @Html.Raw(binding.ToString().StartsWith("https://") ? "class=\"hide\"" : "")>
-                <td class="control-group"><input type="text" class="input-medium span4" name="rawbindings" value="@binding" /></td>
-                <td class="valign-top" style="padding-top: 7px;"><img src="/Images/icon_delete.png" class="remove-binding pointer @Html.Raw((((string[]) Model.RawBindings).Count(x => x.StartsWith("http://"))) == 1 ? " hide" : "")" /></td>
-            </tr>
-        }
+        </tbody>
     }
 </table>
+
+<a href="#" class="add" id="add-binding">Add more</a>
