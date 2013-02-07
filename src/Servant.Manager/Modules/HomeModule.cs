@@ -1,22 +1,16 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using Nancy;
-using Nancy.Security;
-using Servant.Business.Services;
+﻿using System.Linq;
 using Servant.Manager.Helpers;
 
 namespace Servant.Manager.Modules
 {
     public class HomeModule : BaseModule
     {
-        public HomeModule(ApplicationErrorService applicationErrorService, LogEntryService logEntryService)
+        public HomeModule()
         {
             Get["/"] = p => {
-                var latestErrors = applicationErrorService.GetByDateTimeDescending(10).ToList();
+                var latestErrors = EventLogHelper.GetByDateTimeDescending(5).ToList();
                 latestErrors = EventLogHelper.AttachSite(latestErrors);
                 Model.UnhandledExceptions = latestErrors;
-                Model.TotalRequestsToday = logEntryService.GetTotalCount(DateTime.UtcNow.Date);
                 return View["Index", Model];
             };
         }

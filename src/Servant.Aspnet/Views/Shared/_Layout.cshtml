@@ -1,11 +1,11 @@
 ﻿@using Servant.Business.Objects
-@using Servant.Manager.Modules
 @inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>@Model.Title</title>
+    <link href="/css/normalize.css" rel="stylesheet" />
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
     <link href="/css/base.css" rel="stylesheet" type="text/css" />
 </head>
@@ -19,12 +19,11 @@
                 \\@Model.Page.Servername
             </div>
             
-            <form id="search" action="/search/" method="GET">
-                <input type="text" class="white" style="float:left;" />
-                <input type="submit" value=""  />
-            </form>
+            <div id="search">
+                <input type="text" class="white" style="float:left;" /><input type="submit" value=""  />
+            </div>
             
-            <ul>
+            <ul class="active-@ViewBag.ActiveMenuItem">
                 <li class="home"><a href="/">Home</a></li>
                 <li class="sites">
                     <a href="#">Sites<span class="arrow"></span></a>
@@ -33,13 +32,14 @@
                         <li class="bold"><a href="/sites/create">Create new</a></li> 
                         @foreach (Site site in Model.Page.Sites)
                         {
-                            <li><a href="/sites/@site.IisId/settings/">@site.Name</a></li>     
+                            <li@Html.Raw(ViewBag.ActiveSiteName == site.Name ? " class=\"active\"" : null)>
+                                <a href="/sites/@site.IisId/settings/">@site.Name</a>
+                            </li>     
                         }
                     </ul>
                 </li>
                 <li class="settings"><a href="/settings/">Settings</a></li>
             </ul>
-
         </div>
         <div id="maincontent">
             <div id="content-minwidth">
@@ -49,7 +49,7 @@
     </body>
     
     <script src="/scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
-    <script src="/scripts/jquery.uitablefilter.js" type="text/javascript"></script>
+    <script src="/scripts/jquery.filtr.min.js"></script>
     <script src="/scripts/jquery.watermark.min.js"></script>
     <script src="/scripts/base.js" type="text/javascript"></script>
     <script type="text/javascript">
@@ -57,15 +57,9 @@
         var message = "@Html.Raw(Model.Message)";
     </script>
     <script type="text/javascript">
-        //var uvOptions = {};
-        //(function() {
-        //    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
-        //    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/ntkZvVjd0zcNeUeKbxKL8Q.js';
-        //    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
-        //})();
-
         $(function() {
             var $searchTextbox = $("#search input[type=text]");
+            var searchResultInFocus = null;
             $searchTextbox.watermark("Search");
             var $popupMessage = $('#popup-message');
 
@@ -75,16 +69,95 @@
                 @:$popupMessage.delay(200).slideDown();    
             }
 
-            $("body").keydown(function(e) {
+            $("body").keypress(function(e) {
                 var activeElement = $(document.activeElement);
-                
-                if (!activeElement.is(':input')) {
-                    if (e.keyCode === 40) {
-                        console.log($("#submenu ul li a"));
-                        $("#submenu ul li a").focus();
-                    } else {
-                        $searchTextbox.focus();
+                if (e.which == 47 && !activeElement.is(':input')) {
+                    var charcheck = /[a-zA-Z0-9]/;
+                    var keyPressed = String.fromCharCode(e.which);
+                    if(!charcheck.test(keyPressed)) {
+                        keyPressed = '';
                     }
+                    var query = $searchTextbox.val() + keyPressed;
+                    $searchTextbox.focus().val(query);
+                    return false;
+                }
+            });
+            
+            $searchTextbox.keyup(function(e) {
+                var $sidemenu = $('#sidemenu');
+                var searchresults = $('#searchresults');
+                
+                if (e.keyCode == 27) { //esc
+                    $searchTextbox.val('');
+                    $sidemenu.removeClass('search');
+                    return false;
+                }
+                if (e.keyCode == 13) {
+                    var link = searchresults.find('a:visible.active');
+                    if (!link.length)
+                        link = searchresults.find('a:visible:first');
+                    
+                    if (link.length) {
+                        window.location = link.attr("href");
+                    }
+                    return false;
+                };
+
+                
+                if ((e.keyCode == 40 || e.keyCode == 38) && searchresults.length) { //40 == arrow down, 38 == arrow up
+                    var results = searchresults.find('a:visible');
+                    if (searchResultInFocus == null) {
+                        var item;
+                        if (e.keyCode == 38) {
+                            item = results.last();
+                            searchResultInFocus = results.length;
+                        } else {
+                            item = results.first();
+                            searchResultInFocus = 0;    
+                        }
+                        item.addClass('active');
+                    } else {
+                        var newIndex;
+                        if (e.keyCode == 38) { // key up
+                            newIndex =(searchResultInFocus - 1);
+                            if (newIndex < 0)
+                                newIndex = results.length-1;
+                        } else {
+                            newIndex = (searchResultInFocus + 1);
+                            if (newIndex > results.length-1)
+                                newIndex = 0;
+                        }
+                        
+                        var newItem = $(results[newIndex]);
+                        if (newItem.length) {
+                            results.removeClass('active');
+                            newItem.addClass('active');
+                            searchResultInFocus = newIndex;
+                        }
+                    }
+                }
+
+                var val = $searchTextbox.val();
+                if (val.length > 0) {
+                    if (!$sidemenu.hasClass('search')) {
+                        $sidemenu.addClass('search');
+                        
+                        if (!searchresults.length) {
+                            searchresults = $('<div id="searchresults"/>');
+                            $sidemenu.find("a").each(function(i, item) {
+                                var $item = $(item);
+                                var result = $('<a href="' + $item.attr('href') + '" data-filtr="' + $item.text() + '">' + $item.text() + '</a>');
+                                searchresults.append(result);
+                            });
+                            $('#sidemenu').append(searchresults);
+
+                            $searchTextbox.filtr(searchresults.find('a'), {
+                                wait: 0
+                            });
+                        }
+                    }
+                } else {
+                    $sidemenu.removeClass('search');
                 }
             });
 
@@ -92,22 +165,22 @@
                 $(this).slideUp();
             });
 
-            $("#sidemenu > ul > li").click(function() {
-                var $a = $(this).find('a:first');
-                var $selectedSubUl = $(this).find("ul");
-                
-                if (!$a.hasClass('active')) { // Lukker andre
-                    var $allSubUls = $("#sidemenu > ul > li > ul");
-                    $allSubUls.slideUp(function() {
-                        $a.addClass("active");
-                        $selectedSubUl.slideDown("fast");    
-                    });
-                } else {
-                    $selectedSubUl.slideUp();
-                    $a.removeClass("active");
-                }
-                
-                
+            $("#sidemenu > ul > li > a").click(function() {
+                var $a = $(this).parent().find('a:first');
+                var $selectedSubUl = $(this).parent().find("ul");
+
+                if ($selectedSubUl.length) {
+                    var visible = $selectedSubUl.is(':visible');
+                    var $parentUrl = $a.parents('ul');
+                    var $li = $a.parent();
+                    if (!visible) {
+                        $li.addClass('active');
+                        $selectedSubUl.slideDown('fast');
+                    } else {    
+                        $li.removeClass('active');
+                        $selectedSubUl.slideUp('fast');
+                    }
+                }               
             });
         });
     </script>

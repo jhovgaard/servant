@@ -4,15 +4,14 @@
     ViewBag.ActiveMenuItem = "home";
 }
 
-<h1 class="pushdown-short">Welcome to <strong>Servant for IIS</strong></h1>
+<h1 class="pushdown-medium">Welcome to <strong>Servant for IIS</strong></h1>
 
 <p class="pushdown-long indent">
     Hi Administrator!<br/>
     <br/>
-    We’re happy to help you manage your IIS. If you have any questions feel free to contact the team at hello@servant.io. <br/>
-    Found a bug or have a suggestion? Click the feedback button in the bottom right corner and let us know!
+    We’re happy to help you manage your IIS. If you have any questions feel free to contact the team at <a href="mailto:hello@servant.io">hello@servant.io</a>.<br/>
+    Found a bug or have a suggestion? Click <a href="javascript:UserVoice.showPopupWidget();">the feedback button</a> in the bottom left corner and let us know!
 </p>
-
 <h2 class="bug">Latest unhandled exceptions</h2>
 @if(Model.UnhandledExceptions.Count != 0)
 {

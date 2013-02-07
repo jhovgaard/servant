@@ -53,6 +53,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Nancy.Viewengines.Razor.0.14.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
     </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\packages\ServiceStack.Text.3.9.35\lib\net35\ServiceStack.Text.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -69,18 +72,17 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Helpers\ApplicationPoolHelper.cs" />
+    <Compile Include="Helpers\SettingsHelper.cs" />
     <Compile Include="Helpers\ErrorHelper.cs" />
     <Compile Include="Helpers\EventLogHelper.cs" />
     <Compile Include="Helpers\FileSystemHelper.cs" />
-    <Compile Include="Helpers\RequestLogHelper.cs" />
+    <Compile Include="Helpers\ModelIncluders.cs" />
     <Compile Include="Helpers\SiteManager.cs" />
-    <Compile Include="Helpers\SynchronizationHelper.cs" />
     <Compile Include="Infrastructure\IHost.cs" />
     <Compile Include="Infrastructure\UserIdentity.cs" />
     <Compile Include="Infrastructure\UserValidator.cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\HomeModule.cs" />
-    <Compile Include="Modules\MaintenanceModule.cs" />
     <Compile Include="Modules\SettingsModule.cs" />
     <Compile Include="Modules\SetupModule.cs" />
     <Compile Include="Modules\SitesModule.cs" />

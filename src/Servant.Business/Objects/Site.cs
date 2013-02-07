@@ -14,5 +14,10 @@ namespace Servant.Business.Objects
         public string LogFileDirectory { get; set; }
         public List<Binding> Bindings { get; set; }
         public string[] RawBindings { get; set; }
+
+        public Site()
+        {
+            Bindings = new List<Binding>() { new Binding  {UserInput = ""}};
+        }
     }
 }

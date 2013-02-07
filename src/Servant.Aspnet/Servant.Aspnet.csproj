@@ -86,6 +86,7 @@
     <Content Include="Css\base.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Css\normalize.css" />
     <Content Include="Images\checkbox-checked.png" />
     <Content Include="Images\icon-arrow-down.png" />
     <Content Include="Images\icon-bug.png" />
@@ -108,15 +109,10 @@
     <Content Include="Scripts\jquery-1.8.0.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\jquery.uitablefilter.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\jquery.filtr.min.js" />
     <Content Include="Scripts\jquery.watermark.min.js" />
     <Content Include="Scripts\serveraddresschanger.js" />
     <Content Include="Web.config" />
-    <Content Include="x86\SQLite.Interop.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
@@ -168,9 +164,6 @@
     </Content>
     <Content Include="Views\Setup\_Setup.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="servant-default.sqlite">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Sites\Bindings.cshtml" />
     <Content Include="Views\Setup\confirm.cshtml">
