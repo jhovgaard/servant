@@ -4,8 +4,6 @@ using Nancy.ModelBinding;
 using Nancy.Validation;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
-using Servant.Business.Services;
-using Nancy.Validation.DataAnnotations;
 using Servant.Manager.Infrastructure;
 
 namespace Servant.Manager.Modules
@@ -14,9 +12,8 @@ namespace Servant.Manager.Modules
     {
         public SetupModule()
         {
-            var settingsService = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SettingsService>();
+            var settings = Helpers.SettingsHelper.Settings;
             var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
-            var settings = settingsService.LocalSettings;
 
             Get["/setup/confirm/"] = _ =>
             {
@@ -30,7 +27,6 @@ namespace Servant.Manager.Modules
             {
                 new System.Threading.Thread(() =>
                     {
-                        host.LoadSettings();
                         host.Kill();
                         host.Start();        
                     }).Start();
@@ -69,10 +65,8 @@ namespace Servant.Manager.Modules
                     {
                         formSettings.Password = SecurityHelper.HashPassword(formSettings.Password);
                         formSettings.SetupCompleted = true;
-                        settingsService.DeleteAll();
-                        settingsService.Insert(formSettings);
-                        settingsService.ReloadLocalSettings();
-
+                        Helpers.SettingsHelper.UpdateSettings(formSettings);
+                        
                         if (!settings.ParseLogs && formSettings.ParseLogs) 
                             host.StartLogParsing();
 

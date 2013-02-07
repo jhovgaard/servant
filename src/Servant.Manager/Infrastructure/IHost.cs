@@ -13,6 +13,5 @@ namespace Servant.Manager.Infrastructure
         void Kill();
         void StartLogParsing();
         void StopLogParsing();
-        void LoadSettings();
     }
 }
