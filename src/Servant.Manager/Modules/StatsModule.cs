@@ -1,29 +1,27 @@
-﻿using System.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using Nancy;
-using Servant.Business.Services;
 using Servant.Manager.Helpers;
 
 namespace Servant.Manager.Modules
 {
     public class StatsModule: BaseModule
     {
-        public StatsModule(LogEntryService logEntryService, ApplicationErrorService applicationErrorService) : base("/stats/")
+        public StatsModule() : base("/stats/")
         {
             Get["/"] = p => {
                 var siteManager = new SiteManager();
                 
                 var serverStats = new Business.Objects.Reporting.ServerStats();
                 
-                serverStats.TotalRequests = logEntryService.GetTotalCount();
+                //serverStats.TotalRequests = logEntryService.GetTotalCount();
                 serverStats.DataRecieved = "Not available";
                 serverStats.DataSent = "Not available";
                 serverStats.TotalSites = siteManager.GetSites().Count();
 
 
-                serverStats.AverageResponeTime = (int)logEntryService.GetAverageResponseTime();
+                //serverStats.AverageResponeTime = (int)logEntryService.GetAverageResponseTime();
 
-                serverStats.TotalErrors = applicationErrorService.GetTotalCount();
+                //serverStats.TotalErrors = applicationErrorService.GetTotalCount();
                 serverStats.UnusedApplicationPools = ApplicationPoolHelper.GetUnusedApplicationPools().Count();
                 Model.ServerStats = serverStats;
                 return View["Index", Model];

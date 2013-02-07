@@ -6,7 +6,6 @@ using Nancy.Security;
 using Nancy;
 using Nancy.Validation;
 using Servant.Business.Objects;
-using Servant.Business.Services;
 using Servant.Manager.Helpers;
 using Servant.Manager.Views.Shared.Models;
 
@@ -17,7 +16,7 @@ namespace Servant.Manager.Modules
         public dynamic Model = new ExpandoObject();
         protected PageModel Page { get; set; }
         public bool HasErrors { get { return Model.Errors.Count != 0; }}
-        private SettingsService _settingsService;
+        public Settings Settings { get; set; }
         private SiteManager _siteManager;
         private const string MessageKey = "Message";
         private const string MessageTypeKey = "MessageType";
@@ -34,7 +33,7 @@ namespace Servant.Manager.Modules
             
         public void Setup()
         {
-            _settingsService = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SettingsService>();
+            Settings = SettingsHelper.Settings;
             _siteManager = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SiteManager>();
 
             var nonAuthenticatedModules = new List<Type> { typeof(SetupModule) };
@@ -47,7 +46,7 @@ namespace Servant.Manager.Modules
                 Page = new PageModel
                 {
                     Servername = System.Environment.MachineName,
-                    Sites = _siteManager.GetSites()
+                    Sites = _siteManager.GetSites().OrderBy(x => x.Name)
                 };
 
                 Model.Page = Page;
@@ -68,7 +67,7 @@ namespace Servant.Manager.Modules
                     Session[MessageKey] = null;
                 }
                 
-                if (!_settingsService.LocalSettings.SetupCompleted && requiresAuthentication)
+                if (!Settings.SetupCompleted && requiresAuthentication)
                     ctx.Response = Response.AsRedirect("/setup/1/");
             };
 

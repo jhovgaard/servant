@@ -1,86 +1,111 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Servant.Business.Objects;
-using Servant.Business.Services;
+using Servant.Business.Objects.Enums;
 
 namespace Servant.Manager.Helpers
 {
     public static class EventLogHelper
     {
-        private static readonly ApplicationErrorService ApplicationErrorService = new ApplicationErrorService();
-
-        public static ApplicationError ParseEntry(EventLogEntry windowsEntry)
-        { 
-            var typeRegex = new Regex(@"Exception type: (.+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-            var messageRegex = new Regex(@"Exception message: (.+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-            var iisIdRegex = new Regex(@"Application domain: /LM/W3SVC/(\d).+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-            
-            var type = typeRegex.Match(windowsEntry.Message).Groups[1].Value;
-            var message = messageRegex.Match(windowsEntry.Message).Groups[1].Value;
-            
+        public static ApplicationError ParseEntry(EventRecord eventRecord)
+        {
+            var iisIdRegex = new Regex(@"/LM/W3SVC/(\d).+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
             // Entries kan forekomme uden et IIS id.
-            var iisIdResult = iisIdRegex.Match(windowsEntry.Message).Groups[1].Value;
+            var iisIdResult = iisIdRegex.Match(eventRecord.Properties[8].Value.ToString()).Groups[1].Value;
             var iisId = string.IsNullOrWhiteSpace(iisIdResult ) ? 0 : Convert.ToInt32(iisIdResult);
 
-            return new ApplicationError { 
-                Id = windowsEntry.Index,
-                DateTime = windowsEntry.TimeGenerated.ToUniversalTime(), 
-                SiteIisId = iisId,
-                Message = message,
-                ExceptionType = type,
-                FullMessage = windowsEntry.Message.Replace(Environment.NewLine, "<br />")
-            };
-        }
+            var error = new ApplicationError
+                {
+                    Id = (int) eventRecord.RecordId,
+                    SiteIisId = iisId,
+                    DateTime = DateTime.Parse(eventRecord.Properties[2].Value.ToString()).ToUniversalTime(),
+                    ExceptionType = eventRecord.Properties[17].Value.ToString(),
+                    Message = eventRecord.Properties[1].Value.ToString(),
+                    FullMessage = eventRecord.Properties[18].Value.ToString().Replace(Environment.NewLine, "<br />").Trim(),
+                    ThreadInformation = eventRecord.Properties[29].Value.ToString().Replace(Environment.NewLine, "<br />").Trim(),
+                    Url =eventRecord.Properties[19].Value.ToString(),
+                    ClientIpAddress = eventRecord.Properties[21].Value.ToString()
+                };
 
-        public static IEnumerable<EventLogEntry> GetAspNetEvents()
-        {
-            var log = new EventLog("application");
-            var entries = log.Entries
-                .Cast<EventLogEntry>()
-                .Where(x => x.Source.Contains("ASP.NET") && (x.EntryType == EventLogEntryType.Warning || x.EntryType == EventLogEntryType.Error) && x.CategoryNumber != 1);
-
-            return entries;
-        }
-
-        public static IEnumerable<ApplicationError> GetUnhandledExceptionEntries(int max = 0) 
-        {
-            var entries = GetAspNetEvents();
-            entries = entries.OrderByDescending(x => x.TimeGenerated);
-
-            if (max > 0)
-                entries = entries.Take(max);
-
-            return entries.Select(eventLogEntry => ParseEntry(eventLogEntry));
+            return error;
         }
 
         public static ApplicationError GetById(int eventLogId)
         {
-            var log = new EventLog("application");
-            var entry = log.Entries
-                .Cast<EventLogEntry>()
-                .SingleOrDefault(x => x.Index == eventLogId);
 
-            return ParseEntry(entry);
-            
+            var query = string.Format(@"<QueryList>
+                                            <Query Id=""0"" Path=""Application"">
+                                            <Select Path=""Application"">*[System[(EventRecordID={0})]]</Select>
+                                            </Query>
+                                        </QueryList>", eventLogId);
+
+            var elq = new EventLogQuery("Application", PathType.LogName, query);
+            var elr = new EventLogReader(elq);
+            var eventInstance = elr.ReadEvent();
+            return eventInstance == null
+                ? null
+                : ParseEntry(eventInstance);
         }
 
-        public static void SyncServer()
+        public static IEnumerable<ApplicationError> GetByDateTimeDescending(int max = 0)
         {
-            var latestError = ApplicationErrorService.GetLatest();
-            var newErrors = GetNewByLatestError(latestError);
-            ApplicationErrorService.Insert(newErrors);
+            var query = @"<QueryList>
+                              <Query Id=""0"" Path=""Application"">
+                                <Select Path=""Application"">*[System[Provider[@Name='ASP.NET 2.0.50727.0' or @Name='ASP.NET 4.0.30319.0'] and (Level=2 or Level=3)]]</Select>
+                              </Query>
+                            </QueryList>";
+
+            var elq = new EventLogQuery("Application", PathType.LogName, query) {ReverseDirection = true};
+            var elr = new EventLogReader(elq);
+
+            var events = new List<EventRecord>();
+
+            max = (max == 0) ? int.MaxValue : max;
+            var i = 0;
+            for (var eventInstance = elr.ReadEvent(); null != eventInstance && i < max; eventInstance = elr.ReadEvent(), i++)
+                events.Add(eventInstance);
+
+            return events.Select(ParseEntry);
         }
 
-        private static IEnumerable<ApplicationError> GetNewByLatestError(ApplicationError latestError)
+        public static IEnumerable<ApplicationError> GetBySite(int siteIisId, StatsRange range)
         {
-            var entries = GetAspNetEvents();
-            if (latestError != null)
-                entries = entries.Where(x => x.Index > latestError.Id);
+            Int64 msLookback = 0;
 
-            return entries.Select(eventLogEntry => ParseEntry(eventLogEntry));
+            switch (range)
+            {
+                case StatsRange.LastMonth:
+                    msLookback = 2592000000;
+                    break;
+                case StatsRange.LastWeek:
+                    msLookback = 604800000;
+                    break;
+                case StatsRange.Last24Hours:
+                    msLookback = 86400000;
+                    break;
+            }
+
+            var query = string.Format(@"<QueryList>
+                              <Query Id=""0"" Path=""Application"">
+                                <Select Path=""Application"">*[System[Provider[@Name='ASP.NET 2.0.50727.0' or @Name='ASP.NET 4.0.30319.0'] and (Level=2 or Level=3){0}]]</Select>
+                              </Query>
+                            </QueryList>", (msLookback == 0) ? null : "and TimeCreated[timediff(@SystemTime) &lt;= " + msLookback + "]");
+
+            var elq = new EventLogQuery("Application", PathType.LogName, query) { ReverseDirection = true};
+            var elr = new EventLogReader(elq);
+
+            var events = new List<EventRecord>();
+            for (var eventInstance = elr.ReadEvent(); null != eventInstance; eventInstance = elr.ReadEvent())
+            {
+                if (eventInstance.Properties[8].Value.ToString().StartsWith("/LM/W3SVC/" + siteIisId + "/"))
+                    events.Add(eventInstance);
+            }
+
+            return events.Select(ParseEntry);
         }
 
         public static List<ApplicationError> AttachSite(IEnumerable<ApplicationError> errors)

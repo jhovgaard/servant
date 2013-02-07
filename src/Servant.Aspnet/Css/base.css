@@ -13,7 +13,7 @@ body, input {
 
 body {
     width: 100%;
-    font-size: 14px;
+    font-size: 13px;
     margin: 0;
     color: #828282;
 }
@@ -28,7 +28,7 @@ p {
 }
 
 h1 {
-    font-size: 36px;
+    font-size: 36px;    
     font-weight: normal;
     margin: 0;
     color: #272727;
@@ -95,6 +95,18 @@ select {
     font-size: 15px;
     outline: 0;
     line-height: 21px;
+}
+
+pre {
+    background-color: #ffffcc;
+    font-family: "Consolas","Lucida Console",Monospace;
+    font-size: 11pt;
+    line-height: 14pt;
+    margin: 0;
+    padding: 0.5em;
+    color: black;
+    white-space: pre;
+    overflow: auto;
 }
 
 
@@ -165,6 +177,7 @@ select {
     border-right: 7px solid #a5a5a5;
     color: white;
     min-height: 100%;
+    overflow: auto;
 }
 
     #sidemenu a {
@@ -187,6 +200,7 @@ select {
 
     #search input[type=text] {
         width: 180px;
+        line-height: 20px;
     }
 
     #search input[type=submit] {
@@ -195,13 +209,38 @@ select {
         background: url('/images/textbox-submit-search.png') no-repeat;
         border: 0;
         padding: 0;
-        cursor: pointer;
+        cursor: default;
     }
+
 
 #sidemenu ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
+}
+
+#sidemenu > ul { margin-bottom: 40px; } /* UserVoice spacer */
+
+#sidemenu.search > ul {
+    display: none;
+}
+
+#searchresults { display: none;width: 100%;}
+
+#searchresults > a {
+  background-color: #E2E2E2;
+  border-bottom: 1px solid #CCCCCC;
+  color: #272727;
+  display: block;
+  padding: 10px 10px 10px 16px;
+}
+
+#searchresults > a.active {
+    font-weight: bold;
+}
+
+#sidemenu.search #searchresults {
+    display: table;
 }
 
 #sidemenu > ul > li > a {
@@ -223,7 +262,6 @@ select {
         margin-top: 10px;
     }
 
-/* Submenu */
 #sidemenu ul li ul {
     background-color: #4d0078;
     display: none;
@@ -237,28 +275,41 @@ select {
         padding-left: 15px;
     }
 
-#sidemenu ul li.home:hover {
+
+#sidemenu ul.active-home li.home,
+#sidemenu ul li.home:hover,
+#sidemenu ul li.home.active {
     background-color: #00a8ff;
 }
+
+#sidemenu ul.active-sites li.sites,
+#sidemenu ul li.sites:hover,
+#sidemenu ul li.sites.active,
+#sidemenu ul li.sites ul li a:hover,
+#sidemenu ul li.sites ul li.active a {
+    background-color: #6e00ab;
+}
+
+#sidemenu ul.active-settings li.settings,
+#sidemenu ul li.settings:hover,
+#sidemenu ul li.settings.active {
+    background-color: #4a7800;
+}
+
 
 #sidemenu ul li.home a {
     background-image: url('/images/menu-icon-home.png');
 }
 
-#sidemenu ul li.sites a:hover,
-#sidemenu ul li.active ul li a:hover,
-#sidemenu ul li.sites a.active,
-#sidemenu ul li.active ul li a.active {
-    background-color: #6e00ab;
+#sidemenu ul.active-sites li ul {
+    display: block;
 }
+
 
 #sidemenu ul li.sites > a {
     background-image: url('/images/menu-icon-sites.png');
 }
 
-#sidemenu ul li.settings:hover {
-    background-color: #4a7800;
-}
 
 #sidemenu ul li.settings a {
     background-image: url('/images/menu-icon-settings.png');
@@ -298,6 +349,7 @@ select {
     display:block; 
     text-decoration: none; 
     text-transform: uppercase;
+    line-height: 23px;
 }
 
     #topmenu ul li.settings a:hover,
@@ -385,6 +437,16 @@ h2.bug {
         padding: 5px 0 0 0;
         font-size: 12px;
     }
+
+.input-group.error input {
+    border: 3px solid #ff0039;
+}
+
+.input-group .help-block {
+    color: #ff0039;
+    display: block;
+    margin-top: 5px;
+}
 
 input[type=submit] {
     background: url('/images/icon-ok.png') no-repeat 10px center;

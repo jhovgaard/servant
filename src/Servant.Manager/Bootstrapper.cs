@@ -6,7 +6,6 @@ using Nancy.Bootstrapper;
 using Nancy.Conventions;
 using Nancy.Session;
 using Nancy.TinyIoc;
-using Servant.Business.Services;
 using Servant.Manager.Infrastructure;
 
 namespace Servant.Manager
@@ -15,8 +14,6 @@ namespace Servant.Manager
     {
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
-            TinyIoCContainer.Current.Register<SettingsService>().AsSingleton();
-
             base.ApplicationStartup(container, pipelines);
 
             var host = TinyIoCContainer.Current.Resolve<IHost>();
