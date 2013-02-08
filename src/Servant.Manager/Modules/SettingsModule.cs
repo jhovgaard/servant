@@ -23,13 +23,19 @@ namespace Servant.Manager.Modules
 
             Post["/"] = p => {
                 var formSettings = this.Bind<Settings>();
-                formSettings.ServantUrl = BindingHelper.FinializeBinding(formSettings.ServantUrl);
+
+                if (BindingHelper.SafeFinializeBinding(formSettings.ServantUrl) == null)
+                    AddPropertyError("servanturl", "The URL is invalid.");
+                else
+                    formSettings.ServantUrl = BindingHelper.FinializeBinding(formSettings.ServantUrl);
+                                 
 
                 var validationResult = this.Validate(formSettings);
+                AddValidationErrors(validationResult);
 
                 var bindingIsChanged = formSettings.ServantUrl != settings.ServantUrl;
                 
-                if(validationResult.IsValid)
+                if(!HasErrors)
                 {
                     formSettings.Password = string.IsNullOrWhiteSpace(formSettings.Password) 
                         ? settings.Password 
@@ -58,7 +64,6 @@ namespace Servant.Manager.Modules
                     }
                 }
 
-                AddValidationErrors(validationResult);
                 Model.OriginalServantUrl = settings.ServantUrl;
                 Model.Settings = formSettings;
 
