@@ -50,7 +50,6 @@ namespace Servant.Manager.Modules
 
                     var validationResult = this.Validate(formSettings);
 
-                    var bindingIsChanged = formSettings.ServantUrl != settings.ServantUrl;
                     var acceptTerms = (bool)Request.Form.AcceptTerms;
 
                     AddValidationErrors(validationResult);

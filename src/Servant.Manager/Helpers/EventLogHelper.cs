@@ -69,7 +69,7 @@ namespace Servant.Manager.Helpers
             for (var eventInstance = elr.ReadEvent(); null != eventInstance && i < max; eventInstance = elr.ReadEvent(), i++)
                 events.Add(eventInstance);
 
-            return events.Select(ParseEntry);
+            return events.Select(ParseEntry).Where(x => x.SiteIisId != 0);
         }
 
         public static IEnumerable<ApplicationError> GetBySite(int siteIisId, StatsRange range)

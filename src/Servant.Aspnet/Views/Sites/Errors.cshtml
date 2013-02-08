@@ -39,8 +39,8 @@ else
                     <td>
                         <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.Message</a>
                     </td>
-                    <td style="width: 160px;">
-                        <span class="time-diff pull-right">@error.DateTime</span>
+                    <td style="width: 170px;">
+                        <abbr class="timeago" title="@error.DateTime.ToString("o")">@error.DateTime</abbr>
                     </td>
                 </tr>
             }

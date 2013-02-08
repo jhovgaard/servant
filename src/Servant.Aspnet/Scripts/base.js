@@ -1,4 +1,6 @@
 ﻿$(function () {
+    $("abbr.timeago").timeago();
+
     $("#stop-site-form").submit(function () {
         var confirmed = confirm("Are you sure you want to completely stop this site?");
         if (!confirmed)
