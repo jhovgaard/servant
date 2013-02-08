@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
+using CreateSiteResult = Servant.Business.Objects.Enums.CreateSiteResult;
 using Site = Servant.Business.Objects.Site;
 
 namespace Servant.Manager.Helpers
@@ -17,6 +20,15 @@ namespace Servant.Manager.Helpers
         public SiteManager()
         {
             _manager = new Microsoft.Web.Administration.ServerManager();
+            try
+            {
+                var testForIis = _manager.Sites.FirstOrDefault();
+            }
+            catch (COMException)
+            {
+                throw new Exception("Looks like IIS is not installed.");
+            }
+
         }
 
         public IEnumerable<Site> GetSites()
@@ -87,11 +99,11 @@ namespace Servant.Manager.Helpers
             }
         }
 
-        public List<X509Certificate2> GetCertificates()
+        public static List<X509Certificate2> GetCertificates()
         {
             var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
             store.Open(OpenFlags.OpenExistingOnly);
-            return store.Certificates.Cast<X509Certificate2>().ToList();
+            return store.Certificates.Cast<X509Certificate2>().Where(x => !string.IsNullOrWhiteSpace(x.FriendlyName)).ToList();
         }
 
         public static string GetSitename(Servant.Business.Objects.Site site) {
@@ -123,7 +135,10 @@ namespace Servant.Manager.Helpers
             iisSite.Bindings.Clear();
             foreach (var binding in site.Bindings)
             {
-                iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.Protocol.ToString());
+                if (binding.Protocol == Protocol.https)
+                    iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.CertificateHash, "My");
+                else
+                    iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.Protocol.ToString());
             }
                 
             _manager.CommitChanges();
@@ -140,13 +155,18 @@ namespace Servant.Manager.Helpers
             if (iisSite == null)
                 throw new SiteNotFoundException("Site " + site.Name + " was not found on IIS");
 
-            try {
+            try
+            {
                 iisSite.Start();
                 return SiteStartResult.Started;
             }
             catch (Microsoft.Web.Administration.ServerManagerException)
             {
                 return SiteStartResult.BindingIsAlreadyInUse;
+            }
+            catch (FileLoadException)
+            {
+                return SiteStartResult.CannotAccessSitePath;
             }
         }
 
@@ -181,14 +201,20 @@ namespace Servant.Manager.Helpers
             return GetBindingInUse(iisSiteId, bindingInformations) != null;
         }
 
-        public CreateSiteResult CreateSite(Site site)
+        public Business.Objects.CreateSiteResult CreateSite(Site site)
         {
+            var result = new Business.Objects.CreateSiteResult();
+            
+
             var bindingInformations = site.Bindings.Select(x=> x.ToIisBindingInformation()).ToList();
                 
             // Check bindings
             var bindingInUse = GetBindingInUse(0, bindingInformations); // 0 never exists
-            if(bindingInUse != null)
-                return CreateSiteResult.BindingAlreadyInUse;
+            if (bindingInUse != null)
+            {
+                result.Result = CreateSiteResult.BindingAlreadyInUse;
+                return result;
+            }
 
             // Create site
             _manager.Sites.Add(site.Name, "http", bindingInformations.First(), site.SitePath);
@@ -222,7 +248,9 @@ namespace Servant.Manager.Helpers
 
             _manager.CommitChanges();
 
-            return CreateSiteResult.Success;
+            result.Result = CreateSiteResult.Success;
+            result.IisSiteId = (int) iisSite.Id;
+            return result;
         }
 
         private string GetBindingInUse(int iisId, IEnumerable<string> bindingInformations)

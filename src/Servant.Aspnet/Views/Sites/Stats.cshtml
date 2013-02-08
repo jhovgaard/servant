@@ -14,7 +14,7 @@
 {
 
     <ul class="sections active-@Model.ActiveSection">
-        <li class="section1"><a href="/sites/@Model.Site.IisId/stats/">Today</a></li>
+        <li class="section1"><a href="/sites/@Model.Site.IisId/stats/">Last24hours</a></li>
         <li class="section2"><a href="/sites/@Model.Site.IisId/stats/?r=lastweek">Last week</a></li>
         <li class="section3"><a href="/sites/@Model.Site.IisId/stats/?r=lastmonth">Last month</a></li>
         <li class="section4"><a href="/sites/@Model.Site.IisId/stats/?r=alltime">All time</a></li>
@@ -31,7 +31,7 @@
         <p class="gray margin-top10"><strong>@Model.TotalRequests</strong> requests in this period.</p>
         <p class="gray margin-top10">All timestamps are in local server time (Converted from UTC).</p>
 
-        if (Model.Range == StatsRange.Today)
+        if (Model.Range == StatsRange.Last24Hours)
         {
             <h3 class="margin-top30">Latest requests</h3>
             <span>Page was loaded on: @DateTime.Now.ToString("hh:mm:ss")</span>

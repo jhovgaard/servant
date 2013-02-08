@@ -2,7 +2,6 @@
 @inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
     Layout = "Sites/_Details.cshtml";
-    ViewBag.ActiveMenuItem = "sites";
     ViewBag.ActiveSubmenuItem = "errors";
 }   
 
@@ -18,39 +17,16 @@
     on @Model.Exception.DateTime
 </p>
 
-<p>
-    <b>Exception:</b> @Model.Exception.Message
-    <br/>
-    <b>Type:</b> @Model.Exception.ExceptionType
-    <br/>
-    <b>Full exception:</b><br/>
-    <blockquote>
-        @Html.Raw(Model.Exception.FullMessage)
-    </blockquote>
-</p>
-
-@*<h3>Related http(s) requests</h3>
-@if(Model.RelatedRequests.Count != 0)
-{
-    <table class="table table-striped margin-top10">
-        <thead>
-            <tr>
-                <th>Timestamp</th>
-                <th class="span6">URL</th>
-                <th>Status code</th>
-            </tr>
-
-        </thead>
-        @foreach (Servant.Business.Objects.LogEntry entry in Model.RelatedRequests)
-        {
-            <tr>
-                <td>@entry.DateTime</td>
-                <td><a href="/sites/@(entry.SiteIisId)/requests/@entry.Id/">@entry.Uri@entry.Querystring</a></td>
-                <td>@(entry.HttpStatusCode)</td>
-            </tr>
-        }
-    
-    </table>
-} else {
-    <p class="margin-top10">No requests could be related to this error.</p>
-}*@
+<b>URL:</b> <a href="@Model.Exception.Url" target="_blank">@Model.Exception.Url</a>
+<br/>
+<b>Exception:</b> @Model.Exception.Message
+<br/>
+<b>Type:</b> @Model.Exception.ExceptionType
+<br/>
+<b>Client IP:</b> @Model.Exception.ClientIpAddress
+<br/>
+<b>Message:</b>
+<pre>@Html.Raw(Model.Exception.FullMessage)</pre>
+<br/>
+<b>Thread information:</b>
+<pre>@Html.Raw(Model.Exception.ThreadInformation)</pre>
