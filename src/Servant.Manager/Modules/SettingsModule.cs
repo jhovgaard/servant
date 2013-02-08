@@ -3,23 +3,18 @@ using Nancy.ModelBinding;
 using Nancy.Validation;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
-using Servant.Business.Services;
 using Servant.Manager.Infrastructure;
-
-//using Servant.Server.Selfhost;
 
 namespace Servant.Manager.Modules
 {
     public class SettingsModule : BaseModule
     {
-        private SettingsService settingsService = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SettingsService>();
-
         public SettingsModule() : base("/settings/")
         {
             var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
+            var settings = Helpers.SettingsHelper.Settings;
 
             Get["/"] = p => {
-                var settings = settingsService.LocalSettings;
                 Model.OriginalServantUrl = settings.ServantUrl;
                 Model.Settings = settings;
 
@@ -27,7 +22,6 @@ namespace Servant.Manager.Modules
             };
 
             Post["/"] = p => {
-                var settings = settingsService.LocalSettings;
                 var formSettings = this.Bind<Settings>();
                 formSettings.ServantUrl = BindingHelper.FinializeBinding(formSettings.ServantUrl);
 
@@ -44,11 +38,7 @@ namespace Servant.Manager.Modules
                     formSettings.SetupCompleted = true;
                     formSettings.ParseLogs = settings.ParseLogs;
 
-                    settingsService.DeleteAll();
-                    settingsService.Insert(formSettings);
-                    settingsService.ReloadLocalSettings();
-                    
-                    host.LoadSettings();
+                    Helpers.SettingsHelper.UpdateSettings(formSettings);
                     AddMessage("Settings have been saved.");
 
                     if(bindingIsChanged)
@@ -59,8 +49,12 @@ namespace Servant.Manager.Modules
                             host.Kill();
                             host.Start();
                         }).Start();
-                        
-                        return Response.AsRedirect(formSettings.ServantUrl + "settings/");
+
+                        Model.IsWildcard = Settings.ServantUrl.StartsWith("https://*") ||
+                                           Settings.ServantUrl.StartsWith("http://*");
+
+                        Model.NewUrl = Settings.ServantUrl;
+                        return View["BindingChanged", Model];
                     }
                 }
 
@@ -73,7 +67,6 @@ namespace Servant.Manager.Modules
 
             Post["/startlogparsing/"] = _ => {
                 
-                var settings = settingsService.LocalSettings;
                 var start = (bool) Request.Form.Start;
                 
                 if(!settings.ParseLogs && start)
@@ -83,10 +76,8 @@ namespace Servant.Manager.Modules
                     host.StopLogParsing();
 
                 settings.ParseLogs = start;
-                settingsService.DeleteAll();
-                settingsService.Insert(settings);
-                settingsService.ReloadLocalSettings();
-
+                Helpers.SettingsHelper.UpdateSettings(settings);
+                
                 return Response.AsRedirect("/settings/");
             };
         }

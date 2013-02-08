@@ -3,6 +3,7 @@
     public enum SiteStartResult
     {
         Started,
-        BindingIsAlreadyInUse
+        BindingIsAlreadyInUse,
+        CannotAccessSitePath
     }
 }

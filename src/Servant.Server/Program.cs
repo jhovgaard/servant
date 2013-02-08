@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using Servant.Business.Services;
+using Servant.Manager.Helpers;
 using Servant.Manager.Infrastructure;
 using Servant.Server.Selfhost;
 
@@ -20,9 +20,8 @@ namespace Servant.Server
         static void Main(string[] args)
         {
             Init();
-            EnsureDatabaseExists();
 
-            var settings = new SettingsService().LocalSettings;
+            var settings = SettingsHelper.Settings;
             var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
 
             Console.WriteLine();
@@ -88,16 +87,6 @@ namespace Servant.Server
             var identity = WindowsIdentity.GetCurrent();
             var principal = new WindowsPrincipal(identity);
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
-        }
-
-        public static void EnsureDatabaseExists()
-        {
-            var dbPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "servant.sqlite");
-            if(!System.IO.File.Exists(dbPath))
-            {
-                var defaultDbPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "servant-default.sqlite");
-                System.IO.File.Copy(defaultDbPath, dbPath, false);
-            }
         }
 
         public static bool IsIisInstalled()

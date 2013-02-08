@@ -2,7 +2,7 @@
 {
     public enum StatsRange
     {
-        Today,
+        Last24Hours,
         LastWeek,
         LastMonth,
         AllTime

@@ -1,90 +1,131 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
-using Servant.Business.Services;
 using Nancy.Responses;
 using Nancy.ModelBinding;
 using Servant.Manager.Helpers;
+using CreateSiteResult = Servant.Business.Objects.Enums.CreateSiteResult;
 
 namespace Servant.Manager.Modules
 {
     public class SitesModule : BaseModule
     {
-        public SitesModule(LogEntryService logEntryService, ApplicationErrorService applicationErrorService) : base("/sites/")
-        {
-            var siteManager = new SiteManager();
+        readonly SiteManager _siteManager = new SiteManager();
 
+        public void ValidateSite(ref Site site)
+        {
+            string[] bindingsUserInputs = Request.Form.BindingsUserInput.ToString().Split(',');
+            string[] bindingsCertificateName = Request.Form.BindingsCertificateName.ToString().Split(',');
+            site.Bindings = new List<Binding>();
+            var certificates = SiteManager.GetCertificates();
+
+            for (var i = 0; i < bindingsUserInputs.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(bindingsUserInputs[i]))
+                    continue;
+
+                var isValid = true;
+
+                var finalizedHost = BindingHelper.SafeFinializeBinding(bindingsUserInputs[i]);
+
+                if (finalizedHost == null)
+                {
+                    AddPropertyError("bindingsuserinput[" + i + "]", "The binding is invalid.");
+                    isValid = false;
+                }
+                else if (_siteManager.IsBindingInUse(finalizedHost, site.IisId))
+                {
+                    AddPropertyError("bindingsuserinput[" + i + "]", string.Format("The binding {0} is already in use.", finalizedHost));
+                    isValid = false;
+                }
+                Binding binding;
+
+                if (isValid)
+                {
+                    var certificate = certificates.SingleOrDefault(x => x.FriendlyName == bindingsCertificateName[i]);
+                    binding = BindingHelper.ConvertToBinding(finalizedHost, certificate);
+                }
+                else
+                {
+                    binding = new Binding()
+                    {
+                        CertificateName = bindingsCertificateName[i],
+                        UserInput = bindingsUserInputs[i]
+                    };
+                }
+
+                site.Bindings.Add(binding);
+            }
+
+            if (!site.Bindings.Any())
+            {
+                AddPropertyError("bindingsuserinput[0]", "Minimum one binding is required.");
+                site.Bindings.Add(new Binding() {UserInput = ""});
+            }
+
+            if (string.IsNullOrWhiteSpace(site.Name))
+                AddPropertyError("name", "Name is required.");
+
+            var existingSite = _siteManager.GetSiteByName(site.Name);
+            if (site.Name != null && existingSite != null && existingSite.IisId != site.IisId)
+                AddPropertyError("name", "There's already a site with this name.");
+
+            if (string.IsNullOrWhiteSpace(site.SitePath))
+                AddPropertyError("sitepath", "Site path is required.");
+
+            if (site.SitePath != null && !FileSystemHelper.DirectoryExists(site.SitePath))
+                AddPropertyError("sitepath", "The entered directory doesn't exist.");
+        }
+
+        public SitesModule() : base("/sites/")
+        {
             Get["/"] = p  => {
-                var sites = siteManager.GetSites();
+                var sites = _siteManager.GetSites();
                 Model.Sites = sites;
                 return View["Index", Model];
             };
-
+            
             Get["/create/"] = p => {
+                ModelIncluders.IncludeCertificates(ref Model);
+                
                 var site = new Site();
                 Model.Site = site;
-                Model.ApplicationPools = siteManager.GetApplicationPools();
+                Model.ApplicationPools = _siteManager.GetApplicationPools();
                 return View["Create", Model];
             };
             
             Post["/create/"] = p => {
+                ModelIncluders.IncludeCertificates(ref Model);
+                ModelIncluders.IncludeApplicationPools(ref Model);
+
                 var site = this.Bind<Site>();
                 Model.Site = site;
-                Model.ApplicationPools = siteManager.GetApplicationPools();
-                site.RawBindings = Request.Form.RawBindings.ToString().Split(',');
 
-                if(string.IsNullOrWhiteSpace(site.Name))
-                    AddPropertyError("name", "Name is required.");
-
-                if (site.Name != null && siteManager.GetSiteByName(site.Name) != null)
-                    AddPropertyError("name", "There's already a site with this name.");
-
-                if(string.IsNullOrWhiteSpace(site.SitePath))
-                    AddPropertyError("sitepath", "Site path is required.");
-
-                if(site.SitePath != null && !FileSystemHelper.DirectoryExists(site.SitePath))
-                    AddPropertyError("sitepath", "The entered directory doesn't exist.");
-
-                if(site.RawBindings == null)
-                    AddPropertyError("bindings", "Minimum 1 binding is required.");
-                else
-                {
-                    for (int i = 0; i < site.RawBindings.Length; i++)
-                    {
-                        var binding = site.RawBindings[i];
-                        var finalizedBinding = BindingHelper.SafeFinializeBinding(binding);
-
-                        if (finalizedBinding == null)
-                        {
-                            AddPropertyError("rawbindings[" + i + "]", "The binding is invalid.");
-                            continue;
-                        }
-
-                        if (siteManager.IsBindingInUse(binding))
-                            AddPropertyError("rawbindings", string.Format("The binding {0} is already in use.", binding));
-                    }
-                }
-
-                site.Bindings = BindingHelper.ConvertRawBindings(Request.Form.RawBindings);
+                ValidateSite(ref site);
 
                 if(!HasErrors)
                 {
-                    var result = siteManager.CreateSite(site);
+                    var result = _siteManager.CreateSite(site);
 
-                    if(result == CreateSiteResult.NameAlreadyInUse)
-                        AddPropertyError("name", "There's already a site with that name.");
-
-                    if(result == CreateSiteResult.BindingAlreadyInUse)
-                        AddPropertyError("httpbindings", "The binding is already in use.");
-
-                    if(result == CreateSiteResult.Failed)
-                        AddGlobalError("Something went completely wrong :-/");
-
-                    if(result == CreateSiteResult.Success)
-                        return new RedirectResponse("/sites/");
+                    switch (result.Result)
+                    {
+                        case CreateSiteResult.NameAlreadyInUse:
+                            AddPropertyError("name", "There's already a site with that name.");
+                            break;
+                        case CreateSiteResult.BindingAlreadyInUse:
+                            AddPropertyError("httpbindings", "The binding is already in use.");
+                            break;
+                        case CreateSiteResult.Failed:
+                            AddGlobalError("Something went completely wrong :-/");
+                            break;
+                        case CreateSiteResult.Success:
+                            AddMessage("Site has successfully been created.", MessageType.Success);
+                            return new RedirectResponse("/sites/" + result.IisSiteId + "/settings/");
+                    }
                 }
 
                 return View["Create", Model];
@@ -92,45 +133,34 @@ namespace Servant.Manager.Modules
 
             Get[@"/(?<Id>[\d]{1,4})/settings/"] = p =>
             {
-                Site site = siteManager.GetSiteById(p.Id);
-                site.RawBindings = site.Bindings.Select(x => x.ToString()).ToArray();
+                ModelIncluders.IncludeCertificates(ref Model);
+                ModelIncluders.IncludeApplicationPools(ref Model);
+
+                Site site = _siteManager.GetSiteById(p.Id);
 
                 Model.Site = site;
-                Model.ApplicationPools = siteManager.GetApplicationPools();
+                Model.ApplicationPools = _siteManager.GetApplicationPools();
                 return View["Settings", Model];
             };
 
             Post[@"/(?<Id>[\d]{1,4})/settings/"] = p =>
             {
-                Site site = siteManager.GetSiteById(p.Id);
-                
-                site.Name = Request.Form.SiteName;
+                ModelIncluders.IncludeCertificates(ref Model);
+                ModelIncluders.IncludeApplicationPools(ref Model);
+
+                Site site = _siteManager.GetSiteById(p.Id);
+                site.Name = Request.Form.Name;
                 site.SitePath = Request.Form.SitePath;
                 site.ApplicationPool = Request.Form.ApplicationPool;
-                site.RawBindings = Request.Form.RawBindings.ToString().Split(',');
-                if (site.Bindings == null)
-                    AddPropertyError("bindings", "Minimum 1 binding is required.");
-                else
-                {
-                    for(var i = 0; i < site.RawBindings.Length; i++)
-                    {
-                        var binding = site.RawBindings[i];
-                        var finializedBinding = BindingHelper.SafeFinializeBinding(binding);
-                        
-                        if(finializedBinding == null)
-                            AddPropertyError("rawbindings[" + i + "]", string.Format("The binding {0} is invalid.", binding));
-                        else if (siteManager.IsBindingInUse(binding, site.IisId))
-                            AddPropertyError("rawbindings[" + i + "]", string.Format("The binding {0} is already in use.", binding));
-                    }
-                }
+                
+                ValidateSite(ref site);
 
-                Model.ApplicationPools = siteManager.GetApplicationPools();
                 Model.Site = site;
 
                 if(!HasErrors)
                 {
-                    site.Bindings = BindingHelper.ConvertRawBindings(site.RawBindings);
-                    siteManager.UpdateSite(site);
+                    _siteManager.UpdateSite(site);
+                    AddMessage("Settings have been saved.");
                 }
 
                 return View["Settings", Model];
@@ -138,127 +168,78 @@ namespace Servant.Manager.Modules
 
             Post[@"/(?<Id>[\d]{1,4})/stop/"] = p =>
             {
-                Site site = siteManager.GetSiteById(p.Id);
-                siteManager.StopSite(site);
+                Site site = _siteManager.GetSiteById(p.Id);
+                _siteManager.StopSite(site);
                 AddMessage("Site has been stopped.");
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
             Post[@"/(?<Id>[\d]{1,4})/start/"] = p =>
             {
-                Site site = siteManager.GetSiteById(p.Id);
-                siteManager.StartSite(site);
-                AddMessage("Site has been started.");
+                Site site = _siteManager.GetSiteById(p.Id);
+                var result = _siteManager.StartSite(site);
+
+                switch (result)
+                {
+                    case SiteStartResult.BindingIsAlreadyInUse:
+                        AddMessage("Could not start the site because a binding is already in use.", MessageType.Error);
+                        break;
+                    case SiteStartResult.CannotAccessSitePath:
+                        AddMessage("Could not start the site because IIS could not obtain access to the site path. Maybe another process is using the files?", MessageType.Error);
+                        break;
+                    case SiteStartResult.Started:
+                        AddMessage("Site has been started.");
+                        break;
+                }
+
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
             Post[@"/(?<Id>[\d]{1,4})/restart/"] = p =>
             {
-                Site site = siteManager.GetSiteById(p.Id);
-                siteManager.RestartSite(site.IisId);
+                Site site = _siteManager.GetSiteById(p.Id);
+                _siteManager.RestartSite(site.IisId);
                 AddMessage("Site has been restarted.");
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
             Post[@"/(?<Id>[\d]{1,4})/recycle/"] = p =>
             {
-                Site site = siteManager.GetSiteById(p.Id);
-                siteManager.RecycleApplicationPoolBySite(site.IisId);
+                Site site = _siteManager.GetSiteById(p.Id);
+                _siteManager.RecycleApplicationPoolBySite(site.IisId);
                 AddMessage("Application pool has been recycled.");
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
             Post[@"/(?<Id>[\d]{1,4})/delete/"] = p =>
             {
-                Site site = siteManager.GetSiteById(p.Id);
-                siteManager.DeleteSite(site.IisId);
+                Site site = _siteManager.GetSiteById(p.Id);
+                _siteManager.DeleteSite(site.IisId);
                 AddMessage("The site {0} was deleted.", site.Name);
-                return new RedirectResponse("/sites/");
-            };
-
-            Get[@"/(?<Id>[\d]{1,4})/stats/"] = p =>
-            {
-                StatsRange range;
-                StatsRange.TryParse(Request.Query["r"], true, out range); // Defaults "Today" by position
-                Model.Range = range;
-                Site site = siteManager.GetSiteById(p.Id);
-                DateTime oldestDate = DateTime.UtcNow.AddYears(-100);
-
-                switch (range)
-                {
-                    case StatsRange.Today:
-                        oldestDate = DateTime.UtcNow.Date;
-                        Model.ActiveSection = "section1";
-                        break;
-                    case StatsRange.LastWeek:
-                        oldestDate = DateTime.UtcNow.AddDays(-7);
-                        Model.ActiveSection = "section2";
-                        break;
-                    case StatsRange.LastMonth:
-                        oldestDate = DateTime.UtcNow.AddDays(-30);
-                        Model.ActiveSection = "section3";
-                        break;
-                    case StatsRange.AllTime:
-                        Model.ActiveSection = "section4";
-                        break;
-                }
-
-                var hasAnyStats = logEntryService.GetCountBySite(site.IisId) != 0;
-                Model.HasAnyStats = hasAnyStats;
-
-                if(hasAnyStats)
-                {
-                    var totalRequests = logEntryService.GetCountBySite(site.IisId, oldestDate);
-                    Model.LatestEntries = logEntryService.GetLatestBySite(site, 5);
-                    Model.TotalRequests = totalRequests;
-                    Model.HasEntries = totalRequests != 0;
-                    Model.MostActiveClients = logEntryService.GetMostActiveClientsBySite(site.IisId, oldestDate).ToList();
-                    Model.MostExpensiveRequests = logEntryService.GetMostExpensiveRequestsBySite(site.IisId, oldestDate).ToList();
-                    Model.MostActiveUrls = logEntryService.GetMostActiveUrlsBySite(site.IisId, oldestDate).ToList();
-                }
-
-
-                Model.Site = site;
-                return View["Stats", Model];
+                return new RedirectResponse("/");
             };
 
             Get[@"/(?<Id>[\d]{1,4})/errors/"] = p => {                
-                EventLogHelper.SyncServer();
-
                 StatsRange range;
                 var rValue = Request.Query["r"];
                 if(rValue == null)
-                    range = StatsRange.AllTime;
+                    range = StatsRange.Last24Hours;
                 else
-                    StatsRange.TryParse(rValue, true, out range); // Defaults "Today" by position    
+                    Enum.TryParse(rValue, true, out range); // Defaults "Last24hours" by position    
                 
                 Model.Range = range;
                 
-                Site site = siteManager.GetSiteById(p.Id);
-                var hasAnyErrors = applicationErrorService.GetCountBySite(site.IisId) != 0;
-                
-                IEnumerable<ApplicationError> errors = null;
-                switch (range)
-                {
-                    default:
-                        errors = applicationErrorService.GetBySite(site.IisId);
-                        Model.ActiveSection = "section1";
-                        break;
-                    case StatsRange.Today:
-                        errors = applicationErrorService.GetBySite(site.IisId, DateTime.UtcNow.Date);
-                        Model.ActiveSection = "section2";
-                        break;
-                    case StatsRange.LastWeek:
-                        errors = applicationErrorService.GetBySite(site.IisId, DateTime.UtcNow.AddDays(-7).Date);
-                        Model.ActiveSection = "section3";
-                        break;
-                    case StatsRange.LastMonth:
-                        errors = applicationErrorService.GetBySite(site.IisId, DateTime.UtcNow.AddDays(-30).Date);
-                        Model.ActiveSection = "section4";
-                        break;
-                }
+                Site site = _siteManager.GetSiteById(p.Id);
+                var hasAnyErrors = true;
 
-                Model.HasAnyErrors = hasAnyErrors;
+                var sw = new Stopwatch();
+                sw.Start();
+                var errors = EventLogHelper.GetBySite(site.IisId, range).ToList();
+                sw.Stop();
+
+                Model.QueryTime = sw.ElapsedMilliseconds;
+
+                Model.HasAnyErrors = hasAnyErrors; 
                 Model.Site = site;
                 Model.Exceptions = errors.ToList();
                 
@@ -266,24 +247,12 @@ namespace Servant.Manager.Modules
             };
 
             Get[@"/(?<Id>[\d]{1,4})/errors/(?<EventLogId>[\d]{1,7})/"] = p =>{
-                Site site = siteManager.GetSiteById(p.Id);
-                ApplicationError exception = applicationErrorService.GetById(p.EventLogId);
-                var relatedRequests = logEntryService.GetAllRelatedToException(site.IisId, exception.DateTime.ToUniversalTime());
+                Site site = _siteManager.GetSiteById(p.Id);
+                ApplicationError exception = EventLogHelper.GetById(p.EventLogId);
                 Model.Site = site;
                 Model.Exception = exception;
-                Model.RelatedRequests = relatedRequests;
 
                 return View["Error", Model];
-            };
-
-            Get[@"/(?<Id>[\d]{1,4})/requests/(?<RequestId>[\d]{1,7})/"] = p =>
-            {
-                Site site = siteManager.GetSiteById(p.Id);
-                var request = logEntryService.GetById(p.RequestId);
-                Model.Site = site;
-                Model.Request = request;
-
-                return View["Request", Model];
             };
         }
     }
