@@ -40,8 +40,8 @@
                         <a href="/errors/@error.Id/">@error.Message</a>
                     }
                 </td>
-                <td class="span2">
-                    <span class="time-diff pull-right">@error.DateTime</span>
+                <td style="width: 170px;">
+                    <abbr class="timeago" title="@error.DateTime.ToString("o")">@error.DateTime</abbr>
                 </td>
             </tr>
         }
