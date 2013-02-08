@@ -36,7 +36,10 @@ namespace Servant.Server.Selfhost
             }
 
             if (ServantHost == null)
-                ServantHost = new NancyHost(new Uri(_settings.ServantUrl.Replace("*", "localhost")));
+            {
+                var uri = new Uri(_settings.ServantUrl.Replace("*", "localhost"));
+                ServantHost = new NancyHost(uri);
+            }
             
             ServantHost.Start();
 

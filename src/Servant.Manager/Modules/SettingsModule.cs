@@ -49,8 +49,12 @@ namespace Servant.Manager.Modules
                             host.Kill();
                             host.Start();
                         }).Start();
-                        
-                        return Response.AsRedirect(formSettings.ServantUrl + "settings/");
+
+                        Model.IsWildcard = Settings.ServantUrl.StartsWith("https://*") ||
+                                           Settings.ServantUrl.StartsWith("http://*");
+
+                        Model.NewUrl = Settings.ServantUrl;
+                        return View["BindingChanged", Model];
                     }
                 }
 

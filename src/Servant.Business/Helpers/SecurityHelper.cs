@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Servant.Business.Exceptions;
 
 namespace Servant.Business.Helpers
@@ -9,7 +10,7 @@ namespace Servant.Business.Helpers
          {
              var algorithm = new System.Security.Cryptography.SHA512Managed();
              var hashByte = algorithm.ComputeHash(Encoding.UTF8.GetBytes(password));
-             return hashByte.ToString();
+             return Convert.ToBase64String(hashByte);
          }
 
          public static bool IsPasswordValid(string password, string hash)
