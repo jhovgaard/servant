@@ -1,0 +1,16 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Shared/_Layout.cshtml";
+    ViewBag.ActiveMenuItem = "settings";
+}
+<h1>Settings have been saved, but...</h1>
+
+@if (!Model.IsWildcard)
+{
+    <h3 class="pushdown-medium">Since you've changed the location of Servant, we need to go there instead. Please click the green button below:</h3>
+    <a href="@Model.NewUrl" class="btn-submit">Go to new location</a>
+}
+else
+{
+    <h3 class="pushdown-medium">Because you've changed the location of Servant, we need you go there instead. Unfortunately we couldn't figure out the URL for you, sorry :-(</h3>
+}

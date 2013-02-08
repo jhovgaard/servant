@@ -2,7 +2,7 @@
 using System.Timers;
 using Nancy.Hosting.Self;
 using Servant.Business.Objects;
-using Servant.Business.Services;
+using Servant.Manager.Helpers;
 using Servant.Manager.Infrastructure;
 
 namespace Servant.Server.Selfhost
@@ -13,7 +13,7 @@ namespace Servant.Server.Selfhost
         public bool LogParsingStarted { get; set; }
         public bool Debug { get; set; }
         public DateTime StartupTime { get; set; }
-        private static Settings _localSettings;
+        private static Settings _settings;
         private static Timer _timer;
 
         public Host()
@@ -26,20 +26,27 @@ namespace Servant.Server.Selfhost
 
         public void Start(Settings settings = null)
         {
-            _localSettings = settings;
+            _settings = settings;
 
-            if (settings == null)
-                LoadSettings();
             
+            if (settings == null)
+            {
+                _settings = SettingsHelper.Settings;
+                Debug = _settings.Debug;
+            }
+
             if (ServantHost == null)
-                ServantHost = new NancyHost(new Uri(_localSettings.ServantUrl.Replace("*", "localhost")));
+            {
+                var uri = new Uri(_settings.ServantUrl.Replace("*", "localhost"));
+                ServantHost = new NancyHost(uri);
+            }
             
             ServantHost.Start();
 
-            if(_localSettings.ParseLogs)
+            if(_settings.ParseLogs)
                 _timer.Start();
 
-            Console.WriteLine("Host started on {0}", _localSettings.ServantUrl);
+            Console.WriteLine("Host started on {0}", _settings.ServantUrl);
         }
 
         public void Stop()
@@ -64,38 +71,31 @@ namespace Servant.Server.Selfhost
             LogParsingStarted = true;
             _timer.Start();
             
-            if(_localSettings.Debug)
+            if(_settings.Debug)
                 Console.WriteLine("Log parsing started.");
         }
 
         public void StopLogParsing()
         {
-            if (_localSettings.Debug)
+            if (_settings.Debug)
                 Console.WriteLine("Stopping log parsing...");
 
             LogParsingStarted = false;
             _timer.Stop();
 
-            if (_localSettings.Debug)
+            if (_settings.Debug)
                 Console.WriteLine("Log parsing stopped.");
-        }
-
-        public void LoadSettings()
-        {
-            var settingsService = new SettingsService();
-            _localSettings = settingsService.LocalSettings;
-            Debug = _localSettings.Debug;
         }
 
         void SyncDatabaseJob(object sender, ElapsedEventArgs e)
         {
             _timer.Stop();
-            if (_localSettings.Debug)
+            if (_settings.Debug)
                 Console.WriteLine("Started SyncDatabaseJob (IsRunning: {0})", LogParsingStarted);
            
             try
             {
-                Manager.Helpers.EventLogHelper.SyncServer();
+                //Manager.Helpers.EventLogHelper.SyncServer();
                 //Manager.Helpers.SynchronizationHelper.SyncServer();
             }
             catch (Exception ex)

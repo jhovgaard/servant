@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 
@@ -43,10 +44,12 @@ namespace Servant.Business.Helpers
                                  uri.AbsolutePath);
         }
 
-        public static Binding ConvertToBinding(string finalizedBinding)
+        public static Binding ConvertToBinding(string finalizedBinding, X509Certificate2 certificate = null)
         {
             if (finalizedBinding == null)
                 return null;
+
+            finalizedBinding = finalizedBinding.Replace("*", WildcardIdentifier);
 
             var uri = new Uri(finalizedBinding);
             var hostname = uri.Host == WildcardIdentifier ? "*" : uri.Host;
@@ -54,10 +57,11 @@ namespace Servant.Business.Helpers
                 {
                     Hostname = hostname,
                     Port = uri.Port,
-                    Protocol = (Protocol) Enum.Parse(typeof (Protocol), uri.Scheme)
+                    Protocol = (Protocol) Enum.Parse(typeof (Protocol), uri.Scheme),
+                    CertificateName = certificate != null ? certificate.FriendlyName : null,
+                    CertificateHash = certificate != null ? certificate.GetCertHash() : null
                 };
         }
-
 
         public static List<Binding> ConvertRawBindings(string rawBindings)
         {

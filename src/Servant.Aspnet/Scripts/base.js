@@ -1,4 +1,6 @@
 ﻿$(function () {
+    $("abbr.timeago").timeago();
+
     $("#stop-site-form").submit(function () {
         var confirmed = confirm("Are you sure you want to completely stop this site?");
         if (!confirmed)
@@ -11,10 +13,27 @@
             return false;
     });
 
+    $("#bindings").on("change", "tr td input[name=https]", function () {
+        var $certificate = $(this).parent().parent().parent().find("select");
+        $certificate.toggle();
+    });
 
+    $("#bindings").on("keyup", "tr td input", function () {
+        var value = $(this).val();
+        if (value.length > 3) {
+            var $certificate = $(this).parent().find("select");
+            if (value.substring(0, 5).toLowerCase() == "https") {
+                $certificate.show();
+            } else {
+                $certificate.hide();
+            }
+        }
+    });
+    
     $("#add-binding").click(function () {
         var bindings = $("#bindings");
-        var newBinding = bindings.find("tr:visible:last").clone();
+        var newBinding = bindings.find("tbody:visible:last").clone();
+        newBinding.find("select").hide();
         newBinding.find("td input").val("");
         newBinding.find("td").removeClass("error");
         newBinding.find("td span.help-block, td span.help-inline").remove();
@@ -25,8 +44,8 @@
     });
 
     $("#bindings").on("click", "tr td img.remove-binding", function () {
-        if ($("#bindings tr:visible").length > 1) {
-            $(this).parent().parent().remove();
+        if ($("#bindings tbody:visible").length > 1) {
+            $(this).parent().parent().parent().remove();
         }
 
         if ($("#bindings tr:visible").length == 1) {
@@ -36,11 +55,11 @@
     });
     
     $(window).resize(function () {
-        $("#menu").height($(document).height());
+        $("#sidemenu").height($(window).height());
     });
 
     $(function() {
-        $("#menu").height($(document).height());
+        $("#sidemenu").height($(window).height());
         
         if (message.length) {
             var container = $("#message");
@@ -64,7 +83,7 @@
                     input = $("input[name=" + error.PropertyName.toLowerCase() + "]");
                 }
 
-                var group = input.parents(".control-group");
+                var group = input.parents(".input-group");
                 group.addClass("error");
 
                 var helpSpan = group.find("span.help-inline, span.help-block");
