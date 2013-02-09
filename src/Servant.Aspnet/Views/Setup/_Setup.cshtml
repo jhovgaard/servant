@@ -3,26 +3,21 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>@ViewBag.Title</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="/css/metro.blue.css" rel="stylesheet" type="text/css" />
-    <link href="/css/metro.extended.css" rel="stylesheet" type="text/css" />
+    <title>@Model.Title</title>
+    <link href="/css/normalize.css" rel="stylesheet" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
     <link href="/css/base.css" rel="stylesheet" type="text/css" />
 </head>
     <body>
-        <div class="container" id="application">
-            <div class="row margin-top30">
-                <div class="span12 center">
-                    <img src="/images/servant_logo.png" alt="Servant for IIS" />
-                </div>
-            </div>
-                
+        <div style="width: 600px; margin: 40px auto 0; text-align: center;">
             @RenderBody()
         </div>
     </body>
-    <script src="/scripts/jquery-1.8.0.min.js"></script>
-    <script src="/Scripts/jquery.uitablefilter.js"></script>
-    <script src="/Scripts/base.js" type="text/javascript"></script>
+    <script src="/scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="/scripts/jquery.filtr.min.js"></script>
+    <script src="/scripts/jquery.watermark.min.js"></script>
+    <script src="/scripts/jquery.timeago.js"></script>
+    <script src="/scripts/base.js" type="text/javascript"></script>
     <script type="text/javascript">
         var errors = @Html.Raw(Model.ErrorsAsJson);
         var message = "";

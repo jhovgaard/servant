@@ -2,64 +2,44 @@
 @{
     Layout = "_Setup.cshtml";
 }
-<div class="row margin-top30">
-    <div class="span6 offset3 center">
-        <h3>Welcome to Servant!</h3> 
+<h1 class="pushdown-long">Welcome to Servant for IIS</h1> 
         
-        <p>You've succcesfully installed Servant on your server and to be honest, we couldn't be happier! We hate to bug you, but we need a few details from you before we're ready.</p>
+<p>You've succcesfully installed Servant on your server and to be honest, we couldn't be happier! We hate to bug you, but we need a few details from you before we're ready.</p>
         
-        <form action="/setup/1/" method="POST" class="margin-top30">
-            <div class="control-group">
-                <label for="servanturl">URL to Servant</label>
-                <div class="controls">
-                    <input type="text" tabindex="1" name="servanturl" id="servanturl" class="input-medium span4" value="@Model.Settings.ServantUrl" />
-                </div>
-            </div>
-            
-            @*<div class="control-group">
-                <div style="width: 240px; margin: auto;">
-                    <label class="checkbox">
-                        <input type="checkbox" tabindex="2" value="true" name="parselogs"@(Model.Settings.ParseLogs == true ? Html.Raw("checked=\"checked\"") : null) checked="checked" />
-                        Begin parsing my logs immediately
-                    </label>
-                </div>
-            </div>*@
-            
-            <div class="control-group">
-                <label for="username">Username</label>
-                <div class="controls">
-                    <input type="text" tabindex="3" name="username" id="username" class="input-medium span4" value="@Model.Settings.Username" />
-                </div>
-            </div>
-            
-            <div class="control-group">
-                <label for="password">Password</label>
-                <div class="controls">
-                    <input type="password" tabindex="4" name="password" id="password" class="input-medium span4" value="" />
-                </div>
-            </div>
-            
-            <div class="control-group">
-                <div style="width: 300px; margin: auto;">
-                    <label class="checkbox">
-                        <input type="checkbox" tabindex="5" name="acceptterms" @((bool)Model.AcceptTerms ? Html.Raw("checked=\"checked\"") : null) />
-                        I agree and accept <a href="#">the terms and conditions for using Servant for IIS</a>.
-                    </label>
-                </div>
-            </div>
-            
-            <div class="controls margin-top30">
-                <input type="submit" tabindex="6" value="Start Servant now!" class="btn btn-primary"/>
-            </div>
-        </form>
-        <p></p>
+<form action="/setup/1/" method="POST" style="width: 400px; margin: auto;">
+    <div class="input-group">
+        <label for="servanturl">URL to Servant</label>
+        <input type="text" tabindex="1" name="servanturl" id="servanturl" class="input-medium span4" value="@Model.Settings.ServantUrl" />
     </div>
-</div>
+            
+    <div class="input-group">
+        <label for="username">Username</label>
+        <input type="text" tabindex="3" name="username" id="username" class="input-medium span4" value="@Model.Settings.Username" />
+    </div>
+            
+    <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" tabindex="4" name="password" id="password" class="input-medium span4" value="" />
+    </div>
+            
+    <div class="input-group">
+        <div style="width: 300px; margin: auto;">
+            <label>
+                <input type="checkbox" tabindex="5" name="acceptterms" @((bool)Model.AcceptTerms ? Html.Raw("checked=\"checked\"") : null) />
+                I agree and accept <a href="#">the terms and conditions for using Servant for IIS</a>.
+            </label>
+        </div>
+    </div>
+            
+    <div class="controls margin-top30">
+        <input type="submit" tabindex="6" value="Start Servant now!" class="btn btn-primary"/>
+    </div>
+</form>
 
 @section javascript {
     <script type="text/javascript">
         $(function() {
-            $("#password").focus();
+            $('#password').focus();
         });
     </script>
 }

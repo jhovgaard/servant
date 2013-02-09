@@ -15,8 +15,8 @@ namespace Servant.Business.Helpers
 
          public static bool IsPasswordValid(string password, string hash)
          {
-             if(hash == null)
-                 throw new SettingsException("The database doesn't contain a password.");
+             if (hash == null)
+                 return false;
 
              return HashPassword(password) == hash;
          }

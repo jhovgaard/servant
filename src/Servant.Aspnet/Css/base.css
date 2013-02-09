@@ -457,7 +457,7 @@ h2.bug {
     margin-top: 5px;
 }
 
-input[type=submit], .btn-submit {
+input[type=submit], .btn-submit, a.btn-submit:visited {
     background: url('/images/icon-ok.png') no-repeat 10px center;
     padding: 10px 15px 10px 45px;
     background-color: #3fb618;
