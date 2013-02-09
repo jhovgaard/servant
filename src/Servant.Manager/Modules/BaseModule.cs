@@ -41,7 +41,6 @@ namespace Servant.Manager.Modules
 
             Before += ctx =>
             {
-
                 Model.Title = "Servant for IIS";
                 Page = new PageModel
                 {

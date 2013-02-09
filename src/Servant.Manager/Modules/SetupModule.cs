@@ -43,9 +43,14 @@ namespace Servant.Manager.Modules
                 };
 
                 Post["/setup/1/"] = _ => {
-                    var formSettings = this.Bind<Settings>();
+                    var formSettings = this.Bind<Settings>();   
                     var originalInputtedServantUrl = formSettings.ServantUrl;
-                    formSettings.ServantUrl = BindingHelper.FinializeBinding(formSettings.ServantUrl);
+
+                    if(BindingHelper.SafeFinializeBinding(formSettings.ServantUrl) == null)
+                        AddPropertyError("servanturl", "URL is invalid.");
+                    else
+                        formSettings.ServantUrl = BindingHelper.FinializeBinding(formSettings.ServantUrl);
+                    
                     formSettings.ParseLogs = true;
 
                     var validationResult = this.Validate(formSettings);
