@@ -35,9 +35,9 @@
                 </td>
                 <td>
                     @if(error.Site != null) {
-                        <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.Message</a>
+                        <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.ExceptionType</a>
                     } else {
-                        <a href="/errors/@error.Id/">@error.Message</a>
+                        <a href="/errors/@error.Id/">@error.ExceptionType</a>
                     }
                 </td>
                 <td style="width: 170px;">
