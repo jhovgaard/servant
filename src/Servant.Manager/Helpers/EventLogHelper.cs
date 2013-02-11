@@ -101,7 +101,7 @@ namespace Servant.Manager.Helpers
             var events = new List<EventRecord>();
             for (var eventInstance = elr.ReadEvent(); null != eventInstance; eventInstance = elr.ReadEvent())
             {
-                if (eventInstance.Properties[8].Value.ToString().StartsWith("/LM/W3SVC/" + siteIisId + "/"))
+                if (eventInstance.Properties.Count() > 9 && eventInstance.Properties[8].Value.ToString().StartsWith("/LM/W3SVC/" + siteIisId + "/"))
                     events.Add(eventInstance);
             }
 
