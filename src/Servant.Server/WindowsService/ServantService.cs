@@ -17,7 +17,6 @@ namespace Servant.Server.WindowsService
             try
             {
                 Program.StartServant();
-                EventLog.WriteEntry("Servant host started!", EventLogEntryType.SuccessAudit);
             }
             catch (Exception ex)
             {
