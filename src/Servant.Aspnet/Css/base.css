@@ -272,7 +272,7 @@ pre {
     }
 
 #sidemenu ul li ul {
-    background-color: #4d0078;
+    background-color: #ffa840;
     display: none;
 }
 
@@ -288,7 +288,7 @@ pre {
 #sidemenu ul.active-home li.home,
 #sidemenu ul li.home:hover,
 #sidemenu ul li.home.active {
-    background-color: #00a8ff;
+    background-color: #00bcf2;
 }
 
 #sidemenu ul.active-sites li.sites,
@@ -296,13 +296,13 @@ pre {
 #sidemenu ul li.sites.active,
 #sidemenu ul li.sites ul li a:hover,
 #sidemenu ul li.sites ul li.active a {
-    background-color: #6e00ab;
+    background-color: #ff8c00;
 }
 
 #sidemenu ul.active-settings li.settings,
 #sidemenu ul li.settings:hover,
 #sidemenu ul li.settings.active {
-    background-color: #4a7800;
+    background-color: #682174;
 }
 
 
@@ -362,10 +362,10 @@ pre {
 }
 
     #topmenu ul li.settings a:hover,
-    #topmenu ul.active-settings li.settings a { border-bottom: 5px solid #60c8ff; }
+    #topmenu ul.active-settings li.settings a { border-bottom: 5px solid #682174; }
 
     #topmenu ul li.errors a:hover,
-    #topmenu ul.active-errors li.errors a {border-bottom: 5px solid #a300ff;}
+    #topmenu ul.active-errors li.errors a {border-bottom: 5px solid #00bcf2;}
 
 #maincontent {
     float: left;
@@ -424,7 +424,7 @@ input[type=text].white {
     }
 
 h2.bug {
-    background: url('/images/icon-bug.png') no-repeat 20px center #6eb300;
+    background: url('/images/icon-bug.png') no-repeat 20px center #00BCF2;
     padding-left: 60px;
 }
 
@@ -460,7 +460,7 @@ h2.bug {
 input[type=submit], .btn-submit, a.btn-submit:visited {
     background: url('/images/icon-ok.png') no-repeat 10px center;
     padding: 10px 15px 10px 45px;
-    background-color: #3fb618;
+    background-color: #a8c019;
     color: white;
     border: 0;
     font-size: 16px;
@@ -469,25 +469,25 @@ input[type=submit], .btn-submit, a.btn-submit:visited {
 }
 
     input[type=submit]:hover {
-        background-color: #369c14;
+        background-color: #bad80a;
     }
 
     input[type=submit].cancel {
         background-image: url('/images/icon-cancel.png');
-        background-color: #ff0039;
+        background-color: #fb4050;
     }
 
         input[type=submit].cancel:hover {
-            background-color: #dd0031;
+            background-color: #e81123;
         }
 
     input[type=submit].warning {
         background-image: url('/images/icon-warning.png');
-        background-color: #ff9600;
+        background-color: #FFA840;
     }
 
         input[type=submit].warning:hover {
-            background-color: #ee8c00;
+            background-color: #ff8c00;
         }
 
         input[type=submit].recycle { background-image: url('/images/icon-recycle.png'); background-position: 10px 12px }
@@ -499,6 +499,10 @@ table#bindings {
 
     table#bindings tbody tr td {
         background-color: #e2e2e2;
+    }
+
+    table#bindings tbody:nth-child(odd) tr td {
+        background-color: #c9c9c9;
     }
 
     table#bindings tr td {
