@@ -46,13 +46,16 @@ namespace Servant.Server.Selfhost
             if(_settings.ParseLogs)
                 _timer.Start();
 
-            Console.WriteLine("Host started on {0}", _settings.ServantUrl);
+            if(Debug)
+                Console.WriteLine("Host started on {0}", _settings.ServantUrl);
         }
 
         public void Stop()
         {
             ServantHost.Stop();
-            Console.WriteLine("Servant was stopped.");
+
+            if (Debug)
+                Console.WriteLine("Servant was stopped.");
         }
 
         public void Kill()
@@ -71,7 +74,7 @@ namespace Servant.Server.Selfhost
             LogParsingStarted = true;
             _timer.Start();
             
-            if(_settings.Debug)
+            if(Debug)
                 Console.WriteLine("Log parsing started.");
         }
 

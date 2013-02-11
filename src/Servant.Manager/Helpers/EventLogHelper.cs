@@ -13,7 +13,7 @@ namespace Servant.Manager.Helpers
     {
         public static ApplicationError ParseEntry(EventRecord eventRecord)
         {
-            var iisIdRegex = new Regex(@"/LM/W3SVC/(\d).+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            var iisIdRegex = new Regex(@"/LM/W3SVC/(\d{1,9}).+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
             // Entries kan forekomme uden et IIS id.
             var iisIdResult = iisIdRegex.Match(eventRecord.Properties[8].Value.ToString()).Groups[1].Value;
             var iisId = string.IsNullOrWhiteSpace(iisIdResult ) ? 0 : Convert.ToInt32(iisIdResult);
