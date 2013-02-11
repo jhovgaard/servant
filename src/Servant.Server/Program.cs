@@ -1,17 +1,22 @@
 ﻿using System;
+using System.Configuration.Install;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.ServiceProcess;
+using Servant.Business.Objects;
 using Servant.Manager.Helpers;
 using Servant.Manager.Infrastructure;
 using Servant.Server.Selfhost;
+using Servant.Server.WindowsService;
 
 namespace Servant.Server
 {
     class Program
     {
-
+        private static Settings Settings { get; set; }
         static void Init()
         {
             Nancy.TinyIoc.TinyIoCContainer.Current.Register<IHost, Host>().AsSingleton();
@@ -20,15 +25,9 @@ namespace Servant.Server
         static void Main(string[] args)
         {
             Init();
+            Settings = SettingsHelper.Settings;
 
-            var settings = SettingsHelper.Settings;
-            var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
-
-            Console.WriteLine();
-            Console.WriteLine("Welcome to Servant for IIS.");
-            Console.WriteLine();
-
-            if(!IsAnAdministrator())
+            if (!IsAnAdministrator())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("Error: ");
@@ -43,7 +42,6 @@ namespace Servant.Server
                 Console.WriteLine();
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
-                
                 return;
             }
 
@@ -56,20 +54,80 @@ namespace Servant.Server
                 Console.WriteLine();
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
-
                 return;
             }
 
+                var command = args.FirstOrDefault() ?? "";
+
+            switch (command)
+            {
+                case "install":
+                    if (IsAlreadyInstalled())
+                    {
+                        Console.WriteLine("Servant is already installed. Use /uninstall to uninstall.");
+                        Console.ReadLine();
+                        return;
+                    }
+                    ManagedInstallerClass.InstallHelper(new[] {"/LogToConsole=false", Assembly.GetExecutingAssembly().Location });
+                    var startController = new ServiceController("Servant for IIS");
+                    startController.Start();
+                    StartBrowser();
+                    Console.WriteLine("Servant was successfully installed. Please complete the installation from your browser on " + Settings.ServantUrl);
+                    break;
+
+                case "uninstall":
+                    Console.WriteLine();
+                    Console.WriteLine("Trying to uninstall the Servant service...");
+                    try
+                    {
+                        ManagedInstallerClass.InstallHelper(new[] { "/u", "/LogToConsole=false", Assembly.GetExecutingAssembly().Location });
+                        Console.WriteLine("The service was successfully uninstalled.");
+                    }
+                    catch (Exception)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("An error occurred while trying to uninstall Servant.");
+                        Console.ResetColor();
+                    }
+
+                    break;
+                default:
+                    if(Environment.UserInteractive || (args != null && args.Length > 0))
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("Welcome to Servant for IIS.");
+                        Console.WriteLine();
+
+                        StartServant();
+                        Console.WriteLine("You can now manage your server from " + Settings.ServantUrl);
+                        StartBrowser();
+                        while (true)
+                            Console.ReadLine();
+                    }
+                    
+                    ServiceBase.Run(new ServantService());
+                    break;
+
+            }
+        }
+        
+        public static bool IsAlreadyInstalled()
+        {
+            var startController = new ServiceController("Servant for IIS");
+            return startController.Container != null;
+        }
+
+        public static void StartServant()
+        {
+            var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
             host.Start();
+        }
 
-            if(settings.ParseLogs)
-                host.StartLogParsing();
-
-            Console.WriteLine("You can now manage your server from " + settings.ServantUrl);
-
+        public static void StartBrowser()
+        {
             try
             {
-                var startupUrl = settings.SetupCompleted ? settings.ServantUrl : settings.ServantUrl + "setup/1/";
+                var startupUrl = Settings.SetupCompleted ? Settings.ServantUrl : Settings.ServantUrl + "setup/1/";
                 var startInfo = new ProcessStartInfo("explorer.exe", startupUrl);
                 Process.Start(startInfo);
             }
@@ -77,10 +135,7 @@ namespace Servant.Server
             {
                 Console.WriteLine("Could not start browser: " + e.Message);
             }
-
-            Console.ReadLine();
         }
-
 
         public static bool IsAnAdministrator()
         {
@@ -104,4 +159,4 @@ namespace Servant.Server
             }
         }
     }
-}
+} 
