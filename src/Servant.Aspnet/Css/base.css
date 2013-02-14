@@ -6,9 +6,10 @@
     font-size: 100%;
 }
 
-body, input {
+body, input, label {
     font-family: 'Open Sans', sans-serif;
     font-weight: normal;
+    color: #828282;
 }
 
 body {
@@ -415,7 +416,7 @@ input[type=text].white {
     }
 
     #popup-message.error {
-        background-color: #ff0039;
+        background-color: #E81123;
     }
 
     #popup-message.info {
@@ -506,6 +507,17 @@ table#bindings {
     }
 
     table#bindings tr td {
-        padding: 5px 0;
+        padding: 0;
     }
 
+    table#bindings tbody tr:first-child td { padding-top: 10px; }
+    table#bindings tbody tr:last-child td { padding-bottom: 10px; }
+
+    table#bindings tbody tr td select, table#bindings tbody tr td input { border-top: 0;}
+
+    table#bindings tbody tr:first-child td input { border-top: 3px solid #A5A5A5}
+
+    table#bindings tbody tr td label { padding-left: 10px; }
+
+
+  

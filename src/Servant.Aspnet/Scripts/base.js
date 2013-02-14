@@ -21,7 +21,8 @@
     $("#bindings").on("keyup", "tr td input", function () {
         var value = $(this).val();
         if (value.length > 3) {
-            var $certificate = $(this).parent().find("select");
+            var $certificate = $(this).parents('tbody').find('tr.certificate');
+            console.log($certificate)
             if (value.substring(0, 5).toLowerCase() == "https") {
                 $certificate.show();
             } else {

@@ -44,7 +44,7 @@ namespace Servant.Business.Helpers
                                  uri.AbsolutePath);
         }
 
-        public static Binding ConvertToBinding(string finalizedBinding, X509Certificate2 certificate = null)
+        public static Binding ConvertToBinding(string finalizedBinding, string ipAddress, X509Certificate2 certificate = null)
         {
             if (finalizedBinding == null)
                 return null;
@@ -59,28 +59,9 @@ namespace Servant.Business.Helpers
                     Port = uri.Port,
                     Protocol = (Protocol) Enum.Parse(typeof (Protocol), uri.Scheme),
                     CertificateName = certificate != null ? certificate.FriendlyName : null,
-                    CertificateHash = certificate != null ? certificate.GetCertHash() : null
+                    CertificateHash = certificate != null ? certificate.GetCertHash() : null,
+                    IpAddress = ipAddress ?? "*"
                 };
-        }
-
-        public static List<Binding> ConvertRawBindings(string rawBindings)
-        {
-            if (string.IsNullOrWhiteSpace(rawBindings))
-                return null;
-
-            return ConvertRawBindings(rawBindings.Split(','));
-        }
-
-        public static List<Binding> ConvertRawBindings(string[] rawBindings)
-        {
-            var bindings = new List<Binding>();
-            foreach (var binding in rawBindings)
-            {
-                var finalizedBinding = SafeFinializeBinding(binding);
-                bindings.Add(ConvertToBinding(finalizedBinding));
-            }
-
-            return bindings;
         }
     }
 }

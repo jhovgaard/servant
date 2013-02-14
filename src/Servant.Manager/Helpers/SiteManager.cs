@@ -94,6 +94,8 @@ namespace Servant.Manager.Helpers
                 servantBinding.Protocol = (Protocol) Enum.Parse(typeof(Protocol), binding.Protocol);
                 servantBinding.Hostname = binding.Host;
                 servantBinding.Port = binding.EndPoint.Port;
+                var endPointAddress = binding.EndPoint.Address.ToString();
+                servantBinding.IpAddress = endPointAddress == "0.0.0.0" ? "*" : endPointAddress;
 
                 yield return servantBinding;
             }
@@ -189,9 +191,9 @@ namespace Servant.Manager.Helpers
             return ParseSite(_manager.Sites.SingleOrDefault(x => x.Name == name));
         }
 
-        public bool IsBindingInUse(string rawBinding, int iisSiteId = 0)
+        public bool IsBindingInUse(string rawBinding, string ipAddress, int iisSiteId = 0)
         {
-            var binding = BindingHelper.ConvertToBinding(BindingHelper.FinializeBinding(rawBinding));
+            var binding = BindingHelper.ConvertToBinding(BindingHelper.FinializeBinding(rawBinding), ipAddress);
             return IsBindingInUse(binding, iisSiteId);
         }
 

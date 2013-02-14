@@ -14,6 +14,7 @@ namespace Servant.Business.Objects
         public Protocol Protocol { get; set; }
         public string Hostname { get; set; }
         public int Port { get; set; }
+        public string IpAddress { get; set; }
         public string CertificateName { get; set; }
         public byte[] CertificateHash { get; set; }
         public new string ToString()
@@ -23,7 +24,7 @@ namespace Servant.Business.Objects
 
         public string ToIisBindingInformation()
         {
-            return string.Format("*:{0}:{1}", Port, Hostname);
+            return string.Format( "{0}:{1}:{2}", IpAddress, Port, Hostname);
         }
     }
 }
