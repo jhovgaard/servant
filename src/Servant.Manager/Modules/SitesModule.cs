@@ -20,6 +20,7 @@ namespace Servant.Manager.Modules
         {
             string[] bindingsUserInputs = Request.Form.BindingsUserInput.ToString().Split(',');
             string[] bindingsCertificateName = Request.Form.BindingsCertificateName.ToString().Split(',');
+            string[] bindingsIpAddresses = Request.Form.BindingsIpAddress.ToString().Split(',');
             site.Bindings = new List<Binding>();
             var certificates = SiteManager.GetCertificates();
 
@@ -37,7 +38,7 @@ namespace Servant.Manager.Modules
                     AddPropertyError("bindingsuserinput[" + i + "]", "The binding is invalid.");
                     isValid = false;
                 }
-                else if (_siteManager.IsBindingInUse(finalizedHost, site.IisId))
+                else if (_siteManager.IsBindingInUse(finalizedHost, bindingsIpAddresses[i], site.IisId))
                 {
                     AddPropertyError("bindingsuserinput[" + i + "]", string.Format("The binding {0} is already in use.", finalizedHost));
                     isValid = false;
@@ -47,7 +48,7 @@ namespace Servant.Manager.Modules
                 if (isValid)
                 {
                     var certificate = certificates.SingleOrDefault(x => x.FriendlyName == bindingsCertificateName[i]);
-                    binding = BindingHelper.ConvertToBinding(finalizedHost, certificate);
+                    binding = BindingHelper.ConvertToBinding(finalizedHost, bindingsIpAddresses[i], certificate);
                 }
                 else
                 {
@@ -159,8 +160,15 @@ namespace Servant.Manager.Modules
 
                 if(!HasErrors)
                 {
-                    _siteManager.UpdateSite(site);
-                    AddMessage("Settings have been saved.");
+                    try
+                    {
+                        _siteManager.UpdateSite(site);
+                        AddMessage("Settings have been saved.");
+                    }
+                    catch (System.ArgumentException ex)
+                    {
+                        AddMessage("IIS error: " + ex.Message, MessageType.Error);
+                    }
                 }
 
                 return View["Settings", Model];
