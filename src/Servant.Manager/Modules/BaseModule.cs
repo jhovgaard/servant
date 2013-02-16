@@ -50,6 +50,9 @@ namespace Servant.Manager.Modules
 
                 Model.Page = Page;
                 Model.Errors = new List<Error>();
+                bool useMinified;
+                bool.TryParse(System.Configuration.ConfigurationManager.AppSettings["UseMinified"], out useMinified);
+                Model.UseMinified = useMinified;
 
                 return null;
             };

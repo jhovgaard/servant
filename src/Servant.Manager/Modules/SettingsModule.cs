@@ -49,17 +49,10 @@ namespace Servant.Manager.Modules
 
                     if(bindingIsChanged)
                     {
-                        new System.Threading.Thread(() =>
-                        {
-                            System.Threading.Thread.Sleep(50);
-                            host.Kill();
-                            host.Start();
-                        }).Start();
-
                         Model.IsWildcard = Settings.ServantUrl.StartsWith("https://*") ||
                                            Settings.ServantUrl.StartsWith("http://*");
 
-                        Model.NewUrl = Settings.ServantUrl;
+                        Model.NewUrl = formSettings.ServantUrl;
                         return View["BindingChanged", Model];
                     }
                 }
