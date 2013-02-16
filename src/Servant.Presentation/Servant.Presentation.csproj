@@ -57,42 +57,41 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="base.css" />
-    <Content Include="bootstrap.min.css" />
-    <Content Include="Cosmo\Css\bootstrap-responsive.min.css" />
-    <Content Include="Cosmo\Css\bootstrap.min.css" />
-    <Content Include="Cosmo\Default.html" />
-    <Content Include="Default.htm" />
-    <Content Include="favicon.ico" />
-    <Content Include="Fonts\Roboto License.txt" />
-    <Content Include="Fonts\Roboto-Light-webfont.svg" />
-    <Content Include="Fonts\Roboto-Regular-webfont.svg" />
-    <Content Include="manage_site.png" />
-    <Content Include="metro.blue.css" />
-    <Content Include="metro.extended.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="servant_logo.png" />
-    <Content Include="servant_logo_simple.gif" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Fonts\Roboto-Light-webfont.eot" />
-    <Content Include="Fonts\Roboto-Light-webfont.ttf" />
-    <Content Include="Fonts\Roboto-Light-webfont.woff" />
-    <Content Include="Fonts\Roboto-Regular-webfont.eot" />
-    <Content Include="Fonts\Roboto-Regular-webfont.ttf" />
-    <Content Include="Fonts\Roboto-Regular-webfont.woff" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
+    <Content Include="Css\base.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Css\closelabel.gif" />
+    <Content Include="Css\loading.gif" />
+    <Content Include="Css\nextlabel.gif" />
+    <Content Include="Css\normalize.css" />
+    <Content Include="Css\prevlabel.gif" />
+    <Content Include="Css\slimbox2.css" />
+    <Content Include="Default.html" />
+    <Content Include="favicon.ico" />
+    <Content Include="Images\icon_download.png" />
+    <Content Include="Images\servant_logo.gif" />
+    <Content Include="Images\servant_screenshot_1.gif" />
+    <Content Include="Images\servant_screenshot_1_thumb.gif" />
+    <Content Include="Images\servant_screenshot_2.gif" />
+    <Content Include="Images\servant_screenshot_2_thumb.gif" />
+    <Content Include="Images\servant_screenshot_3.gif" />
+    <Content Include="Images\servant_screenshot_3_thumb.gif" />
+    <Content Include="Images\servant_logo_square.png" />
+    <Content Include="slimbox2.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\PublishProfiles\Profile.pubxml" />
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
     </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
     </None>
   </ItemGroup>
   <PropertyGroup>

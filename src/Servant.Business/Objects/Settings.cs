@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataAnnotationsExtensions;
-using System.Linq;
 
 namespace Servant.Business.Objects
 {

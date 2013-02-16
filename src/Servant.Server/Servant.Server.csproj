@@ -52,43 +52,38 @@
   <PropertyGroup>
     <ApplicationIcon>Servant.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Something|AnyCPU'">
+    <OutputPath>bin\Something\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Web.Administration, Version=7.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\dependencies\Microsoft.Web.Administration.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Nancy, Version=0.14.1.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy, Version=0.16.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.0.14.1\lib\net40\Nancy.dll</HintPath>
+      <HintPath>..\packages\Nancy.0.16.1\lib\net40\Nancy.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.Hosting.Self, Version=0.14.1.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy.Hosting.Self, Version=0.16.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Hosting.Self.0.14.1\lib\net40\Nancy.Hosting.Self.dll</HintPath>
+      <HintPath>..\packages\Nancy.Hosting.Self.0.16.1\lib\net40\Nancy.Hosting.Self.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.Validation.DataAnnotations, Version=0.14.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Validation.DataAnnotations.0.14.1\lib\net40\Nancy.Validation.DataAnnotations.dll</HintPath>
+    <Reference Include="Nancy.Validation.DataAnnotations">
+      <HintPath>..\packages\Nancy.Validation.DataAnnotations.0.16.1\lib\net40\Nancy.Validation.DataAnnotations.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.ViewEngines.Razor, Version=0.14.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Viewengines.Razor.0.14.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
+    <Reference Include="Nancy.ViewEngines.Razor">
+      <HintPath>..\packages\Nancy.Viewengines.Razor.0.16.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Nancy.Viewengines.Razor.0.14.1\lib\net40\System.Web.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Web.Razor, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\System.Web.Razor.Unofficial.2.0.1\lib\net40\System.Web.Razor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -110,8 +105,26 @@
   <ItemGroup>
     <Content Include="acknowledgments.txt" />
     <Content Include="Servant.ico" />
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+      <TransformOnBuild>true</TransformOnBuild>
+    </None>
+    <None Include="App.Debug.config">
+      <DependentUpon>App.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="App.Release.config">
+      <DependentUpon>App.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="Install Servant Service.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
+    <None Include="Uninstall Servant Service.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Servant.Business\Servant.Business.csproj">
@@ -156,18 +169,22 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)Servant.Aspnet\Css" “$(ProjectDir)$(OutDir)Css” /e /y /i /r
-xcopy "$(SolutionDir)Servant.Aspnet\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r
-xcopy "$(SolutionDir)Servant.Aspnet\Scripts" “$(ProjectDir)$(OutDir)Scripts” /e /y /i /r
-xcopy "$(SolutionDir)Servant.Aspnet\Views" “$(ProjectDir)$(OutDir)Views” /e /y /i /r
-</PreBuildEvent>
+    <PreBuildEvent>xcopy "$(SolutionDir)Servant.Aspnet\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r
+xcopy "$(SolutionDir)Servant.Aspnet\Views" “$(ProjectDir)$(OutDir)Views” /e /y /i /r</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>
-if $(ConfigurationName) == Debug (
-xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.14.1\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll" "$(ProjectDir)bin\"
-xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.14.1\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\"
+    <PostBuildEvent>if $(ConfigurationName) == Debug (
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll" "$(ProjectDir)bin\"
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\"
+)
+
+if $(ConfigurationName) == Release (
+mkdir $(ProjectDir)$(OutDir)Scripts
+mkdir $(ProjectDir)$(OutDir)Css
 )</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SlowCheetahTargets Condition=" '$(SlowCheetahTargets)'=='' ">$(LOCALAPPDATA)\Microsoft\MSBuild\SlowCheetah\v1\SlowCheetah.Transforms.targets</SlowCheetahTargets>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -176,4 +193,18 @@ xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.14.1\lib\Net40\
   <Target Name="AfterBuild">
   </Target>
   -->
+  <UsingTask TaskName="CssCompressorTask" AssemblyFile="$(SolutionDir)packages\YUICompressor.NET.MSBuild.2.2.1.0\lib\NET20\Yahoo.Yui.Compressor.Build.MsBuild.dll" />
+  <UsingTask TaskName="JavaScriptCompressorTask" AssemblyFile="$(SolutionDir)packages\YUICompressor.NET.MSBuild.2.2.1.0\lib\NET20\Yahoo.Yui.Compressor.Build.MsBuild.dll" />
+  <Target Name="AfterBuild" Condition="'$(Configuration)'=='Release'">
+    <ItemGroup>
+      <CssFiles Include="..\Servant.Aspnet\Css\normalize.css" />
+      <CssFiles Include="..\Servant.Aspnet\Css\base.css" />
+      <JavaScriptFiles Include="..\Servant.Aspnet\Scripts\*.js" Exclude="..\Servant.Aspnet\Scripts\jquery-1.8.0.min.js" />
+      <JqueryFile Include="..\Servant.Aspnet\Scripts\jquery-1.8.0.min.js" />
+    </ItemGroup>
+    <CssCompressorTask SourceFiles="@(CssFiles)" OutputFile="$(OutDir)css\servant.css" />
+    <JavaScriptCompressorTask SourceFiles="@(JavaScriptFiles)" OutputFile="$(OutDir)scripts\servant.js" />
+    <JavaScriptCompressorTask SourceFiles="@(JqueryFile)" OutputFile="$(OutDir)scripts\jquery-1.8.0.min.js" />
+  </Target>
+  <Import Project="$(SlowCheetahTargets)" Condition="Exists('$(SlowCheetahTargets)')" />
 </Project>
