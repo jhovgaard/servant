@@ -17,7 +17,7 @@ namespace Servant.Business.Objects
 
         public Site()
         {
-            Bindings = new List<Binding>() { new Binding  {UserInput = ""}};
+            Bindings = new List<Binding>() { new Binding  {UserInput = "", IpAddress = "*"}};
         }
     }
 }

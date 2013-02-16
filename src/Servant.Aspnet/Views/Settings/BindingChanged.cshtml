@@ -14,3 +14,10 @@ else
 {
     <h3 class="pushdown-medium">Because you've changed the location of Servant, we need you go there instead. Unfortunately we couldn't figure out the URL for you, sorry :-(</h3>
 }
+@section javascript {
+    <script>
+        $(function() {
+            $.get("/setup/restartservant/");
+        });
+    </script>
+}

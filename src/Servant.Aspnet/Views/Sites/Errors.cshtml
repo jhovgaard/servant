@@ -14,10 +14,10 @@
 else
 {
     <select id="statsrange" class="pushdown-short">
-        <option@IsOptionSelected(StatsRange.Last24Hours)>Last 24 hours</option>
-        <option@IsOptionSelected(StatsRange.LastWeek)>Last week</option>
-        <option@IsOptionSelected(StatsRange.LastMonth)>Last month</option>
-        <option@IsOptionSelected(StatsRange.AllTime)>All time</option>
+        <option @IsOptionSelected(StatsRange.Last24Hours)>Last 24 hours</option>
+        <option @IsOptionSelected(StatsRange.LastWeek)>Last week</option>
+        <option @IsOptionSelected(StatsRange.LastMonth)>Last month</option>
+        <option @IsOptionSelected(StatsRange.AllTime)>All time</option>
     </select>
 
     if (Model.Exceptions.Count == 0)
