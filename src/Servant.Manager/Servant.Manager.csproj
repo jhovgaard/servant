@@ -72,6 +72,7 @@
     <Compile Include="Infrastructure\IHost.cs" />
     <Compile Include="Infrastructure\UserIdentity.cs" />
     <Compile Include="Infrastructure\UserValidator.cs" />
+    <Compile Include="LoggingErrorHandler .cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\HomeModule.cs" />
     <Compile Include="Modules\SettingsModule.cs" />
