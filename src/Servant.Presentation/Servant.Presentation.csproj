@@ -69,7 +69,7 @@
     <Content Include="Css\normalize.css" />
     <Content Include="Css\prevlabel.gif" />
     <Content Include="Css\slimbox2.css" />
-    <Content Include="Default.html" />
+    <Content Include="Default.htm" />
     <Content Include="favicon.ico" />
     <Content Include="Images\icon_download.png" />
     <Content Include="Images\servant_logo.gif" />
@@ -83,16 +83,7 @@
     <Content Include="slimbox2.js" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="web.config" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Properties\PublishProfiles\Profile.pubxml" />
-    <None Include="web.Debug.config">
-      <DependentUpon>web.config</DependentUpon>
-    </None>
-    <None Include="web.Release.config">
-      <DependentUpon>web.config</DependentUpon>
-    </None>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
