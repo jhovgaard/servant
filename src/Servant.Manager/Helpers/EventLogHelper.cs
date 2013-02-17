@@ -13,25 +13,37 @@ namespace Servant.Manager.Helpers
     {
         public static ApplicationError ParseEntry(EventRecord eventRecord)
         {
-            var iisIdRegex = new Regex(@"/LM/W3SVC/(\d{1,9}).+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-            // Entries kan forekomme uden et IIS id.
-            var iisIdResult = iisIdRegex.Match(eventRecord.Properties[8].Value.ToString()).Groups[1].Value;
-            var iisId = string.IsNullOrWhiteSpace(iisIdResult ) ? 0 : Convert.ToInt32(iisIdResult);
+            try
+            {
+                var iisIdRegex = new Regex(@"/LM/W3SVC/(\d{1,9}).+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                // Entries kan forekomme uden et IIS id.
+                var iisIdString = eventRecord.Properties[8].Value.ToString();
+                var iisIdMatch = iisIdRegex.Match(iisIdString);
+                var iisIdResult = (iisIdMatch.Groups.Count > 1 && !string.IsNullOrEmpty(iisIdMatch.Groups[1].Value)) ? Convert.ToInt32(iisIdMatch.Groups[1].Value) : 0;
 
-            var error = new ApplicationError
+                if (iisIdResult == 0)
+                    return null;
+
+                var error = new ApplicationError
                 {
-                    Id = (int) eventRecord.RecordId,
-                    SiteIisId = iisId,
-                    DateTime = DateTime.Parse(eventRecord.Properties[2].Value.ToString()).ToUniversalTime(),
+                    Id = (int)eventRecord.RecordId,
+                    SiteIisId = iisIdResult,
+                    DateTime = eventRecord.TimeCreated.Value.ToUniversalTime(),
                     ExceptionType = eventRecord.Properties[17].Value.ToString(),
                     Message = eventRecord.Properties[1].Value.ToString(),
                     FullMessage = eventRecord.Properties[18].Value.ToString().Replace(Environment.NewLine, "<br />").Trim(),
                     ThreadInformation = eventRecord.Properties[29].Value.ToString().Replace(Environment.NewLine, "<br />").Trim(),
-                    Url =eventRecord.Properties[19].Value.ToString(),
+                    Url = eventRecord.Properties[19].Value.ToString(),
                     ClientIpAddress = eventRecord.Properties[21].Value.ToString()
                 };
 
-            return error;
+                return error;
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Servant for IIS", "Error parsing entry: " + ex.Message + Environment.NewLine + ex.StackTrace + Environment.NewLine + Environment.NewLine + Environment.NewLine + "EventRecord: " + Environment.NewLine + eventRecord.ToXml());
+                return null;
+            }
         }
 
         public static ApplicationError GetById(int eventLogId)
@@ -69,7 +81,7 @@ namespace Servant.Manager.Helpers
             for (var eventInstance = elr.ReadEvent(); null != eventInstance && i < max; eventInstance = elr.ReadEvent(), i++)
                 events.Add(eventInstance);
 
-            return events.Select(ParseEntry).Where(x => x.SiteIisId != 0);
+            return events.Select(ParseEntry).Where(x => x != null && x.SiteIisId != 0);
         }
 
         public static IEnumerable<ApplicationError> GetBySite(int siteIisId, StatsRange range)
