@@ -524,4 +524,11 @@ table#bindings {
     table#bindings tbody tr td label { padding-left: 10px; }
 
 
-  
+  #copyright {
+      text-align: center; 
+      color: #828282; 
+      font-size: 10px; 
+      text-transform: uppercase; 
+      display: block; 
+      width: 100%;
+  }
