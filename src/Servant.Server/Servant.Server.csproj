@@ -170,18 +170,16 @@
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Servant.Aspnet\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r
-xcopy "$(SolutionDir)Servant.Aspnet\Views" “$(ProjectDir)$(OutDir)Views” /e /y /i /r</PreBuildEvent>
+xcopy "$(SolutionDir)Servant.Aspnet\Views" “$(ProjectDir)$(OutDir)Views” /e /y /i /r
+</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug (
 xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll" "$(ProjectDir)bin\"
-xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\"
-)
 
-if $(ConfigurationName) == Release (
-mkdir $(ProjectDir)$(OutDir)Scripts
-mkdir $(ProjectDir)$(OutDir)Css
-)</PostBuildEvent>
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\"n
+)
+</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <SlowCheetahTargets Condition=" '$(SlowCheetahTargets)'=='' ">$(LOCALAPPDATA)\Microsoft\MSBuild\SlowCheetah\v1\SlowCheetah.Transforms.targets</SlowCheetahTargets>
