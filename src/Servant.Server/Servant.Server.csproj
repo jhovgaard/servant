@@ -166,18 +166,21 @@
       <DependentUpon>ServantService.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Servant.Aspnet\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r
 xcopy "$(SolutionDir)Servant.Aspnet\Views" “$(ProjectDir)$(OutDir)Views” /e /y /i /r
-</PreBuildEvent>
+
+if not exist $(TargetDir)Scripts cmd /x /c mkdir "$(TargetDir)Scripts"
+if not exist $(TargetDir)Css cmd /x /c mkdir "$(TargetDir)Css"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug (
 xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll" "$(ProjectDir)bin\"
 
-xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\"n
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\"
 )
 </PostBuildEvent>
   </PropertyGroup>
