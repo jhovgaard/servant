@@ -35,7 +35,9 @@ namespace Servant.Manager.Helpers
         {
             foreach (var site in _manager.Sites)
             {
-                yield return ParseSite(site);
+                var parsedSite = ParseSite(site);
+                if(parsedSite != null)
+                    yield return parsedSite;
             }
         }
 
@@ -55,12 +57,15 @@ namespace Servant.Manager.Helpers
 
         private Servant.Business.Objects.Site ParseSite(Microsoft.Web.Administration.Site site)
         {
-            if (site == null)
+            var allowedProtocols = new[] { "http", "https" };
+
+            if (site == null  ||site.Bindings.Any(x => !allowedProtocols.Contains(x.Protocol)))
                 return null;
 
             var applicationPoolState = _manager.ApplicationPools[site.Applications[0].ApplicationPoolName].State;
 
-            var allowedProtocols = new[] { "http", "https"};
+            
+
             return new Site {
                     IisId = (int)site.Id,
                     Name = site.Name,
