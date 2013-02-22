@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Timers;
 using Nancy.Hosting.Self;
 using Servant.Business.Objects;
@@ -39,9 +40,28 @@ namespace Servant.Server.Selfhost
             {
                 var uri = new Uri(_settings.ServantUrl.Replace("*", "localhost"));
                 ServantHost = new NancyHost(uri);
+                
+                try
+                {
+                    ServantHost.Start();
+                }
+                catch (HttpListenerException ex) // Tries to start Servant on another port
+                {
+                    var servantUrl =_settings.ServantUrl.Replace("*", "localhost");
+                    var portPosition = servantUrl.LastIndexOf(":");
+                    if (portPosition != -1)
+                        servantUrl = servantUrl.Substring(0, portPosition);
+                    servantUrl += ":54445";
+
+                    var newUri = new Uri(servantUrl);
+                    ServantHost = new NancyHost(newUri);
+                    ServantHost.Start();
+
+                    _settings.ServantUrl = newUri.ToString();
+                    SettingsHelper.UpdateSettings(_settings);
+                }
+                
             }
-            
-            ServantHost.Start();
 
             if(_settings.ParseLogs)
                 _timer.Start();
