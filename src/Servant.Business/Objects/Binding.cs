@@ -4,6 +4,11 @@ namespace Servant.Business.Objects
 {
     public class Binding
     {
+        public Binding()
+        {
+            IpAddress = "*";
+        }
+
         private string _userInput;
         public string UserInput
         {

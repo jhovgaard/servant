@@ -69,6 +69,9 @@
     </Content>
     <Content Include="Css\normalize.css" />
     <Content Include="Images\checkbox-checked.png" />
+    <Content Include="Images\favicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\icon-arrow-down.png" />
     <Content Include="Images\icon-bug.png" />
     <Content Include="Images\icon-cancel.png" />
@@ -94,6 +97,9 @@
     <Content Include="Scripts\jquery.timeago.js" />
     <Content Include="Scripts\jquery.watermark.min.js" />
     <Content Include="Scripts\serveraddresschanger.js" />
+    <Content Include="Views\favicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

@@ -453,7 +453,7 @@ h2.bug {
     }
 
 .input-group.error input {
-    border: 3px solid #ff0039;
+    border-color: #ff0039 !important;
 }
 
 .input-group .help-block {
