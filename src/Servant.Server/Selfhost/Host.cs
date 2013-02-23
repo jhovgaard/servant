@@ -110,6 +110,16 @@ namespace Servant.Server.Selfhost
                 Console.WriteLine("Log parsing stopped.");
         }
 
+        public void RemoveCertificateBinding(int port)
+        {
+            CertificateHandler.RemoveCertificateBinding(port);
+        }
+
+        public void AddCertificateBinding(int port)
+        {
+            CertificateHandler.AddCertificateBinding(port);
+        }
+
         void SyncDatabaseJob(object sender, ElapsedEventArgs e)
         {
             _timer.Stop();
