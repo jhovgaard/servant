@@ -13,5 +13,7 @@ namespace Servant.Manager.Infrastructure
         void Kill();
         void StartLogParsing();
         void StopLogParsing();
+        void RemoveCertificateBinding(int port);
+        void AddCertificateBinding(int port);
     }
 }

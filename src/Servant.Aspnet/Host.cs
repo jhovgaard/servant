@@ -30,6 +30,14 @@ namespace Servant.Aspnet
         {
         }
 
+        public void RemoveCertificateBinding(int port)
+        {
+        }
+
+        public void AddCertificateBinding(int port)
+        {
+        }
+
         public void LoadSettings()
         {
         }
