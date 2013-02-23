@@ -64,7 +64,7 @@ namespace Servant.Manager.Modules
 
             if (!site.Bindings.Any())
             {
-                AddPropertyError("bindingsuserinput[0]", "Minimum one binding is required.");
+                AddPropertyError("bindingsipaddress[0]", "Minimum one binding is required.");
                 site.Bindings.Add(new Binding() {UserInput = ""});
             }
 

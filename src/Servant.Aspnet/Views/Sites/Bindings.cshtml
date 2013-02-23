@@ -3,7 +3,7 @@
 <table id="bindings" class="pushdown-short">
     @foreach(var binding in Model.Site.Bindings)
     {
-        <tbody>
+        <tbody class="input-group">
             <tr>
                 <td>
                     <label for="bindingsuserinput">Binding</label>
@@ -24,7 +24,9 @@
             </tr>
             <tr class="last">
                 <td style="width: 70px;"><label>IP</label></td>
-                <td><input type="text" name="bindingsipaddress" value="@binding.IpAddress" style="width: 100%;" /></td>
+                <td><input type="text" name="bindingsipaddress" value="@binding.IpAddress" style="width: 100%;" />
+                    <span class="help-block"></span>
+                </td>
             </tr>
         </tbody>
     }
