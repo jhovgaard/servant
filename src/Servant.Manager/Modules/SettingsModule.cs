@@ -1,4 +1,5 @@
-﻿using Nancy;
+﻿using System;
+using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Validation;
 using Servant.Business.Helpers;
@@ -49,6 +50,21 @@ namespace Servant.Manager.Modules
 
                     if(bindingIsChanged)
                     {
+                        var oldIsHttps = settings.ServantUrl.StartsWith("https://");
+                        var newIsHttps = formSettings.ServantUrl.StartsWith("https://");
+
+                        if (oldIsHttps)
+                        {
+                            var port = new Uri(settings.ServantUrl).Port;
+                            host.RemoveCertificateBinding(port);
+                        }
+
+                        if (newIsHttps)
+                        {
+                            var port = new Uri(formSettings.ServantUrl).Port;
+                            host.AddCertificateBinding(port);
+                        }
+
                         Model.IsWildcard = Settings.ServantUrl.StartsWith("https://*") ||
                                            Settings.ServantUrl.StartsWith("http://*");
 

@@ -74,6 +74,13 @@ namespace Servant.Manager.Modules
                         if (!settings.ParseLogs && formSettings.ParseLogs) 
                             host.StartLogParsing();
 
+                        var isHttps = formSettings.ServantUrl.StartsWith("https://");
+                        if (isHttps)
+                        {
+                            var port = new Uri(formSettings.ServantUrl).Port;
+                            host.AddCertificateBinding(port);
+                        }
+
                         return Response.AsRedirect("/setup/confirm/?url=" + Uri.EscapeDataString(formSettings.ServantUrl));
                     }
 

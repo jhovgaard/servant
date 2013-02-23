@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceProcess;
 using Servant.Business.Objects;
@@ -22,9 +23,29 @@ namespace Servant.Server
             Nancy.TinyIoc.TinyIoCContainer.Current.Register<IHost, Host>().AsSingleton();
         }
 
+        private static void InstallServantCertificate()
+        {
+            var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            store.Open(OpenFlags.ReadWrite);
+            var certificatePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "servant.pfx");
+            var cert = new X509Certificate2(certificatePath, "myservantpass994") { FriendlyName = "Servant"};
+            store.Add(cert);
+            store.Close();
+        }
+
+        private static bool IsServantCertificateInstalled()
+        {
+            var certificates = SiteManager.GetCertificates();
+            return certificates.Any(x => x.Thumbprint == "8D2673EE6B9076E3C96299048A5032FA401E01C4");
+        }
+
         static void Main(string[] args)
         {
             Init();
+
+            if (!IsServantCertificateInstalled())
+                InstallServantCertificate();   
+
             Settings = SettingsHelper.Settings;
 
             if (!IsAnAdministrator())
