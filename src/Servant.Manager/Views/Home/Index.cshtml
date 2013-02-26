@@ -1,0 +1,52 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Shared/_Layout.cshtml";
+    ViewBag.ActiveMenuItem = "home";
+}
+
+<h1 class="pushdown-medium">Welcome to <strong>Servant for IIS</strong></h1>
+
+<p class="pushdown-long indent">
+    Hi Administrator!<br/>
+    <br/>
+    We’re happy to help you manage your IIS. If you have any questions feel free to contact the team at <a href="mailto:hello@servant.io">hello@servant.io</a>.<br/>
+    Found a bug or have a suggestion? Click <a href="javascript:UserVoice.showPopupWidget();">the feedback button</a> in the right side of the screen and let us know!
+</p>
+<h2 class="bug">Latest unhandled exceptions</h2>
+@if(Model.UnhandledExceptions.Count != 0)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Site</th>
+                <th>Exception</th>
+                <th>Timestamp</th>
+
+            </tr>
+        </thead>
+        @foreach(Servant.Business.Objects.ApplicationError error in Model.UnhandledExceptions) {
+            <tr>
+                <td style="min-width: 60px">
+                    @if (error.Site != null){
+                        <a href="/sites/@error.SiteIisId/settings/">@error.Site.Name</a>
+                    } else {
+                        @:Unknown
+                    }
+                </td>
+                <td>
+                    @if(error.Site != null) {
+                        <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.ExceptionType</a>
+                    } else {
+                        <a href="/errors/@error.Id/">@error.ExceptionType</a>
+                    }
+                </td>
+                <td style="width: 170px;">
+                    <abbr class="timeago" title="@error.DateTime.ToString("o")">@error.DateTime</abbr>
+                </td>
+            </tr>
+        }
+    </table>
+} else
+{
+    <p class="pushup-short">Awesome! Not a single error was found.</p>
+}
