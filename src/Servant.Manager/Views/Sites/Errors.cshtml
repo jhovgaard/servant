@@ -1,0 +1,70 @@
+﻿@using System.Collections.Generic
+@using System.Linq
+@using Servant.Business.Objects.Enums
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Sites/_Details.cshtml";
+    ViewBag.ActiveMenuItem = "sites";
+    ViewBag.ActiveSubmenuItem = "errors";
+}   
+@if (!Model.HasAnyErrors)
+{
+    <h4>Not a single error was detected on this site.</h4>
+}
+else
+{
+    <select id="statsrange" class="pushdown-short">
+        <option @IsOptionSelected(StatsRange.Last24Hours)>Last 24 hours</option>
+        <option @IsOptionSelected(StatsRange.LastWeek)>Last week</option>
+        <option @IsOptionSelected(StatsRange.LastMonth)>Last month</option>
+        <option @IsOptionSelected(StatsRange.AllTime)>All time</option>
+    </select>
+
+    if (Model.Exceptions.Count == 0)
+    {
+        <p>No exceptions thrown in the selected period.</p>
+    }
+    else
+    {
+        <table class="pushdown-short">
+            <thead>
+                <tr>
+                    <th>Exception</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            @foreach (Servant.Business.Objects.ApplicationError error in Model.Exceptions)
+            {
+                <tr>
+                    <td>
+                        <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.ExceptionType</a>
+                    </td>
+                    <td style="width: 170px;">
+                        <abbr class="timeago" title="@error.DateTime.ToString("o")">@error.DateTime</abbr>
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+}
+<p class="gray">Query time: @(Model.QueryTime)ms</p>
+
+
+@section javascript {
+    <script>
+        $(function() {
+            $("#statsrange").change(function() {
+                window.location = window.location.pathname + "?r=" + $(this).val().split(' ').join('').toLowerCase();
+            });
+        });
+    </script>
+}
+
+@helper IsOptionSelected(StatsRange range)
+{
+    if (range == Model.Range)
+    {
+        @Html.Raw(" selected=\"selected\"")
+    }
+}
+
