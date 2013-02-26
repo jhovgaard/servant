@@ -59,7 +59,8 @@ namespace Servant.Manager.Modules
                     };
                 }
 
-                site.Bindings.Add(binding);
+                if(!site.Bindings.Any(x => x.Hostname == binding.Hostname && x.Port == binding.Port && x.Protocol == binding.Protocol))
+                    site.Bindings.Add(binding);
             }
 
             if (!site.Bindings.Any())
