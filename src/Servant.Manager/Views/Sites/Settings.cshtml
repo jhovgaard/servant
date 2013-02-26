@@ -1,0 +1,95 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Sites/_Details.cshtml";
+    ViewBag.ActiveSubmenuItem = "settings";
+}   
+
+<div class="box100 pushdown-medium">
+    <h3>Status</h3>
+    <p class="margin-top10">Site is currently <b>@Model.Site.SiteState.ToString().ToLower()</b>.</p>
+    
+    @if (Model.Site.SiteState == Servant.Business.Objects.Enums.InstanceState.Started)
+    {
+        if(Model.Site.ApplicationPoolState != Servant.Business.Objects.Enums.InstanceState.Started) {
+            <p class="text-error">Warning: The application pool isn't running!</p>
+        }
+        <form action="/sites/@Model.Site.IisId/stop/" method="POST" id="stop-site-form"  style="float:left; margin-right: 5px;">
+            <input type="submit" class="cancel" value="Stop site" class="margin-top10"/>
+        </form>    
+    
+        <form action="/sites/@Model.Site.IisId/restart/" method="POST" style="float:left; margin-right: 5px;">
+            <input type="submit" class="warning restart" value="Restart site" class="margin-top10"/>
+        </form>
+    
+        <form action="/sites/@Model.Site.IisId/recycle/" method="POST">
+            <input type="submit" class="warning recycle" value="Recycle application pool" class="margin-top10"/>
+        </form>
+    }
+    else
+    {
+        <form action="/sites/@Model.Site.IisId/start/" method="POST">
+            <input type="submit" class="btn btn-success" value="Start site" class="margin-top10"/>
+        </form>
+    }
+</div>
+
+<form action="/sites/@Model.Site.IisId/settings/" method="POST">
+    <div class="box50">
+        <h3>General</h3>
+       
+        <div class="input-group">
+            <label for="name">Site name</label>
+            <input type="text" id="name" name="name" value="@Model.Site.Name" />
+        </div>
+
+        <div class="input-group">
+            <label for="sitepath">Site path (i.e.: C:\Sites\MyWebsite\)</label>
+            <input type="text" id="sitepath" name="sitepath" value="@Model.Site.SitePath" />
+        </div>
+    
+        <div class="input-group">
+            <label for="logfilespath">Log files path</label>
+            <input type="text" readonly="readonly" id="logfilespath" name="logfilespath" value="@Model.Site.LogFileDirectory\W3SVC@(Model.Site.IisId)" />
+        </div>
+    
+        <div class="input-group">
+            <label for="applicationpool">Application pool</label>
+            <select name="applicationpool" id="applicationpool">
+                @foreach (var appPool in Model.ApplicationPools)
+                {
+                    if(appPool == Model.Site.ApplicationPool)
+                    {
+                        <option selected="selected">@appPool</option>
+                    } else {
+                        <option>@appPool</option>
+                    }
+                
+                }
+
+            </select>
+        </div>       
+    </div>
+
+    <div class="box50">
+        <h3>Bindings</h3>
+        @Html.Partial("Bindings", Model)
+    </div>
+    
+    <div class="box100 pushdown-medium">
+        <input type="submit" class="btn btn-primary" value="Save settings" />
+    </div>
+</form>
+
+
+<div class="box100">
+    <h3>Delete site</h3>
+    <p>
+        <small>By clicking the button below the site will be deleted from IIS. The site's content will remain on the filesystem. If the application pool is only used by this application it will also be deleted.</small> 
+    </p>
+    <div class="margin-top10">
+        <form action="/sites/@Model.Site.IisId/delete/" method="POST" id="delete-site-form">
+            <input type="submit" class="cancel" value="Click here to delete @Model.Site.Name" class="margin-top10"/>
+        </form>
+    </div>
+</div>
+ 

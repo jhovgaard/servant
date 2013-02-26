@@ -16,8 +16,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Presentation", "Ser
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Manager", "Servant.Manager\Servant.Manager.csproj", "{EEE520B9-C058-45A8-A903-0A5371CA241B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Aspnet", "Servant.Aspnet\Servant.Aspnet.csproj", "{AB275DD2-F670-4BB6-9EBC-6196D61D01B9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,10 +38,6 @@ Global
 		{EEE520B9-C058-45A8-A903-0A5371CA241B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEE520B9-C058-45A8-A903-0A5371CA241B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEE520B9-C058-45A8-A903-0A5371CA241B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB275DD2-F670-4BB6-9EBC-6196D61D01B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB275DD2-F670-4BB6-9EBC-6196D61D01B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB275DD2-F670-4BB6-9EBC-6196D61D01B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB275DD2-F670-4BB6-9EBC-6196D61D01B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

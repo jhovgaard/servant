@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using Nancy;
 using Nancy.Authentication.Basic;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
 using Nancy.Session;
 using Nancy.TinyIoc;
+using Nancy.ViewEngines;
 using Servant.Manager.Infrastructure;
 
 namespace Servant.Manager
@@ -17,6 +19,23 @@ namespace Servant.Manager
         protected override byte[] FavIcon
         {
             get { return _favicon ?? (_favicon = LoadFavIcon()); }
+        }
+
+        protected override NancyInternalConfiguration InternalConfiguration
+        {
+            get { return NancyInternalConfiguration.WithOverrides(x => x.ViewLocationProvider = typeof(ResourceViewLocationProvider)); }
+        }
+
+        protected override void ConfigureApplicationContainer(TinyIoCContainer container)
+        {
+            base.ConfigureApplicationContainer(container);
+            //This should be the assembly your views are embedded in
+            var assembly = GetType().Assembly;
+            ResourceViewLocationProvider.Ignore.Add(Assembly.Load("Nancy.ViewEngines.Razor, Version=0.16.1.0, Culture=neutral, PublicKeyToken=null"));
+            ResourceViewLocationProvider.RootNamespaces.Clear();
+            ResourceViewLocationProvider
+                .RootNamespaces
+                .Add(assembly, "Servant.Manager.Views");
         }
 
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
