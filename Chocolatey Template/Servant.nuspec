@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Servant</id>
+    <title>Servant</title>
+    <version>1.0.5</version>
+    <authors>Jonas Hovgaard</authors>
+    <owners>Servant</owners>
+    <summary>Servant is a piece of software that transforms your regular Internet Information Services (IIS) Manager to a beautiful, fast and web-based management tool.</summary>
+    <description>Servant is a piece of software that transforms your regular Internet Information Services (IIS) Manager to a beautiful, fast and web-based management tool. It's designed to fit your daily routines, optimized to track down your worst problems and created to stop you from wasting time on administration.</description>
+    <projectUrl>http://servant.io</projectUrl>
+    <tags>servant servantforiis iis</tags>
+    <copyright>Copyright 2013 8seven</copyright>
+    <licenseUrl>http://servant.io/license.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!--<iconUrl>https://github.com/__CHOCO_PKG_OWNER_REPO__/raw/master/Servant/Servant.gif</iconUrl>-->
+    <!--<dependencies>
+      <dependency id="" version="" />
+    </dependencies>-->
+    <releaseNotes></releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+    <!--<file src="content\**" target="content" />-->
+  </files>
+</package>
