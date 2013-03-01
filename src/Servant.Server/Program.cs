@@ -7,10 +7,9 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceProcess;
+using Servant.Business;
 using Servant.Business.Objects;
-using Servant.Manager.Helpers;
-using Servant.Manager.Infrastructure;
-using Servant.Server.Selfhost;
+using Servant.Web.Helpers;
 using Servant.Server.WindowsService;
 
 namespace Servant.Server
@@ -20,7 +19,7 @@ namespace Servant.Server
         private static Settings Settings { get; set; }
         static void Init()
         {
-            Nancy.TinyIoc.TinyIoCContainer.Current.Register<IHost, Host>().AsSingleton();
+            Nancy.TinyIoc.TinyIoCContainer.Current.Register<IHost, Selfhost.Host>().AsSingleton();
         }
 
         private static void InstallServantCertificate()
