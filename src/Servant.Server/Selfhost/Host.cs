@@ -2,9 +2,9 @@
 using System.Net;
 using System.Timers;
 using Nancy.Hosting.Self;
+using Servant.Business;
 using Servant.Business.Objects;
-using Servant.Manager.Helpers;
-using Servant.Manager.Infrastructure;
+using Servant.Web.Helpers;
 
 namespace Servant.Server.Selfhost
 {
