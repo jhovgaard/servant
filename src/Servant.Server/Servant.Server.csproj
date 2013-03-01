@@ -86,6 +86,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bootstrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Selfhost\CertificateHandler.cs" />
     <Compile Include="WindowsService\ProjectInstaller.cs">
@@ -135,9 +136,9 @@
       <Project>{91ba5146-45d2-4fce-bf35-fa451bf7528d}</Project>
       <Name>Servant.Business</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Servant.Manager\Servant.Manager.csproj">
-      <Project>{eee520b9-c058-45a8-a903-0a5371ca241b}</Project>
-      <Name>Servant.Manager</Name>
+    <ProjectReference Include="..\Servant.Web\Servant.Web.csproj">
+      <Project>{ed24dec4-4adc-4745-96a3-dd770054c25e}</Project>
+      <Name>Servant.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -174,7 +175,12 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)Servant.Manager\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r
+    <PreBuildEvent>xcopy "$(SolutionDir)Servant.Web\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r
+
+if $(ConfigurationName) == Debug (
+xcopy "$(SolutionDir)Servant.Web\Css" “$(ProjectDir)$(OutDir)Css” /e /y /i /r
+xcopy "$(SolutionDir)Servant.Web\Scripts" “$(ProjectDir)$(OutDir)Scripts” /e /y /i /r
+)
 
 if not exist $(TargetDir)Scripts cmd /x /c mkdir "$(TargetDir)Scripts"
 if not exist $(TargetDir)Css cmd /x /c mkdir "$(TargetDir)Css"</PreBuildEvent>
@@ -201,8 +207,8 @@ xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\lib\Net40\
   <UsingTask TaskName="JavaScriptCompressorTask" AssemblyFile="$(SolutionDir)packages\YUICompressor.NET.MSBuild.2.2.1.0\lib\NET20\Yahoo.Yui.Compressor.Build.MsBuild.dll" />
   <Target Name="AfterBuild" Condition="'$(Configuration)'=='Release'">
     <ItemGroup>
-      <CssFiles Include="..\Servant.Manager\Css\normalize.css" />
       <CssFiles Include="..\Servant.Manager\Css\base.css" />
+      <CssFiles Include="..\Servant.Manager\Css\normalize.css" />
       <JavaScriptFiles Include="..\Servant.Manager\Scripts\*.js" Exclude="..\Servant.Manager\Scripts\jquery-1.8.0.min.js" />
       <JqueryFile Include="..\Servant.Manager\Scripts\jquery-1.8.0.min.js" />
     </ItemGroup>
