@@ -1,12 +1,11 @@
-﻿@using Servant.Business.Objects
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+﻿﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>@Model.Title</title>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
-    @if (!Model.UseMinified)
+    @if (Model.IsDevelopment)
     {
         <link href="/css/normalize.css" rel="stylesheet" />
         <link href="/css/base.css" rel="stylesheet" type="text/css" />
@@ -37,7 +36,7 @@
                     
                     <ul>
                         <li class="bold"><a href="/sites/create">Create new</a></li> 
-                        @foreach (Site site in Model.Page.Sites)
+                        @foreach (var site in Model.Page.Sites)
                         {
                             <li @Html.Raw(ViewBag.ActiveSiteName == site.Name ? " class=\"active\"" : null)>
                                 <a href="/sites/@site.IisId/settings/">@site.Name</a>
@@ -61,7 +60,7 @@
         </script>
     
         <script src="/scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
-        @if (!Model.UseMinified)
+        @if (Model.IsDevelopment)
         {
             <script src="/scripts/jquery.filtr.min.js"></script>
             <script src="/scripts/jquery.watermark.min.js"></script>

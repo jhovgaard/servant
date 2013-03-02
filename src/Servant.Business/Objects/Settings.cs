@@ -11,6 +11,7 @@ namespace Servant.Business.Objects
         public string Username { get; set; }
         public string Password { get; set; }
         public bool SetupCompleted { get; set; }
-        public bool ParseLogs { get; set; }
+        public bool EnableErrorMonitoring { get; set; }
+        public bool AutoSendCrashReport { get; set; }
     }
 }

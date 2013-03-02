@@ -50,9 +50,9 @@ namespace Servant.Web.Modules
 
                 Model.Page = Page;
                 Model.Errors = new List<Error>();
-                bool useMinified;
-                bool.TryParse(System.Configuration.ConfigurationManager.AppSettings["UseMinified"], out useMinified);
-                Model.UseMinified = useMinified;
+                bool IsDevelopment;
+                bool.TryParse(System.Configuration.ConfigurationManager.AppSettings["IsDevelopment"], out IsDevelopment);
+                Model.IsDevelopment = IsDevelopment;
 
                 return null;
             };

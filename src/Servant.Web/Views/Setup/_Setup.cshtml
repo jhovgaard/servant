@@ -5,7 +5,7 @@
 <head>
     <title>@Model.Title</title>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
-    @if (!Model.UseMinified)
+    @if (Model.IsDevelopment)
     {
         <link href="/css/normalize.css" rel="stylesheet" />
         <link href="/css/base.css" rel="stylesheet" type="text/css" />
@@ -20,7 +20,7 @@
             @RenderBody()
         </div>
     <script src="/scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
-        @if (!Model.UseMinified)
+        @if (Model.IsDevelopment)
         {
             <script src="/scripts/jquery.filtr.min.js"></script>
             <script src="/scripts/jquery.watermark.min.js"></script>

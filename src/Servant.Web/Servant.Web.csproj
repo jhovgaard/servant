@@ -46,6 +46,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\dependencies\Microsoft.Web.Administration.dll</HintPath>
     </Reference>
+    <Reference Include="Mindscape.Raygun4Net">
+      <HintPath>..\packages\Mindscape.Raygun4Net.1.0.3\lib\net35\Mindscape.Raygun4Net.dll</HintPath>
+    </Reference>
     <Reference Include="Nancy">
       <HintPath>..\packages\Nancy.0.16.1\lib\net40\Nancy.dll</HintPath>
     </Reference>
@@ -75,6 +78,7 @@
   <ItemGroup>
     <Content Include="Css\base.css" />
     <Content Include="Css\normalize.css" />
+    <Content Include="Errors\500.html" />
     <Content Include="Images\checkbox-checked.png" />
     <Content Include="Images\favicon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -93,13 +97,9 @@
     <Content Include="Images\menu-icon-settings.png" />
     <Content Include="Images\menu-icon-sites.png" />
     <Content Include="Images\textbox-submit-search.png" />
-    <Content Include="Scripts\base.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\base.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\jquery-1.8.0.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\jquery-1.8.0.min.js" />
     <Content Include="Scripts\jquery.filtr.min.js" />
     <Content Include="Scripts\jquery.timeago.js" />
     <Content Include="Scripts\jquery.watermark.min.js" />
@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="ErrorHandler.cs" />
     <Compile Include="Helpers\ApplicationPoolHelper.cs" />
     <Compile Include="Helpers\ErrorHelper.cs" />
     <Compile Include="Helpers\EventLogHelper.cs" />
@@ -120,7 +121,6 @@
     <Compile Include="Infrastructure\DummyHost.cs" />
     <Compile Include="Infrastructure\UserIdentity.cs" />
     <Compile Include="Infrastructure\UserValidator.cs" />
-    <Compile Include="LoggingErrorHandler .cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\HomeModule.cs" />
     <Compile Include="Modules\SettingsModule.cs" />
@@ -129,6 +129,7 @@
     <Compile Include="Modules\StatsModule.cs" />
     <Compile Include="Modules\TestModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RazorConfiguration.cs" />
     <Compile Include="Reports\AgentstringWithCount.cs" />
     <Compile Include="Views\Home\Models\IndexModel.cs" />
     <Compile Include="Views\Shared\Models\PageModel.cs" />
@@ -153,6 +154,15 @@
     <EmbeddedResource Include="Views\Sites\Stats.cshtml" />
     <EmbeddedResource Include="Views\Stats\CleanupApplicationPools.cshtml" />
     <EmbeddedResource Include="Views\Stats\Index.cshtml" />
+    <Content Include="Copy of Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Copy of Web.Debug.config">
+      <DependentUpon>Copy of Web.config</DependentUpon>
+    </None>
+    <None Include="Copy of Web.Release.config">
+      <DependentUpon>Copy of Web.config</DependentUpon>
+    </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

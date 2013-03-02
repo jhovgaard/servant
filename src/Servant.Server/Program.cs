@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Configuration;
 using System.Configuration.Install;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -14,12 +17,38 @@ using Servant.Server.WindowsService;
 
 namespace Servant.Server
 {
-    class Program
+    static class Program
     {
         private static Settings Settings { get; set; }
         static void Init()
         {
             Nancy.TinyIoc.TinyIoCContainer.Current.Register<IHost, Selfhost.Host>().AsSingleton();
+        }
+
+        public static System.Reflection.Assembly Resolver(object sender, ResolveEventArgs args)
+        {
+            Assembly executingAssembly = Assembly.GetExecutingAssembly();
+            AssemblyName assemblyName = new AssemblyName(args.Name);
+
+            string path = assemblyName.Name + ".dll";
+
+            if (assemblyName.CultureInfo.Equals(CultureInfo.InvariantCulture) == false)
+            {
+                path = String.Format(@"{0}\{1}", assemblyName.CultureInfo, path);
+            }
+            path = "Servant.Server.Resources." + path;
+
+            Console.WriteLine("Trying to resolve: " + path);
+            using (Stream stream = executingAssembly.GetManifestResourceStream(path))
+            {
+                if (stream == null)
+                    return null;
+
+                byte[] assemblyRawBytes = new byte[stream.Length];
+                stream.Read(assemblyRawBytes, 0, assemblyRawBytes.Length);
+                Console.WriteLine("Resolved: " + path);
+                return Assembly.Load(assemblyRawBytes);
+            }
         }
 
         private static void InstallServantCertificate()
@@ -37,9 +66,9 @@ namespace Servant.Server
             var certificates = SiteManager.GetCertificates();
             return certificates.Any(x => x.Thumbprint == "8D2673EE6B9076E3C96299048A5032FA401E01C4");
         }
-
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(Resolver);
             Init();
 
             if (!IsServantCertificateInstalled())
@@ -138,7 +167,7 @@ namespace Servant.Server
         }
 
         public static void StartServant()
-        {
+        {   
             var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
             host.Start();
         }

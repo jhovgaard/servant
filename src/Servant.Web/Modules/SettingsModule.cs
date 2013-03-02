@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Validation;
@@ -19,7 +20,6 @@ namespace Servant.Web.Modules
             Get["/"] = p => {
                 Model.OriginalServantUrl = settings.ServantUrl;
                 Model.Settings = settings;
-
                 return View["Index", Model];
             };
 
@@ -44,7 +44,7 @@ namespace Servant.Web.Modules
                         : Business.Helpers.SecurityHelper.HashPassword(formSettings.Password);
 
                     formSettings.SetupCompleted = true;
-                    formSettings.ParseLogs = settings.ParseLogs;
+                    formSettings.EnableErrorMonitoring = settings.EnableErrorMonitoring;
 
                     Helpers.SettingsHelper.UpdateSettings(formSettings);
                     AddMessage("Settings have been saved.");
@@ -84,13 +84,13 @@ namespace Servant.Web.Modules
                 
                 var start = (bool) Request.Form.Start;
                 
-                if(!settings.ParseLogs && start)
+                if(!settings.EnableErrorMonitoring && start)
                     host.StartLogParsing();
 
-                if(settings.ParseLogs && !start)
+                if(settings.EnableErrorMonitoring && !start)
                     host.StopLogParsing();
 
-                settings.ParseLogs = start;
+                settings.EnableErrorMonitoring = start;
                 Helpers.SettingsHelper.UpdateSettings(settings);
                 
                 return Response.AsRedirect("/settings/");
