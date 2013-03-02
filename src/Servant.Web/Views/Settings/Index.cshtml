@@ -15,11 +15,19 @@
                 <br/><span class="gray"><code>localhost</code> and <code>*</code> is both handled as a wildcard binding. Hostnames cannot include <code>localhost</code>.</span>
             </p>
         </div>
-
+       
         <div class="input-group">
             <label for="debug">Debug mode</label>
             <label class="checkbox" style="text-align: left;">
                 <input type="checkbox" name="debug" id="debug" value="true" @(Model.Settings.Debug == true ? Html.Raw("checked=\"checked\"") : null) />
+                Enabled
+            </label>
+        </div>
+        
+        <div class="input-group">
+            <label for="debug">Auto send crash report</label>
+            <label class="checkbox" style="text-align: left;">
+                <input type="checkbox" name="autosendcrashreport" id="autosendcrashreport" value="true" @(Model.Settings.AutoSendCrashReport == true ? Html.Raw("checked=\"checked\"") : null) />
                 Enabled
             </label>
         </div>
@@ -45,9 +53,9 @@
     <h3>Error monitoring</h3>
         
     <p class="margin-top10">Error monitoring checks your IIS for new application errors every 5 minutes. 
-        Error monitoring is currently <strong>@Html.Raw((bool)Model.Settings.ParseLogs ? "activated" : "deactived")</strong>.</p>
+        Error monitoring is currently <strong>@Html.Raw((bool)Model.Settings.EnableErrorMonitoring ? "activated" : "deactived")</strong>.</p>
         
-    @if((bool)Model.Settings.ParseLogs)
+    @if((bool)Model.Settings.EnableErrorMonitoring)
     {
         <form method="POST" action="/settings/startlogparsing/">
             <input type="hidden" value="false" name="start"/>

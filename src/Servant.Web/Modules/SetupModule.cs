@@ -39,7 +39,9 @@ namespace Servant.Web.Modules
                 Get["/setup/1/"] = _ => {
                     Model.Settings = settings;
                     Model.AcceptTerms = false;
+                    Model.AutoSendCrashReport = true;
                     Model.OriginalServantUrl = settings.ServantUrl;
+
                     return View["1", Model];
                 };
 
@@ -52,8 +54,6 @@ namespace Servant.Web.Modules
                     else
                         formSettings.ServantUrl = BindingHelper.FinializeBinding(formSettings.ServantUrl);
                     
-                    formSettings.ParseLogs = true;
-
                     var validationResult = this.Validate(formSettings);
 
                     var acceptTerms = (bool)Request.Form.AcceptTerms;
@@ -70,9 +70,10 @@ namespace Servant.Web.Modules
                     {
                         formSettings.Password = SecurityHelper.HashPassword(formSettings.Password);
                         formSettings.SetupCompleted = true;
+                        formSettings.AutoSendCrashReport = (bool)Request.Form.AutoSendCrashReport;
                         Helpers.SettingsHelper.UpdateSettings(formSettings);
                         
-                        if (!settings.ParseLogs && formSettings.ParseLogs) 
+                        if (!settings.EnableErrorMonitoring && formSettings.EnableErrorMonitoring) 
                             host.StartLogParsing();
 
                         var isHttps = formSettings.ServantUrl.StartsWith("https://");

@@ -24,7 +24,7 @@
 
             </tr>
         </thead>
-        @foreach(Servant.Business.Objects.ApplicationError error in Model.UnhandledExceptions) {
+        @foreach(var error in Model.UnhandledExceptions) {
             <tr>
                 <td style="min-width: 60px">
                     @if (error.Site != null){
