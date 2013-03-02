@@ -5,6 +5,7 @@ using Nancy.Hosting.Self;
 using Servant.Business;
 using Servant.Business.Objects;
 using Servant.Web.Helpers;
+using Servant.Web.Infrastructure;
 
 namespace Servant.Server.Selfhost
 {
@@ -28,7 +29,6 @@ namespace Servant.Server.Selfhost
         public void Start(Settings settings = null)
         {
             _settings = settings;
-
             
             if (settings == null)
             {
@@ -39,8 +39,9 @@ namespace Servant.Server.Selfhost
             if (ServantHost == null)
             {
                 var uri = new Uri(_settings.ServantUrl.Replace("*", "localhost"));
-                ServantHost = new NancyHost(uri);
-                
+                CreateHost(uri);
+
+                StartLogParsing();
                 try
                 {
                     ServantHost.Start();
@@ -54,7 +55,7 @@ namespace Servant.Server.Selfhost
                     servantUrl += ":54445";
 
                     var newUri = new Uri(servantUrl);
-                    ServantHost = new NancyHost(newUri);
+                    CreateHost(uri);
                     ServantHost.Start();
 
                     _settings.ServantUrl = newUri.ToString();
@@ -63,11 +64,20 @@ namespace Servant.Server.Selfhost
                 
             }
 
-            if(_settings.ParseLogs)
+            if(_settings.EnableErrorMonitoring)
                 _timer.Start();
 
             if(Debug)
                 Console.WriteLine("Host started on {0}", _settings.ServantUrl);
+        }
+
+        private void CreateHost(Uri uri)
+        {
+            ServantHost = new NancyHost(uri, new Bootstrapper(), new HostConfiguration { UnhandledExceptionCallback = ex =>
+                {
+                    var client = new Mindscape.Raygun4Net.RaygunClient("YtmedAsAZw/ptG3cy4bSXg==");
+                    client.Send(ex);
+                } });
         }
 
         public void Stop()

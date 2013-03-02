@@ -21,6 +21,15 @@
         <label for="password">Password</label>
         <input type="password" tabindex="4" name="password" id="password" class="input-medium span4" value="" />
     </div>
+    
+    <div class="input-group">
+        <div style="width: 300px; margin: auto;">
+            <label>
+                <input type="checkbox" tabindex="7" name="autosendcrashreport" @((bool)Model.AutoSendCrashReport ? Html.Raw("checked=\"checked\"") : null) />
+                Help improve Servant by sending crash reports to the Servant Team automatically.
+            </label>
+        </div>
+    </div>
             
     <div class="input-group">
         <div style="width: 300px; margin: auto;">
@@ -30,6 +39,7 @@
             </label>
         </div>
     </div>
+
             
     <div class="controls margin-top30">
         <input type="submit" tabindex="6" value="Start Servant now!" class="btn btn-primary"/>

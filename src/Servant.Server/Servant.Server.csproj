@@ -61,6 +61,10 @@
       <HintPath>..\..\dependencies\Microsoft.Web.Administration.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Mindscape.Raygun4Net, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Mindscape.Raygun4Net.1.0.3\lib\net35\Mindscape.Raygun4Net.dll</HintPath>
+    </Reference>
     <Reference Include="Nancy, Version=0.16.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Nancy.0.16.1\lib\net40\Nancy.dll</HintPath>
@@ -76,10 +80,12 @@
       <HintPath>..\packages\Nancy.Viewengines.Razor.0.16.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Razor, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\System.Web.Razor.Unofficial.2.0.1\lib\net40\System.Web.Razor.dll</HintPath>
@@ -89,6 +95,7 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Selfhost\CertificateHandler.cs" />
+    <Compile Include="Selfhost\ErrorWriter.cs" />
     <Compile Include="WindowsService\ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -107,18 +114,6 @@
   <ItemGroup>
     <Content Include="acknowledgments.txt" />
     <Content Include="Servant.ico" />
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-      <TransformOnBuild>true</TransformOnBuild>
-    </None>
-    <None Include="App.Debug.config">
-      <DependentUpon>App.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-    </None>
-    <None Include="App.Release.config">
-      <DependentUpon>App.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-    </None>
     <Content Include="Install Servant Service.vbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -129,7 +124,6 @@
     <Content Include="Uninstall Servant Service.vbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Servant.Business\Servant.Business.csproj">
@@ -176,12 +170,6 @@
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Servant.Web\Images" “$(ProjectDir)$(OutDir)Images” /e /y /i /r
-
-if $(ConfigurationName) == Debug (
-xcopy "$(SolutionDir)Servant.Web\Css" “$(ProjectDir)$(OutDir)Css” /e /y /i /r
-xcopy "$(SolutionDir)Servant.Web\Scripts" “$(ProjectDir)$(OutDir)Scripts” /e /y /i /r
-)
-
 if not exist $(TargetDir)Scripts cmd /x /c mkdir "$(TargetDir)Scripts"
 if not exist $(TargetDir)Css cmd /x /c mkdir "$(TargetDir)Css"</PreBuildEvent>
   </PropertyGroup>
@@ -205,12 +193,13 @@ xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\lib\Net40\
   -->
   <UsingTask TaskName="CssCompressorTask" AssemblyFile="$(SolutionDir)packages\YUICompressor.NET.MSBuild.2.2.1.0\lib\NET20\Yahoo.Yui.Compressor.Build.MsBuild.dll" />
   <UsingTask TaskName="JavaScriptCompressorTask" AssemblyFile="$(SolutionDir)packages\YUICompressor.NET.MSBuild.2.2.1.0\lib\NET20\Yahoo.Yui.Compressor.Build.MsBuild.dll" />
-  <Target Name="AfterBuild" Condition="'$(Configuration)'=='Release'">
+  <UsingTask TaskName="ILMerge.MSBuild.Tasks.ILMerge" AssemblyFile="$(SolutionDir)\packages\ILMerge.MSBuild.Tasks.1.0.0.3\tools\ILMerge.MSBuild.Tasks.dll" />
+  <Target Name="AfterBuild">
     <ItemGroup>
-      <CssFiles Include="..\Servant.Manager\Css\base.css" />
-      <CssFiles Include="..\Servant.Manager\Css\normalize.css" />
-      <JavaScriptFiles Include="..\Servant.Manager\Scripts\*.js" Exclude="..\Servant.Manager\Scripts\jquery-1.8.0.min.js" />
-      <JqueryFile Include="..\Servant.Manager\Scripts\jquery-1.8.0.min.js" />
+      <CssFiles Include="..\Servant.Web\Css\base.css" />
+      <CssFiles Include="..\Servant.Web\Css\normalize.css" />
+      <JavaScriptFiles Include="..\Servant.Web\Scripts\*.js" Exclude="..\Servant.Web\Scripts\jquery-1.8.0.min.js" />
+      <JqueryFile Include="..\Servant.Web\Scripts\jquery-1.8.0.min.js" />
     </ItemGroup>
     <CssCompressorTask SourceFiles="@(CssFiles)" OutputFile="$(OutDir)css\servant.css" />
     <JavaScriptCompressorTask SourceFiles="@(JavaScriptFiles)" OutputFile="$(OutDir)scripts\servant.js" />
