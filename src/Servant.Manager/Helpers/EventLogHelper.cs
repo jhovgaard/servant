@@ -103,7 +103,7 @@ namespace Servant.Manager.Helpers
 
             var query = string.Format(@"<QueryList>
                               <Query Id=""0"" Path=""Application"">
-                                <Select Path=""Application"">*[System[Provider[@Name='ASP.NET 2.0.50727.0' or @Name='ASP.NET 4.0.30319.0'] and (Level=2 or Level=3){0}]]</Select>
+                                <Select Path=""Application"">*[System[Provider[@Name='ASP.NET 2.0.50727.0' or @Name='ASP.NET 4.0.30319.0'] and (Level=2 or Level=3 or Level=3){0}]]</Select>
                               </Query>
                             </QueryList>", (msLookback == 0) ? null : "and TimeCreated[timediff(@SystemTime) &lt;= " + msLookback + "]");
 
