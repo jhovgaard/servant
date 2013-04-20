@@ -15,7 +15,7 @@ namespace Servant.Server.Selfhost
         public bool LogParsingStarted { get; set; }
         public bool Debug { get; set; }
         public DateTime StartupTime { get; set; }
-        private static Settings _settings;
+        private static ServantConfiguration _configuration;
         private static Timer _timer;
 
         public Host()
@@ -26,19 +26,19 @@ namespace Servant.Server.Selfhost
             _timer.Elapsed += SyncDatabaseJob;
         }
 
-        public void Start(Settings settings = null)
+        public void Start(ServantConfiguration settings = null)
         {
-            _settings = settings;
+            _configuration = settings;
             
             if (settings == null)
             {
-                _settings = SettingsHelper.Settings;
-                Debug = _settings.Debug;
+                _configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+                Debug = _configuration.Debug;
             }
 
             if (ServantHost == null)
             {
-                var uri = new Uri(_settings.ServantUrl.Replace("*", "localhost"));
+                var uri = new Uri(_configuration.ServantUrl.Replace("*", "localhost"));
                 CreateHost(uri);
 
                 StartLogParsing();
@@ -46,9 +46,9 @@ namespace Servant.Server.Selfhost
                 {
                     ServantHost.Start();
                 }
-                catch (HttpListenerException ex) // Tries to start Servant on another port
+                catch (HttpListenerException) // Tries to start Servant on another port
                 {
-                    var servantUrl =_settings.ServantUrl.Replace("*", "localhost");
+                    var servantUrl =_configuration.ServantUrl.Replace("*", "localhost");
                     var portPosition = servantUrl.LastIndexOf(":");
                     if (portPosition != -1)
                         servantUrl = servantUrl.Substring(0, portPosition);
@@ -58,17 +58,17 @@ namespace Servant.Server.Selfhost
                     CreateHost(uri);
                     ServantHost.Start();
 
-                    _settings.ServantUrl = newUri.ToString();
-                    SettingsHelper.UpdateSettings(_settings);
+                    _configuration.ServantUrl = newUri.ToString();
+                    ConfigurationHelper.UpdateConfigurationOnDisk(_configuration);
                 }
                 
             }
 
-            if(_settings.EnableErrorMonitoring)
+            if(_configuration.EnableErrorMonitoring)
                 _timer.Start();
 
             if(Debug)
-                Console.WriteLine("Host started on {0}", _settings.ServantUrl);
+                Console.WriteLine("Host started on {0}", _configuration.ServantUrl);
         }
 
         private void CreateHost(Uri uri)
@@ -110,13 +110,13 @@ namespace Servant.Server.Selfhost
 
         public void StopLogParsing()
         {
-            if (_settings.Debug)
+            if (_configuration.Debug)
                 Console.WriteLine("Stopping log parsing...");
 
             LogParsingStarted = false;
             _timer.Stop();
 
-            if (_settings.Debug)
+            if (_configuration.Debug)
                 Console.WriteLine("Log parsing stopped.");
         }
 
@@ -133,7 +133,7 @@ namespace Servant.Server.Selfhost
         void SyncDatabaseJob(object sender, ElapsedEventArgs e)
         {
             _timer.Stop();
-            if (_settings.Debug)
+            if (_configuration.Debug)
                 Console.WriteLine("Started SyncDatabaseJob (IsRunning: {0})", LogParsingStarted);
            
             try

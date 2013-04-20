@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Nancy;
 using Nancy.ErrorHandling;
 
@@ -17,8 +18,9 @@ namespace Servant.Web
             bool.TryParse(System.Configuration.ConfigurationManager.AppSettings["IsDevelopment"], out isDevelopment);
             if (!isDevelopment)
             {
-                var content = System.IO.File.ReadAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Errors/500.html"));
-                context.Response = content;    
+                var content = new StreamReader(typeof(ErrorHandler).Assembly.GetManifestResourceStream("Servant.Web.Errors.500.html")).ReadToEnd();
+                context.Response = content;
+                context.Response.StatusCode = HttpStatusCode.InternalServerError;
             }
         }
     }

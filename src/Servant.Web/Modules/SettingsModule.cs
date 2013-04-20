@@ -15,16 +15,16 @@ namespace Servant.Web.Modules
         public SettingsModule() : base("/settings/")
         {
             var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
-            var settings = Helpers.SettingsHelper.Settings;
+            var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
             Get["/"] = p => {
-                Model.OriginalServantUrl = settings.ServantUrl;
-                Model.Settings = settings;
+                Model.OriginalServantUrl = configuration.ServantUrl;
+                Model.Settings = configuration;
                 return View["Index", Model];
             };
 
             Post["/"] = p => {
-                var formSettings = this.Bind<Settings>();
+                var formSettings = this.Bind<ServantConfiguration>();
 
                 if (BindingHelper.SafeFinializeBinding(formSettings.ServantUrl) == null)
                     AddPropertyError("servanturl", "The URL is invalid.");
@@ -35,28 +35,28 @@ namespace Servant.Web.Modules
                 var validationResult = this.Validate(formSettings);
                 AddValidationErrors(validationResult);
 
-                var bindingIsChanged = formSettings.ServantUrl != settings.ServantUrl;
+                var bindingIsChanged = formSettings.ServantUrl != configuration.ServantUrl;
                 
                 if(!HasErrors)
                 {
                     formSettings.Password = string.IsNullOrWhiteSpace(formSettings.Password) 
-                        ? settings.Password 
+                        ? configuration.Password 
                         : Business.Helpers.SecurityHelper.HashPassword(formSettings.Password);
 
                     formSettings.SetupCompleted = true;
-                    formSettings.EnableErrorMonitoring = settings.EnableErrorMonitoring;
+                    formSettings.EnableErrorMonitoring = configuration.EnableErrorMonitoring;
 
-                    Helpers.SettingsHelper.UpdateSettings(formSettings);
+                    Helpers.ConfigurationHelper.UpdateConfigurationOnDisk(formSettings);
                     AddMessage("Settings have been saved.");
 
                     if(bindingIsChanged)
                     {
-                        var oldIsHttps = settings.ServantUrl.StartsWith("https://");
+                        var oldIsHttps = configuration.ServantUrl.StartsWith("https://");
                         var newIsHttps = formSettings.ServantUrl.StartsWith("https://");
 
                         if (oldIsHttps)
                         {
-                            var port = new Uri(settings.ServantUrl).Port;
+                            var port = new Uri(configuration.ServantUrl).Port;
                             host.RemoveCertificateBinding(port);
                         }
 
@@ -66,15 +66,15 @@ namespace Servant.Web.Modules
                             host.AddCertificateBinding(port);
                         }
 
-                        Model.IsWildcard = Settings.ServantUrl.StartsWith("https://*") ||
-                                           Settings.ServantUrl.StartsWith("http://*");
+                        Model.IsWildcard = Configuration.ServantUrl.StartsWith("https://*") ||
+                                           Configuration.ServantUrl.StartsWith("http://*");
 
                         Model.NewUrl = formSettings.ServantUrl;
                         return View["BindingChanged", Model];
                     }
                 }
 
-                Model.OriginalServantUrl = settings.ServantUrl;
+                Model.OriginalServantUrl = configuration.ServantUrl;
                 Model.Settings = formSettings;
 
                 return View["Index", Model];
@@ -84,14 +84,14 @@ namespace Servant.Web.Modules
                 
                 var start = (bool) Request.Form.Start;
                 
-                if(!settings.EnableErrorMonitoring && start)
+                if(!configuration.EnableErrorMonitoring && start)
                     host.StartLogParsing();
 
-                if(settings.EnableErrorMonitoring && !start)
+                if(configuration.EnableErrorMonitoring && !start)
                     host.StopLogParsing();
 
-                settings.EnableErrorMonitoring = start;
-                Helpers.SettingsHelper.UpdateSettings(settings);
+                configuration.EnableErrorMonitoring = start;
+                Helpers.ConfigurationHelper.UpdateConfigurationOnDisk(configuration);
                 
                 return Response.AsRedirect("/settings/");
             };
