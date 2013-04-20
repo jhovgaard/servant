@@ -29,15 +29,14 @@ namespace Servant.Server
             get { return NancyInternalConfiguration.WithOverrides(x => x.ViewLocationProvider = typeof(ResourceViewLocationProvider)); }
         }
 
-        protected override void ConfigureApplicationContainer(Nancy.TinyIoc.TinyIoCContainer container)
+        protected override void ConfigureApplicationContainer(TinyIoCContainer container)
         {
             base.ConfigureApplicationContainer(container);
             
             var assembly = GetType().Assembly;
             ResourceViewLocationProvider.Ignore.Add(Assembly.Load("Nancy.ViewEngines.Razor, Version=0.16.1.0, Culture=neutral, PublicKeyToken=null"));
-            ResourceViewLocationProvider
-                .RootNamespaces
-                .Add(assembly, "Servant.Web.Views");
+            ResourceViewLocationProvider.RootNamespaces.Clear();
+            ResourceViewLocationProvider.RootNamespaces.Add(assembly, "Servant.Web.Views");
         }
     }
 }

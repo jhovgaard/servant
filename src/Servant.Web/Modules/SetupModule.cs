@@ -1,5 +1,6 @@
 ﻿using System;
 using Nancy;
+using Nancy.Helpers;
 using Nancy.ModelBinding;
 using Nancy.Validation;
 using Servant.Business;
@@ -13,7 +14,7 @@ namespace Servant.Web.Modules
     {
         public SetupModule()
         {
-            var settings = Helpers.SettingsHelper.Settings;
+            var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
             var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
 
             Get["/setup/confirm/"] = _ =>
@@ -34,19 +35,19 @@ namespace Servant.Web.Modules
                 return true;
             };
 
-            if(!settings.SetupCompleted)
+            if(!configuration.SetupCompleted)
             {
                 Get["/setup/1/"] = _ => {
-                    Model.Settings = settings;
+                    Model.Configuration = configuration;
                     Model.AcceptTerms = false;
                     Model.AutoSendCrashReport = true;
-                    Model.OriginalServantUrl = settings.ServantUrl;
+                    Model.OriginalServantUrl = configuration.ServantUrl;
 
                     return View["1", Model];
                 };
 
                 Post["/setup/1/"] = _ => {
-                    var formSettings = this.Bind<Settings>();   
+                    var formSettings = this.Bind<ServantConfiguration>();   
                     var originalInputtedServantUrl = formSettings.ServantUrl;
 
                     if(BindingHelper.SafeFinializeBinding(formSettings.ServantUrl) == null)
@@ -71,9 +72,9 @@ namespace Servant.Web.Modules
                         formSettings.Password = SecurityHelper.HashPassword(formSettings.Password);
                         formSettings.SetupCompleted = true;
                         formSettings.AutoSendCrashReport = (bool)Request.Form.AutoSendCrashReport;
-                        Helpers.SettingsHelper.UpdateSettings(formSettings);
+                        Helpers.ConfigurationHelper.UpdateConfigurationOnDisk(formSettings);
                         
-                        if (!settings.EnableErrorMonitoring && formSettings.EnableErrorMonitoring) 
+                        if (!configuration.EnableErrorMonitoring && formSettings.EnableErrorMonitoring) 
                             host.StartLogParsing();
 
                         var isHttps = formSettings.ServantUrl.StartsWith("https://");
@@ -83,12 +84,12 @@ namespace Servant.Web.Modules
                             host.AddCertificateBinding(port);
                         }
 
-                        return Response.AsRedirect("/setup/confirm/?url=" + Uri.EscapeDataString(formSettings.ServantUrl));
+                        return Response.AsRedirect("/setup/confirm/?url=" + HttpUtility.UrlEncode(formSettings.ServantUrl));
                     }
 
                     formSettings.ServantUrl = originalInputtedServantUrl;
 
-                    Model.OriginalServantUrl = settings.ServantUrl;
+                    Model.OriginalServantUrl = configuration.ServantUrl;
                     Model.Settings = formSettings;
                     Model.AcceptTerms = Request.Form.AcceptTerms;
 

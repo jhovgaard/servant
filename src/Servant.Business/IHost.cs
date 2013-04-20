@@ -8,7 +8,7 @@ namespace Servant.Business
         bool LogParsingStarted { get; set; }
         bool Debug { get; set; }
         DateTime StartupTime { get; set; }
-        void Start(Settings settings = null);
+        void Start(ServantConfiguration settings = null);
         void Stop();
         void Kill();
         void StartLogParsing();
