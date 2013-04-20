@@ -7,6 +7,8 @@ using Nancy.Conventions;
 using Nancy.Session;
 using Nancy.TinyIoc;
 using Servant.Business;
+using Servant.Business.Objects;
+using Servant.Web.Helpers;
 using Servant.Web.Infrastructure;
 
 namespace Servant.Web
@@ -20,10 +22,10 @@ namespace Servant.Web
             get { return _favicon ?? (_favicon = LoadFavIcon()); }
         }
 
-        protected override void ConfigureApplicationContainer(TinyIoCContainer container)
+        public Bootstrapper()
         {
-            base.ConfigureApplicationContainer(container);
             TinyIoCContainer.Current.Register<IHost, DummyHost>();
+            TinyIoCContainer.Current.Register<ServantConfiguration>(ConfigurationHelper.GetConfigurationFromDisk());
         }
 
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)

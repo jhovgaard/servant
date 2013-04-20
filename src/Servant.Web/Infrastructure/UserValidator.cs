@@ -1,5 +1,6 @@
 ﻿using Nancy.Authentication.Basic;
 using Nancy.Security;
+using Servant.Business.Objects;
 using Servant.Web.Helpers;
 
 namespace Servant.Web.Infrastructure
@@ -8,9 +9,9 @@ namespace Servant.Web.Infrastructure
     {
         public IUserIdentity Validate(string username, string password)
         {
-            var settings = SettingsHelper.Settings;
-            var isUsernameCorrect = username == settings.Username;
-            var isPasswordCorrect = Business.Helpers.SecurityHelper.IsPasswordValid(password, settings.Password);
+            var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+            var isUsernameCorrect = username == configuration.Username;
+            var isPasswordCorrect = Business.Helpers.SecurityHelper.IsPasswordValid(password, configuration.Password);
             
             if(isUsernameCorrect && isPasswordCorrect)
                 return new UserIdentity(username, null);

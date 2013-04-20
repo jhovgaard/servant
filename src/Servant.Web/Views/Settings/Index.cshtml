@@ -53,9 +53,9 @@
     <h3>Error monitoring</h3>
         
     <p class="margin-top10">Error monitoring checks your IIS for new application errors every 5 minutes. 
-        Error monitoring is currently <strong>@Html.Raw((bool)Model.Settings.EnableErrorMonitoring ? "activated" : "deactived")</strong>.</p>
+        Error monitoring is currently <strong>@Html.Raw((bool)Model.Configuration.EnableErrorMonitoring ? "activated" : "deactived")</strong>.</p>
         
-    @if((bool)Model.Settings.EnableErrorMonitoring)
+    @if((bool)Model.Configuration.EnableErrorMonitoring)
     {
         <form method="POST" action="/settings/startlogparsing/">
             <input type="hidden" value="false" name="start"/>

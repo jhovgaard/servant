@@ -78,7 +78,7 @@
   <ItemGroup>
     <Content Include="Css\base.css" />
     <Content Include="Css\normalize.css" />
-    <Content Include="Errors\500.html" />
+    <EmbeddedResource Include="Errors\500.html" />
     <Content Include="Images\checkbox-checked.png" />
     <Content Include="Images\favicon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -116,7 +116,7 @@
     <Compile Include="Helpers\EventLogHelper.cs" />
     <Compile Include="Helpers\FileSystemHelper.cs" />
     <Compile Include="Helpers\ModelIncluders.cs" />
-    <Compile Include="Helpers\SettingsHelper.cs" />
+    <Compile Include="Helpers\ConfigurationHelper.cs" />
     <Compile Include="Helpers\SiteManager.cs" />
     <Compile Include="Infrastructure\DummyHost.cs" />
     <Compile Include="Infrastructure\UserIdentity.cs" />
@@ -154,15 +154,6 @@
     <EmbeddedResource Include="Views\Sites\Stats.cshtml" />
     <EmbeddedResource Include="Views\Stats\CleanupApplicationPools.cshtml" />
     <EmbeddedResource Include="Views\Stats\Index.cshtml" />
-    <Content Include="Copy of Web.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <None Include="Copy of Web.Debug.config">
-      <DependentUpon>Copy of Web.config</DependentUpon>
-    </None>
-    <None Include="Copy of Web.Release.config">
-      <DependentUpon>Copy of Web.config</DependentUpon>
-    </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

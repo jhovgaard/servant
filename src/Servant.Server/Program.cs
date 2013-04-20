@@ -19,7 +19,7 @@ namespace Servant.Server
 {
     static class Program
     {
-        private static Settings Settings { get; set; }
+        private static ServantConfiguration Configuration { get; set; }
         static void Init()
         {
             Nancy.TinyIoc.TinyIoCContainer.Current.Register<IHost, Selfhost.Host>().AsSingleton();
@@ -72,9 +72,9 @@ namespace Servant.Server
             Init();
 
             if (!IsServantCertificateInstalled())
-                InstallServantCertificate();   
+                InstallServantCertificate();
 
-            Settings = SettingsHelper.Settings;
+            Configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
             if (!IsAnAdministrator())
             {
@@ -121,7 +121,7 @@ namespace Servant.Server
                     var startController = new ServiceController("Servant for IIS");
                     startController.Start();
                     StartBrowser();
-                    Console.WriteLine("Servant was successfully installed. Please complete the installation from your browser on " + Settings.ServantUrl);
+                    Console.WriteLine("Servant was successfully installed. Please complete the installation from your browser on " + Configuration.ServantUrl);
                     break;
 
                 case "uninstall":
@@ -148,7 +148,7 @@ namespace Servant.Server
                         Console.WriteLine();
 
                         StartServant();
-                        Console.WriteLine("You can now manage your server from " + Settings.ServantUrl);
+                        Console.WriteLine("You can now manage your server from " + Configuration.ServantUrl);
                         StartBrowser();
                         while (true)
                             Console.ReadLine();
@@ -176,7 +176,7 @@ namespace Servant.Server
         {
             try
             {
-                var startupUrl = Settings.SetupCompleted ? Settings.ServantUrl : Settings.ServantUrl + "setup/1/";
+                var startupUrl = Configuration.SetupCompleted ? Configuration.ServantUrl : Configuration.ServantUrl + "setup/1/";
                 var startInfo = new ProcessStartInfo("explorer.exe", startupUrl);
                 Process.Start(startInfo);
             }
