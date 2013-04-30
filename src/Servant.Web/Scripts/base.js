@@ -63,6 +63,10 @@
         return false;
     });
 
+    $("#entries").on("click", ".remove-entry", function() {
+        $(this).parents("tbody").remove();
+    });
+
     $("#bindings").on("click", "tr td img.remove-binding", function () {
         if ($("#bindings tbody:visible").length > 1) {
             $(this).parent().parent().parent().remove();
@@ -97,8 +101,10 @@
                 var firstIndexChar = error.PropertyName.indexOf("[");
                 if (firstIndexChar > -1) {
                     var propertyName = error.PropertyName.substring(0, firstIndexChar);
-                    var index = error.PropertyName.substring(firstIndexChar+1, error.PropertyName.indexOf("]"));
+                    var index = error.PropertyName.substring(firstIndexChar + 1, error.PropertyName.indexOf("]"));
+                    console.log("Index: " + index);
                     input = $($("input[name=" + propertyName + "]")[index]);
+                    console.log(input);
                 } else {
                     input = $("input[name=" + error.PropertyName.toLowerCase() + "]");
                 }

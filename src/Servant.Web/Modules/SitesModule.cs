@@ -18,13 +18,7 @@ namespace Servant.Web.Modules
         readonly SiteManager _siteManager = new SiteManager();
 
         public SitesModule() : base("/sites/")
-        {
-            //Get["/"] = p  => {
-            //    var sites = _siteManager.GetSites();
-            //    Model.Sites = sites;
-            //    return View["Index", Model];
-            //};
-            
+        {           
             Get["/create/"] = p => {
                 ModelIncluders.IncludeCertificates(ref Model);
                 
@@ -182,9 +176,10 @@ namespace Servant.Web.Modules
                 string[] applicationPools = Request.Form.ApplicationPool.ToString().Split(',');
                 string[] diskPaths = Request.Form.DiskPath.ToString().Split(',');
 
+                site.Applications.Clear();
                 for (int i = 0; i < paths.Length; i++)
                 {
-                    site.Applications.Clear();
+                    
                     site.Applications.Add(new SiteApplication
                         {
                             ApplicationPool = applicationPools[i],
@@ -316,6 +311,10 @@ namespace Servant.Web.Modules
             for (int i = 0; i < site.Applications.Count; i++)
             {
                 var application = site.Applications[i];
+
+                if (!application.Path.StartsWith("/"))
+                    application.Path = "/" + application.Path;
+
                 if (application.DiskPath != null && !FileSystemHelper.DirectoryExists(application.DiskPath))
                 {
                     AddPropertyError("diskpath["+ i + "]", "The entered directory doesn't exist.");    
@@ -330,7 +329,7 @@ namespace Servant.Web.Modules
 
                 var existingApplicationByPath = site.Applications.SingleOrDefault(x => x != site.Applications[i] && x.Path == site.Applications[i].Path);
                 if (site.SitePath != null && existingApplicationByPath != null)
-                    AddPropertyError("path", "There's already an application with this path.");
+                    AddPropertyError("path[" + i + "]", "There's already an application with this path.");
             }
         }
     }
