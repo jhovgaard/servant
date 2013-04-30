@@ -10,8 +10,11 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceProcess;
+using Nancy.TinyIoc;
+using Pluralsight.Crypto;
 using Servant.Business;
 using Servant.Business.Objects;
+using Servant.Server.Selfhost;
 using Servant.Web.Helpers;
 using Servant.Server.WindowsService;
 
@@ -23,6 +26,7 @@ namespace Servant.Server
         static void Init()
         {
             Nancy.TinyIoc.TinyIoCContainer.Current.Register<IHost, Selfhost.Host>().AsSingleton();
+            TinyIoCContainer.Current.Register<ServantConfiguration>(ConfigurationHelper.GetConfigurationFromDisk());
         }
 
         public static System.Reflection.Assembly Resolver(object sender, ResolveEventArgs args)
@@ -55,8 +59,24 @@ namespace Servant.Server
         {
             var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
             store.Open(OpenFlags.ReadWrite);
-            var certificatePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "servant.pfx");
-            var cert = new X509Certificate2(certificatePath, "myservantpass994") { FriendlyName = "Servant"};
+
+            X509Certificate2 cert;
+            using (var ctx = new CryptContext())
+            {
+                ctx.Open();
+
+                cert = ctx.CreateSelfSignedCertificate(
+                    new SelfSignedCertProperties
+                    {
+                        IsPrivateKeyExportable = true,
+                        KeyBitLength = 4096,
+                        Name = new X500DistinguishedName("CN=\"Servant\"; C=\"Denmark\"; O=\"Denmark\"; OU=\"Denmark\";"),
+                        ValidFrom = DateTime.Today.AddDays(-1),
+                        ValidTo = DateTime.Today.AddYears(30),
+                    });
+            }
+
+            cert.FriendlyName = "Servant";
             store.Add(cert);
             store.Close();
         }
@@ -64,17 +84,14 @@ namespace Servant.Server
         private static bool IsServantCertificateInstalled()
         {
             var certificates = SiteManager.GetCertificates();
-            return certificates.Any(x => x.Thumbprint == "8D2673EE6B9076E3C96299048A5032FA401E01C4");
+            return certificates.Any(x => x.FriendlyName == "Servant");
         }
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(Resolver);
             Init();
 
-            if (!IsServantCertificateInstalled())
-                InstallServantCertificate();
 
-            Configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
             if (!IsAnAdministrator())
             {
@@ -106,7 +123,21 @@ namespace Servant.Server
                 return;
             }
 
-                var command = args.FirstOrDefault() ?? "";
+            var command = args.FirstOrDefault() ?? "";
+
+            Configuration = TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+
+            if (Configuration.IsHttps())
+            {
+                if (!IsServantCertificateInstalled())
+                    InstallServantCertificate();
+
+                var servantPort = new Uri(Configuration.ServantUrl).Port;
+                if (!CertificateHandler.IsCertificateBound(servantPort))
+                {
+                    CertificateHandler.AddCertificateBinding(servantPort);
+                }
+            }
 
             switch (command)
             {
@@ -158,6 +189,7 @@ namespace Servant.Server
                     break;
 
             }
+
         }
         
         public static bool IsAlreadyInstalled()

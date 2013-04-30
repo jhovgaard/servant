@@ -46,7 +46,7 @@ namespace Servant.Web.Modules
                     formSettings.SetupCompleted = true;
                     formSettings.EnableErrorMonitoring = configuration.EnableErrorMonitoring;
 
-                    Helpers.ConfigurationHelper.UpdateConfigurationOnDisk(formSettings);
+                    Helpers.ConfigurationHelper.UpdateConfiguration(formSettings);
                     AddMessage("Settings have been saved.");
 
                     if(bindingIsChanged)
@@ -91,7 +91,7 @@ namespace Servant.Web.Modules
                     host.StopLogParsing();
 
                 configuration.EnableErrorMonitoring = start;
-                Helpers.ConfigurationHelper.UpdateConfigurationOnDisk(configuration);
+                Helpers.ConfigurationHelper.UpdateConfiguration(configuration);
                 
                 return Response.AsRedirect("/settings/");
             };

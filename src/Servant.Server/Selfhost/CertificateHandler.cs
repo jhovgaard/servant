@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Linq;
+using Servant.Web.Helpers;
 
 namespace Servant.Server.Selfhost
 {
@@ -12,7 +14,8 @@ namespace Servant.Server.Selfhost
 
          public static void AddCertificateBinding(int port)
          {
-             var command = string.Format("http add sslcert ipport=0.0.0.0:{0} certhash=8D2673EE6B9076E3C96299048A5032FA401E01C4 appid={{dc97f9b1-1653-490f-90f6-6fe008c9701a}}", port);
+             var certificateHash = GetServantCertHash();
+             var command = "http add sslcert ipport=0.0.0.0:" + port + " certhash=" + certificateHash + " appid={dc97f9b1-1653-490f-90f6-6fe008c9701a}";
              ExecuteNetshCommand(command);
          }
 
@@ -20,6 +23,15 @@ namespace Servant.Server.Selfhost
         {
             var command = string.Format("http show sslcert ipport=0.0.0.0:{0}", port);
             return !ExecuteNetshCommand(command).Contains("The system cannot find the file specified.");   
+        }
+
+        private static string GetServantCertHash()
+        {
+            var certificate = SiteManager.GetCertificates().SingleOrDefault(x => x.FriendlyName == "Servant");
+            if (certificate == null)
+                return null;
+
+            return certificate.Thumbprint;
         }
 
         private static string ExecuteNetshCommand(string command)

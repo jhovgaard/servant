@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Servant.Business.Objects.Enums;
 
 namespace Servant.Business.Objects
@@ -14,10 +15,17 @@ namespace Servant.Business.Objects
         public string LogFileDirectory { get; set; }
         public List<Binding> Bindings { get; set; }
         public string[] RawBindings { get; set; }
+        public List<SiteApplication> Applications { get; set; }
 
         public Site()
         {
             Bindings = new List<Binding>() { new Binding  {UserInput = "", IpAddress = "*"}};
+            Applications = new List<SiteApplication>();
+        }
+
+        public bool HasApplications()
+        {
+            return Applications.Any();
         }
     }
 }

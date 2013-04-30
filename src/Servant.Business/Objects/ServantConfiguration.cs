@@ -19,5 +19,11 @@ namespace Servant.Business.Objects
             ServantUrl = "http://localhost:54444/";
             Username = "admin";
         }
+
+        public bool IsHttps()
+        {
+            return ServantUrl.StartsWith("https://");
+
+        }
     }
 }

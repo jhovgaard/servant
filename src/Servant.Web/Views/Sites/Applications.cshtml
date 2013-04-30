@@ -1,0 +1,45 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Sites/_Details.cshtml";
+    ViewBag.ActiveSubmenuItem = "applications";
+}   
+<form action="/sites/@Model.Site.IisId/applications/" method="POST">
+    <table class="pushdown-short" id="entries">
+        @foreach(var application in Model.Site.Applications)
+        {
+            <tbody class="input-group">
+                <tr>
+                    <td><label for="Path">Name (path)</label></td>
+                    <td><input type="text" name="path" value="@application.Path" style="width: 100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label>Application pool</label></td>
+                    <td>
+                        <select name="applicationpool" id="applicationpool" style="width: 100%">
+                            @foreach (var appPool in Model.ApplicationPools)
+                            {
+                                if(appPool == application.ApplicationPool)
+                                {
+                                    <option selected="selected">@appPool</option>
+                                } else {
+                                    <option>@appPool</option>
+                                }
+                
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr class="last">
+                    <td><label>Disk path</label></td>
+                    <td><input type="text" name="diskpath" value="@application.DiskPath" style="width: 100%;" /></td>
+                </tr>
+            </tbody>
+        }
+    </table>
+
+    <a href="#" class="add" id="add-entry">Add application</a>
+        
+    <div class="box100 pushup-medium">
+        <input type="submit" class="btn btn-primary" value="Save applications" />
+    </div>
+</form>

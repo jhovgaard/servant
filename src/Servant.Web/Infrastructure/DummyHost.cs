@@ -9,7 +9,7 @@ namespace Servant.Web.Infrastructure
         public bool LogParsingStarted { get; set; }
         public bool Debug { get; set; }
         public DateTime StartupTime { get; set; }
-        public void Start(ServantConfiguration settings = null)
+        public void Start(ServantConfiguration configuration = null)
         {
         }
 
