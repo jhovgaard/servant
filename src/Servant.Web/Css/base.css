@@ -156,6 +156,14 @@ pre {
     margin-top: 5px;
 }
 
+.pushup-medium {
+    margin-top: 20px;
+}
+
+.pushup-long {
+    margin-top: 50px;
+}
+
 
 .bold {
     font-weight: bold;
@@ -372,6 +380,9 @@ pre {
     #topmenu ul li.errors a:hover,
     #topmenu ul.active-errors li.errors a {border-bottom: 5px solid #00bcf2;}
 
+    #topmenu ul li.applications a:hover,
+    #topmenu ul.active-applications li.applications a {border-bottom: 5px solid #ff8c00;}
+
 #maincontent {
     float: left;
     clear: right;
@@ -522,6 +533,30 @@ table#bindings {
     table#bindings tbody tr:first-child td input { border-top: 3px solid #A5A5A5}
 
     table#bindings tbody tr td label { padding-left: 10px; }
+
+
+
+
+table#entries {
+    padding: 5px;
+}
+
+    table#entries tbody tr td {
+        background-color: #e2e2e2;
+    }
+
+    table#entries tbody:nth-child(odd) tr td {
+        background-color: #c9c9c9;
+    }
+
+    table#entries tr td {
+        padding: 3px;
+    }
+    
+    table#entries tbody tr:first-child td input { border-top: 3px solid #A5A5A5}
+
+    table#entries tbody tr td label { padding-left: 10px; }
+
 
 
   #copyright {

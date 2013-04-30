@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.Web.Administration;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
+using Binding = Servant.Business.Objects.Binding;
 using CreateSiteResult = Servant.Business.Objects.Enums.CreateSiteResult;
 using Site = Servant.Business.Objects.Site;
 
@@ -69,9 +72,7 @@ namespace Servant.Web.Helpers
 
             var applicationPoolState = _manager.ApplicationPools[site.Applications[0].ApplicationPoolName].State;
 
-            
-
-            return new Site {
+            var servantSite = new Site {
                     IisId = (int)site.Id,
                     Name = site.Name,
                     ApplicationPool = site.Applications[0].ApplicationPoolName,
@@ -79,8 +80,23 @@ namespace Servant.Web.Helpers
                     SiteState = (InstanceState)Enum.Parse(typeof(InstanceState), site.State.ToString()),
                     ApplicationPoolState = (InstanceState)Enum.Parse(typeof(InstanceState),  applicationPoolState.ToString()),
                     LogFileDirectory = site.LogFile.Directory,
-                    Bindings = GetBindings(site).ToList()
+                    Bindings = GetBindings(site).ToList(),
                 };
+
+            if (site.Applications.Count > 1)
+            {
+                foreach (var application in site.Applications.Skip(1))
+                {
+                    servantSite.Applications.Add(new SiteApplication
+                        {
+                            ApplicationPool = application.ApplicationPoolName,
+                            Path = application.Path,
+                            DiskPath = application.VirtualDirectories[0].PhysicalPath,
+                        });
+                }
+            }
+
+            return servantSite;
         }
 
         private IEnumerable<Binding> GetBindings(Microsoft.Web.Administration.Site iisSite)
@@ -137,11 +153,11 @@ namespace Servant.Web.Helpers
         public void UpdateSite(Servant.Business.Objects.Site site)
         {
             var iisSite = _manager.Sites.SingleOrDefault(x => x.Id == site.IisId);
-            var application = iisSite.Applications[0];
+            var mainApplication = iisSite.Applications.First();
 
-            application.VirtualDirectories[0].PhysicalPath = site.SitePath;
+            mainApplication.VirtualDirectories[0].PhysicalPath = site.SitePath;
             iisSite.Name = site.Name;
-            application.ApplicationPoolName = site.ApplicationPool;
+            mainApplication.ApplicationPoolName = site.ApplicationPool;
 
             // Commits bindings
             iisSite.Bindings.Clear();
@@ -151,6 +167,31 @@ namespace Servant.Web.Helpers
                     iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.CertificateHash, "My");
                 else
                     iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.Protocol.ToString());
+            }
+
+            //Intelligently updates virtual applications
+            foreach (var application in site.Applications)
+            {
+                var iisApp = iisSite.Applications.SingleOrDefault(x => x.Path == application.Path);
+
+                if (iisApp == null)
+                {
+                    if (!application.Path.StartsWith("/"))
+                        application.Path = "/" + application.Path;
+
+                    iisSite.Applications.Add(application.Path, application.DiskPath);
+                    iisApp = iisSite.Applications.Single(x => x.Path == application.Path);
+
+                }
+
+                iisApp.VirtualDirectories[0].PhysicalPath = application.DiskPath;
+                iisApp.ApplicationPoolName = application.ApplicationPool;
+            }
+
+            var applicationsToDelete = iisSite.Applications.Skip(1).Where(x => !site.Applications.Select(a => a.Path).Contains(x.Path));
+            foreach (var application in applicationsToDelete)
+            {
+                application.Delete();
             }
                 
             _manager.CommitChanges();
@@ -260,8 +301,34 @@ namespace Servant.Web.Helpers
 
             _manager.CommitChanges();
 
-            result.Result = CreateSiteResult.Success;
-            result.IisSiteId = (int) iisSite.Id;
+            var created = false;
+            var sw = new Stopwatch();
+            sw.Start();
+            while (!created || sw.Elapsed.TotalSeconds >= 3)
+            {
+                try
+                {
+                    if (iisSite.State == ObjectState.Started)
+                        created = true;
+                }
+                catch (COMException)
+                {
+                    System.Threading.Thread.Sleep(100);
+                }
+                
+            }
+            sw.Stop();
+
+            if (created)
+            {
+                result.Result = CreateSiteResult.Success;
+                result.IisSiteId = (int) iisSite.Id;
+            }
+            else
+            {
+                result.Result = CreateSiteResult.Failed;
+            }
+            
             return result;
         }
 

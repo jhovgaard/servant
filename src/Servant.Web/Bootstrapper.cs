@@ -24,13 +24,18 @@ namespace Servant.Web
 
         public Bootstrapper()
         {
-            TinyIoCContainer.Current.Register<IHost, DummyHost>();
+            IHost host;
+            TinyIoCContainer.Current.TryResolve<IHost>(out host);
+            if (host == null)
+            {
+                TinyIoCContainer.Current.Register<IHost, DummyHost>();
+            }
+
             TinyIoCContainer.Current.Register<ServantConfiguration>(ConfigurationHelper.GetConfigurationFromDisk());
         }
 
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
-            base.ApplicationStartup(container, pipelines);
             var host = TinyIoCContainer.Current.Resolve<IHost>();
 
             pipelines.EnableBasicAuthentication(new BasicAuthenticationConfiguration(container.Resolve<IUserValidator>(), "Servant"));
@@ -38,7 +43,7 @@ namespace Servant.Web
             
             var sw = new Stopwatch();
 
-            pipelines.BeforeRequest.InsertBefore("Debugging", nancyContext => 
+            pipelines.BeforeRequest.InsertBefore("DebuggingStart", nancyContext => 
             {
                 sw.Reset();
                 sw.Start();
@@ -53,7 +58,7 @@ namespace Servant.Web
                     nancyContext.Response.ContentType = "text/html; charset=utf8";
             });
 
-            pipelines.AfterRequest.InsertAfter("RebootHandler", ctx =>
+            pipelines.AfterRequest.InsertAfter("DebuggingEnd", ctx =>
             {
                 sw.Stop();
                 if (host.Debug)
@@ -63,6 +68,8 @@ namespace Servant.Web
                     Console.ResetColor();
                 }
             });
+
+            base.ApplicationStartup(container, pipelines);
         }
 
         protected override void ConfigureConventions(NancyConventions nancyConventions)

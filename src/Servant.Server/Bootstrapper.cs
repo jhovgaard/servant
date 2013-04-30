@@ -1,16 +1,14 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using Nancy.Bootstrapper;
 using Nancy.TinyIoc;
 using Nancy.ViewEngines;
-using Nancy.ViewEngines.Razor;
 using Servant.Server.Selfhost;
 
 namespace Servant.Server
 {
-    public class Bootstrapper : Web.Bootstrapper
+    public class Bootstrapper : Servant.Web.Bootstrapper
     {
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
@@ -26,14 +24,17 @@ namespace Servant.Server
 
         protected override NancyInternalConfiguration InternalConfiguration
         {
-            get { return NancyInternalConfiguration.WithOverrides(x => x.ViewLocationProvider = typeof(ResourceViewLocationProvider)); }
+            get
+            {
+                return NancyInternalConfiguration.WithOverrides(x => x.ViewLocationProvider = typeof (ResourceViewLocationProvider));
+            }
         }
 
         protected override void ConfigureApplicationContainer(TinyIoCContainer container)
         {
             base.ConfigureApplicationContainer(container);
-            
-            var assembly = GetType().Assembly;
+
+            var assembly = typeof(Servant.Web.Bootstrapper).Assembly;
             ResourceViewLocationProvider.Ignore.Add(Assembly.Load("Nancy.ViewEngines.Razor, Version=0.16.1.0, Culture=neutral, PublicKeyToken=null"));
             ResourceViewLocationProvider.RootNamespaces.Clear();
             ResourceViewLocationProvider.RootNamespaces.Add(assembly, "Servant.Web.Views");

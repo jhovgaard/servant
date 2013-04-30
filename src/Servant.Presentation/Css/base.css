@@ -111,6 +111,60 @@ pre {
     overflow: auto;
 }
 
+.input-group {
+    padding-bottom: 15px;
+}
+
+    .input-group label {
+        display: block;
+        padding-bottom: 5px;
+    }
+
+    .input-group input[type=text], .input-group input[type=password], .input-group select {
+        width: 80%;
+    }
+
+    .input-group p {
+        margin: 0;
+        padding: 5px 0 0 0;
+        font-size: 12px;
+    }
+
+    input[type=submit], .btn-submit, a.btn-submit:visited {
+    background: url('icon-ok.png') no-repeat 10px center;
+    padding: 10px 15px 10px 45px;
+    background-color: #a8c019;
+    color: white;
+    border: 0;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+    input[type=submit]:hover {
+        background-color: #bad80a;
+    }
+
+    input[type=submit].cancel {
+        background-image: url('/images/icon-cancel.png');
+        background-color: #fb4050;
+    }
+
+        input[type=submit].cancel:hover {
+            background-color: #e81123;
+        }
+
+    input[type=submit].warning {
+        background-image: url('/images/icon-warning.png');
+        background-color: #FFA840;
+    }
+
+        input[type=submit].warning:hover {
+            background-color: #ff8c00;
+        }
+
+        input[type=submit].recycle { background-image: url('/images/icon-recycle.png'); background-position: 10px 12px }
+        input[type=submit].restart { background-image: url('/images/icon-restart.png'); }
 
 
 /* GLOBALS

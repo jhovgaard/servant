@@ -154,6 +154,7 @@
     <EmbeddedResource Include="Views\Sites\Stats.cshtml" />
     <EmbeddedResource Include="Views\Stats\CleanupApplicationPools.cshtml" />
     <EmbeddedResource Include="Views\Stats\Index.cshtml" />
+    <Content Include="Views\Sites\Applications.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

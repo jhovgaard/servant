@@ -47,6 +47,21 @@
         newBinding.find("td input").first().focus();
         return false;
     });
+    
+    $("#add-entry").click(function () {
+        var table = $("#entries");
+        var newEntry = table.find("tbody:visible:last").clone();
+
+        newEntry.find("td input")
+            .val("")
+            .removeClass("error");
+        
+        newEntry.find("td span.help-block, td span.help-inline").remove();
+        table.append(newEntry);
+        newEntry.find("td input").first().focus();
+        
+        return false;
+    });
 
     $("#bindings").on("click", "tr td img.remove-binding", function () {
         if ($("#bindings tbody:visible").length > 1) {
