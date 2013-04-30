@@ -2,6 +2,7 @@
 using Nancy;
 using Nancy.Helpers;
 using Nancy.ModelBinding;
+using Nancy.Security;
 using Nancy.Validation;
 using Servant.Business;
 using Servant.Business.Helpers;
@@ -26,7 +27,7 @@ namespace Servant.Web.Modules
             };
 
             Get["/setup/restartservant/"] = _ =>
-            {
+                {
                 new System.Threading.Thread(() =>
                     {
                         host.Kill();
@@ -72,7 +73,7 @@ namespace Servant.Web.Modules
                         formSettings.Password = SecurityHelper.HashPassword(formSettings.Password);
                         formSettings.SetupCompleted = true;
                         formSettings.AutoSendCrashReport = (bool)Request.Form.AutoSendCrashReport;
-                        Helpers.ConfigurationHelper.UpdateConfigurationOnDisk(formSettings);
+                        Helpers.ConfigurationHelper.UpdateConfiguration(formSettings);
                         
                         if (!configuration.EnableErrorMonitoring && formSettings.EnableErrorMonitoring) 
                             host.StartLogParsing();

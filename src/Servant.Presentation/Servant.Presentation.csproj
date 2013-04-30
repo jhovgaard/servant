@@ -64,6 +64,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Css\closelabel.gif" />
+    <Content Include="Css\icon-ok.png" />
     <Content Include="Css\loading.gif" />
     <Content Include="Css\nextlabel.gif" />
     <Content Include="Css\normalize.css" />
@@ -82,8 +83,10 @@
     <Content Include="Images\servant_screenshot_3.gif" />
     <Content Include="Images\servant_screenshot_3_thumb.gif" />
     <Content Include="Images\servant_logo_square.png" />
+    <Content Include="Images\shanselman.jpg" />
     <Content Include="Images\twitter-64x64.png" />
     <Content Include="Images\twitter.png" />
+    <Content Include="jquery.watermark.min.js" />
     <Content Include="slimbox2.js" />
   </ItemGroup>
   <ItemGroup>

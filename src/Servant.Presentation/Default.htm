@@ -25,6 +25,12 @@
             
                 <p>Servant is a piece of software that transforms your regular Internet Information Services (IIS) Manager to a beautiful, fast and web-based management tool.</p>
                 <p>It's designed to fit your daily routines, optimized to track down your worst problems and created to stop you from wasting time on administration.</p>
+                
+                <p>
+                    <img src="Images/shanselman.jpg" />
+                    <strong>Scott Hanselman</strong><br/>
+                    "It's really a lovely piece of software. Nicely done!"
+                </p>
             </div>
             
             <div class="box">
@@ -54,7 +60,8 @@
                 </a>
                 
             </div>
-
+            
+            
             
             <div class="fullbox pushdown-long" id="screenshots">
                 <h2>Screenshots</h2>
@@ -62,6 +69,19 @@
                 <a href="Images/servant_screenshot_2.gif"><img src="Images/servant_screenshot_2_thumb.gif" alt="Servant Screenshot - Site settings" /></a>
                 <a href="Images/servant_screenshot_3.gif"><img src="Images/servant_screenshot_3_thumb.gif" alt="Servant Screenshot - Site errors/exceptions" /></a>
 
+            </div>
+            
+            <div class="fullbox">
+                <h2>Sign up for the newsletter</h2>
+                <p>Want to get updated when we release new awesome features? Subscribe below, we promise no spam!</p>
+                <form action="http://servant.us5.list-manage1.com/subscribe/post?u=03f7634d8f38f00fa95264d15&amp;id=dea225a6ba" method="post" target="_blank">
+                    <div class="input-group">
+                        <div style="width: 600px; margin: auto;">
+                            <input type="text" value="" name="EMAIL" style="padding: 8px 8px 7px; width: 450px;">
+                            <input type="submit"  value="Subscribe" class="btn-submit" />
+                        </div>
+                    </div>
+                </form>
             </div>
 
             <div class="fullbox pushdown-long">
@@ -73,13 +93,8 @@
         </div>
         
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js" type="text/javascript"></script>
+        <script src="jquery.watermark.min.js"></script>
         <script src="slimbox2.js"></script>
-        <script>
-            $("#screenshots a").slimbox({
-                resizeDuration: 200,
-                captionAnimationDuration: 50,
-            });
-        </script>
         <script type="text/javascript">
             var _gaq = _gaq || [];
             _gaq.push(['_setAccount', 'UA-9004302-4']);
@@ -90,6 +105,14 @@
                 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
                 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
             })();
+
+            $(function() {
+                $('input[name=EMAIL]').watermark('Your email address');
+                $('#screenshots a').slimbox({
+                    resizeDuration: 200,
+                    captionAnimationDuration: 50,
+                });
+            });
         </script>
     </body>
 </html>

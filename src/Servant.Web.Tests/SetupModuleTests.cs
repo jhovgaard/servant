@@ -2,6 +2,7 @@
 using Nancy;
 using Nancy.Helpers;
 using Nancy.Testing;
+using Servant.Web.Tests.Helpers;
 
 namespace Servant.Web.Tests
 {
@@ -51,7 +52,5 @@ namespace Servant.Web.Tests
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
-
-
     }
 }

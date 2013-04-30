@@ -1,4 +1,5 @@
 ﻿using System;
+using Nancy.TinyIoc;
 using Servant.Business.Objects;
 using ServiceStack.Text;
 
@@ -15,14 +16,15 @@ namespace Servant.Web.Helpers
 
             var configContent = System.IO.File.ReadAllText(ConfigFilePath);
 
-            var settings = JsonSerializer.DeserializeFromString<ServantConfiguration>(configContent);
-            return settings;
+            var configuration = JsonSerializer.DeserializeFromString<ServantConfiguration>(configContent);
+            return configuration;
         }
 
-        public static void UpdateConfigurationOnDisk(ServantConfiguration settings)
+        public static void UpdateConfiguration(ServantConfiguration configuration)
         {
-            var content = JsonSerializer.SerializeToString(settings);
+            var content = JsonSerializer.SerializeToString(configuration);
             System.IO.File.WriteAllText(ConfigFilePath, content);
+            TinyIoCContainer.Current.Register(configuration);
         }
     }
 }

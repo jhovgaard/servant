@@ -7,7 +7,7 @@ namespace Servant.Web
     {
         public IEnumerable<string> GetAssemblyNames()
         {
-            return new[] { typeof(Business.LogParser).Assembly.ToString() };
+            return new[] { typeof(Business.IHost).Assembly.ToString() };
         }
 
         public IEnumerable<string> GetDefaultNamespaces()

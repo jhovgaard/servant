@@ -1,7 +1,7 @@
 ﻿using Nancy.Testing;
 using Servant.Business.Objects;
 
-namespace Servant.Web.Tests
+namespace Servant.Web.Tests.Helpers
 {
     public class BrowserBuilder
     {
@@ -26,7 +26,11 @@ namespace Servant.Web.Tests
 
         public BrowserBuilder WithDefaultConfiguration()
         {
-            Nancy.TinyIoc.TinyIoCContainer.Current.Register<ServantConfiguration>(new ServantConfiguration() { Password = "servant", SetupCompleted = true});
+            Nancy.TinyIoc.TinyIoCContainer.Current.Register<ServantConfiguration>(new ServantConfiguration() { 
+                Password = "CsVHVDq2Dri7EFNscyFt5V/MpdxbZ8XRynGt+LxtMO3KafHRzy0AOJbBWWxkZ6gbOFBUuTPQxGcpnjcxXBN/qA==", // "servant"
+                SetupCompleted = true,
+                Debug = true
+            });
             return this;
         }
     }

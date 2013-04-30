@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
@@ -16,79 +17,13 @@ namespace Servant.Web.Modules
     {
         readonly SiteManager _siteManager = new SiteManager();
 
-        public void ValidateSite(ref Site site)
-        {
-            string[] bindingsUserInputs = Request.Form.BindingsUserInput.ToString().Split(',');
-            string[] bindingsCertificateName = Request.Form.BindingsCertificateName.ToString().Split(',');
-            string[] bindingsIpAddresses = Request.Form.BindingsIpAddress.ToString().Split(',');
-            site.Bindings = new List<Binding>();
-            var certificates = SiteManager.GetCertificates();
-
-            for (var i = 0; i < bindingsUserInputs.Length; i++)
-            {
-                if (string.IsNullOrWhiteSpace(bindingsUserInputs[i]))
-                    continue;
-
-                var isValid = true;
-
-                var finalizedHost = BindingHelper.SafeFinializeBinding(bindingsUserInputs[i]);
-
-                if (finalizedHost == null)
-                {
-                    AddPropertyError("bindingsuserinput[" + i + "]", "The binding is invalid.");
-                    isValid = false;
-                }
-                else if (_siteManager.IsBindingInUse(finalizedHost, bindingsIpAddresses[i], site.IisId))
-                {
-                    AddPropertyError("bindingsuserinput[" + i + "]", string.Format("The binding {0} is already in use.", finalizedHost));
-                    isValid = false;
-                }
-                Binding binding;
-
-                if (isValid)
-                {
-                    var certificate = certificates.SingleOrDefault(x => x.FriendlyName == bindingsCertificateName[i]);
-                    binding = BindingHelper.ConvertToBinding(finalizedHost, bindingsIpAddresses[i], certificate);
-                }
-                else
-                {
-                    binding = new Binding()
-                    {
-                        CertificateName = bindingsCertificateName[i],
-                        UserInput = bindingsUserInputs[i]
-                    };
-                }
-
-                site.Bindings.Add(binding);
-            }
-
-            if (!site.Bindings.Any())
-            {
-                AddPropertyError("bindingsipaddress[0]", "Minimum one binding is required.");
-                site.Bindings.Add(new Binding() {UserInput = ""});
-            }
-
-            if (string.IsNullOrWhiteSpace(site.Name))
-                AddPropertyError("name", "Name is required.");
-
-            var existingSite = _siteManager.GetSiteByName(site.Name);
-            if (site.Name != null && existingSite != null && existingSite.IisId != site.IisId)
-                AddPropertyError("name", "There's already a site with this name.");
-
-            if (string.IsNullOrWhiteSpace(site.SitePath))
-                AddPropertyError("sitepath", "Site path is required.");
-
-            if (site.SitePath != null && !FileSystemHelper.DirectoryExists(site.SitePath))
-                AddPropertyError("sitepath", "The entered directory doesn't exist.");
-        }
-
         public SitesModule() : base("/sites/")
         {
-            Get["/"] = p  => {
-                var sites = _siteManager.GetSites();
-                Model.Sites = sites;
-                return View["Index", Model];
-            };
+            //Get["/"] = p  => {
+            //    var sites = _siteManager.GetSites();
+            //    Model.Sites = sites;
+            //    return View["Index", Model];
+            //};
             
             Get["/create/"] = p => {
                 ModelIncluders.IncludeCertificates(ref Model);
@@ -124,6 +59,7 @@ namespace Servant.Web.Modules
                             AddGlobalError("Something went completely wrong :-/");
                             break;
                         case CreateSiteResult.Success:
+                            System.Threading.Thread.Sleep(1000);
                             AddMessage("Site has successfully been created.", MessageType.Success);
                             return new RedirectResponse("/sites/" + result.IisSiteId + "/settings/");
                     }
@@ -227,6 +163,49 @@ namespace Servant.Web.Modules
                 return new RedirectResponse("/");
             };
 
+            Get[@"/(?<Id>[\d]{1,4})/applications/"] = p =>
+            {
+                ModelIncluders.IncludeApplicationPools(ref Model);
+                Site site = _siteManager.GetSiteById(p.Id);
+
+                Model.Site = site;
+                Model.ApplicationPools = _siteManager.GetApplicationPools();
+                return View["Applications", Model];
+            };
+
+            Post[@"/(?<Id>[\d]{1,4})/applications/"] = p =>
+            {
+                ModelIncluders.IncludeApplicationPools(ref Model);
+                Site site = _siteManager.GetSiteById(p.Id);
+
+                string[] paths = Request.Form.Path.ToString().Split(',');
+                string[] applicationPools = Request.Form.ApplicationPool.ToString().Split(',');
+                string[] diskPaths = Request.Form.DiskPath.ToString().Split(',');
+
+                for (int i = 0; i < paths.Length; i++)
+                {
+                    site.Applications.Clear();
+                    site.Applications.Add(new SiteApplication
+                        {
+                            ApplicationPool = applicationPools[i],
+                            DiskPath = diskPaths[i],
+                            Path = paths[i]
+                        });
+                }
+
+                ValidateSiteApplications(site);
+
+                if(!HasErrors)
+                {
+                    _siteManager.UpdateSite(site);
+                    AddMessage("Applications have been saved.", MessageType.Success);
+                }
+
+                Model.Site = site;
+                Model.ApplicationPools = _siteManager.GetApplicationPools();
+                return View["Applications", Model];
+            };
+
             Get[@"/(?<Id>[\d]{1,4})/errors/"] = p => {                
                 StatsRange range;
                 var rValue = Request.Query["r"];
@@ -262,6 +241,97 @@ namespace Servant.Web.Modules
 
                 return View["Error", Model];
             };
+        }
+
+
+        public void ValidateSite(ref Site site)
+        {
+            string[] bindingsUserInputs = Request.Form.BindingsUserInput.ToString().Split(',');
+            string[] bindingsCertificateName = Request.Form.BindingsCertificateName.ToString().Split(',');
+            string[] bindingsIpAddresses = Request.Form.BindingsIpAddress.ToString().Split(',');
+
+            site.Bindings = new List<Binding>();
+            var certificates = SiteManager.GetCertificates();
+
+            for (var i = 0; i < bindingsUserInputs.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(bindingsUserInputs[i]))
+                    continue;
+
+                var isValid = true;
+
+                var finalizedHost = BindingHelper.SafeFinializeBinding(bindingsUserInputs[i]);
+
+                if (finalizedHost == null)
+                {
+                    AddPropertyError("bindingsuserinput[" + i + "]", "The binding is invalid.");
+                    isValid = false;
+                }
+                else if (_siteManager.IsBindingInUse(finalizedHost, bindingsIpAddresses[i], site.IisId))
+                {
+                    AddPropertyError("bindingsuserinput[" + i + "]", string.Format("The binding {0} is already in use.", finalizedHost));
+                    isValid = false;
+                }
+                Binding binding;
+
+                if (isValid)
+                {
+                    var certificate = certificates.SingleOrDefault(x => x.FriendlyName == bindingsCertificateName[i]);
+                    binding = BindingHelper.ConvertToBinding(finalizedHost, bindingsIpAddresses[i], certificate);
+                }
+                else
+                {
+                    binding = new Binding()
+                    {
+                        CertificateName = bindingsCertificateName[i],
+                        UserInput = bindingsUserInputs[i]
+                    };
+                }
+
+                site.Bindings.Add(binding);
+            }
+
+            if (!site.Bindings.Any())
+            {
+                AddPropertyError("bindingsipaddress[0]", "Minimum one binding is required.");
+                site.Bindings.Add(new Binding() { UserInput = "" });
+            }
+
+            if (string.IsNullOrWhiteSpace(site.Name))
+                AddPropertyError("name", "Name is required.");
+
+            var existingSite = _siteManager.GetSiteByName(site.Name);
+            if (site.Name != null && existingSite != null && existingSite.IisId != site.IisId)
+                AddPropertyError("name", "There's already a site with this name.");
+
+            if (string.IsNullOrWhiteSpace(site.SitePath))
+                AddPropertyError("sitepath", "Site path is required.");
+
+            if (site.SitePath != null && !FileSystemHelper.DirectoryExists(site.SitePath))
+                AddPropertyError("sitepath", "The entered directory doesn't exist.");
+        }
+
+        public void ValidateSiteApplications(Site site)
+        {
+            for (int i = 0; i < site.Applications.Count; i++)
+            {
+                var application = site.Applications[i];
+                if (application.DiskPath != null && !FileSystemHelper.DirectoryExists(application.DiskPath))
+                {
+                    AddPropertyError("diskpath["+ i + "]", "The entered directory doesn't exist.");    
+                }
+
+                if (string.IsNullOrWhiteSpace(application.Path))
+                    AddPropertyError("path[" + i + "]", "Path is required.");
+
+                var invalidCharacters = new[] { '\\', '?', ';', ':', '@', '&', '=', '+', '$', ',', '|', '"', '<', '>', '*' };
+                if(invalidCharacters.Any(x => application.Path.ToArray().Contains(x)))
+                    AddPropertyError("path[" + i + "]", "Path cannot contain the following characters: \\, ?, ;, :, @, &, =, +, $, ,, |, \", <, >, *.");
+
+                var existingApplicationByPath = site.Applications.SingleOrDefault(x => x != site.Applications[i] && x.Path == site.Applications[i].Path);
+                if (site.SitePath != null && existingApplicationByPath != null)
+                    AddPropertyError("path", "There's already an application with this path.");
+            }
         }
     }
 }
