@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Nancy;
@@ -22,7 +23,7 @@ namespace Servant.Web.Tests
             Name = "unit-test-site"
         };
 
-        [TestFixtureTearDown, TestFixtureSetUp]
+        [TestFixtureTearDown]
         public void Cleanup()
         {
             var siteManager = new SiteManager();
@@ -48,6 +49,7 @@ namespace Servant.Web.Tests
         [Test]
         public void Can_Create_Site()
         {
+            Cleanup();
             var browser = new BrowserBuilder().WithDefaultConfiguration().Build();
 
             var response = browser.Post("/sites/create/", with =>
@@ -62,7 +64,13 @@ namespace Servant.Web.Tests
                     with.FormValue("applicationpool", "");
                 });
 
-            Assert.DoesNotThrow(() => Assert.IsTrue(new Regex(@"/sites/(\d+)/settings", RegexOptions.IgnoreCase).IsMatch(response.Headers["Location"])));
+            var body = response.Body.AsString();
+
+            var urlRegex = new Regex(@"/sites/(\d+)/settings", RegexOptions.IgnoreCase);
+            string headerLocation;
+            response.Headers.TryGetValue("Location", out headerLocation);
+            
+            Assert.IsTrue(urlRegex.IsMatch(headerLocation ?? ""));
         }
 
         [Test]
@@ -121,6 +129,8 @@ namespace Servant.Web.Tests
                 with.FormValue("applicationpool", originalSite.ApplicationPool);
             });
 
+            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
+            
             var body = response.Body.AsString();
 
             StringAssert.Contains("\"Message\":\"The binding is invalid.\",\"PropertyName\":\"bindingsuserinput[0]\"", body);
@@ -139,6 +149,44 @@ namespace Servant.Web.Tests
                 });
 
             response.ShouldHaveRedirectedTo("/");
+        }
+
+        [Test]
+        public void Can_Create_Application()
+        {
+            var browser = new BrowserBuilder().WithDefaultConfiguration().Build();
+            var site = GetTestSiteFromIis();
+
+            var response = browser.Post("/sites/" + site.IisId + "/applications/", with =>
+            {
+                with.Authenticated();
+                with.HttpRequest();
+                with.FormValue("path", "virtualapptest");
+                with.FormValue("applicationpool", site.ApplicationPool);
+                with.FormValue("diskpath", "C:");
+            });
+
+            var body = response.Body.AsString();
+            StringAssert.Contains("var message = \"Applications have been saved.\";", body);
+        }
+
+        [Test]
+        public void Cannot_Create_Application_With_Invalid_Path()
+        {
+            var browser = new BrowserBuilder().WithDefaultConfiguration().Build();
+            var site = GetTestSiteFromIis();
+
+            var response = browser.Post("/sites/" + site.IisId + "/applications/", with =>
+            {
+                with.Authenticated();
+                with.HttpRequest();
+                with.FormValue("path", "virtual%¤#<*>apptest");
+                with.FormValue("applicationpool", site.ApplicationPool);
+                with.FormValue("diskpath", "C:");
+            });
+
+            var body = response.Body.AsString();
+            StringAssert.Contains("Path cannot contain the following characters", body);
         }
 
         private Site GetTestSiteFromIis()

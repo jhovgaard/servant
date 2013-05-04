@@ -340,6 +340,8 @@ pre {
 #topmenu {
     border-bottom: 5px solid #c0c0c0;
     margin-bottom: 20px;
+    min-width: 631px;
+    padding-top: 12px;
 }
 
 #topmenu ul {
@@ -566,4 +568,9 @@ table#entries {
       text-transform: uppercase; 
       display: block; 
       width: 100%;
+  }
+
+  #add-entry {
+      display: inline-block;
+      clear: both;
   }

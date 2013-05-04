@@ -378,6 +378,8 @@ namespace Servant.Web.Helpers
                 _manager.ApplicationPools[applicationPoolname].Delete();
 
             _manager.CommitChanges();
+
+            System.Threading.Thread.Sleep(500);
         }
     }
 }
