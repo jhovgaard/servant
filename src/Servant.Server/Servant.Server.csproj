@@ -191,9 +191,8 @@ xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.16.1\lib\Net40\
   <Target Name="AfterBuild">
   </Target>
   -->
-  <UsingTask TaskName="CssCompressorTask" AssemblyFile="$(SolutionDir)packages\YUICompressor.NET.MSBuild.2.2.1.0\lib\NET20\Yahoo.Yui.Compressor.Build.MsBuild.dll" />
-  <UsingTask TaskName="JavaScriptCompressorTask" AssemblyFile="$(SolutionDir)packages\YUICompressor.NET.MSBuild.2.2.1.0\lib\NET20\Yahoo.Yui.Compressor.Build.MsBuild.dll" />
-  <UsingTask TaskName="ILMerge.MSBuild.Tasks.ILMerge" AssemblyFile="$(SolutionDir)\packages\ILMerge.MSBuild.Tasks.1.0.0.3\tools\ILMerge.MSBuild.Tasks.dll" />
+  <UsingTask TaskName="CssCompressorTask" AssemblyFile="$(SolutionDir)..\dependencies\YUICompressor\Yahoo.Yui.Compressor.Build.MsBuild.dll" />
+  <UsingTask TaskName="JavaScriptCompressorTask" AssemblyFile="$(SolutionDir)..\dependencies\YUICompressor\Yahoo.Yui.Compressor.Build.MsBuild.dll" />
   <Target Name="AfterBuild">
     <ItemGroup>
       <CssFiles Include="..\Servant.Web\Css\base.css" />
