@@ -2,9 +2,39 @@
 @{
     Layout = "Sites/_Details.cshtml";
     ViewBag.ActiveSubmenuItem = "applications";
-}   
+}
+
+
 <form action="/sites/@Model.Site.IisId/applications/" method="POST">
-    <table class="pushdown-short" id="entries">
+    <table class="pushdown-short @(!Model.Site.HasApplications() ? "hide" : "")" id="entries">
+        <tbody class="hide">
+            <tr class="input-group">
+                <td><label for="Path">Name (path)</label></td>
+                <td><input type="text" name="path" value="" style="width: 100%;" /></td>
+                <td rowspan="3" style="width: 30px; text-align: center; padding-top: 15px; vertical-align: top;"><img src="/Images/icon-delete.png" class="remove-entry pointer hide" /></td>
+            </tr>
+            <tr class="input-group">
+                <td><label>Application pool</label></td>
+                <td>
+                    <select name="applicationpool" id="applicationpool" style="width: 100%">
+                        @foreach (var appPool in Model.ApplicationPools)
+                        {
+                            if(appPool == Model.Site.ApplicationPool)
+                            {
+                                <option selected="selected">@appPool</option>
+                            } else {
+                                <option>@appPool</option>
+                            }
+                
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr class="last input-group">
+                <td><label>Disk path</label></td>
+                <td><input type="text" name="diskpath" value="" style="width: 100%;" /></td>
+            </tr>
+        </tbody>
         @foreach(var application in Model.Site.Applications)
         {
             <tbody>
@@ -44,3 +74,12 @@
         <input type="submit" class="btn btn-primary" value="Save applications" />
     </div>
 </form>
+
+
+@section javascript {
+    <script>
+        $("form").submit(function () {
+            $("#entries tbody:hidden").remove();
+        })
+    </script>
+}
