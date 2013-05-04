@@ -50,21 +50,30 @@
     
     $("#add-entry").click(function () {
         var table = $("#entries");
-        var newEntry = table.find("tbody:visible:last").clone();
+        var newEntry = table.find("tbody:first").clone();
+        newEntry.removeClass("hide");
 
         newEntry.find("td input")
             .val("")
             .removeClass("error");
+
+        newEntry.find(".remove-entry").removeClass("hide");
         
         newEntry.find("td span.help-block, td span.help-inline").remove();
         table.append(newEntry);
+        
         newEntry.find("td input").first().focus();
+        table.removeClass("hide");
         
         return false;
     });
 
     $("#entries").on("click", ".remove-entry", function() {
         $(this).parents("tbody").remove();
+        var table = $("#entries");
+        if(table.find("tbody:visible").length < 1) {
+            table.addClass("hide");
+        }
     });
 
     $("#bindings").on("click", "tr td img.remove-binding", function () {
@@ -103,7 +112,7 @@
                     var propertyName = error.PropertyName.substring(0, firstIndexChar);
                     var index = error.PropertyName.substring(firstIndexChar + 1, error.PropertyName.indexOf("]"));
                     console.log("Index: " + index);
-                    input = $($("input[name=" + propertyName + "]")[index]);
+                    input = $($("input[name=" + propertyName + "]:visible")[index]);
                     console.log(input);
                 } else {
                     input = $("input[name=" + error.PropertyName.toLowerCase() + "]");
