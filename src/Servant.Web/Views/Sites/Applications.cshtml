@@ -78,8 +78,18 @@
 
 @section javascript {
     <script>
-        $("form").submit(function () {
-            $("#entries tbody:hidden").remove();
-        })
+        $(function () {
+            $("form").submit(function () {
+                var $entries = $("#entries");
+                var count = $entries.find("tbody:visible").length;
+                console.log(count);
+                
+                if (count > 0) {
+                    $entries.find("tbody:hidden").remove();
+                } else {
+                    return false;
+                }
+            });
+        });
     </script>
 }
