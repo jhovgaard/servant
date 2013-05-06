@@ -99,48 +99,9 @@
             container.find("div.text").html(message);
             container.fadeIn();
         }
+
+        ParseErrors();
     });
-    
-    // Form validation parser
-    if(errors != null) {
-        for (var error in errors) {
-            error = errors[error];
-            if (!error.IsGlobal) { // property
-                var input;
-                var firstIndexChar = error.PropertyName.indexOf("[");
-                if (firstIndexChar > -1) {
-                    var propertyName = error.PropertyName.substring(0, firstIndexChar);
-                    var index = error.PropertyName.substring(firstIndexChar + 1, error.PropertyName.indexOf("]"));
-                    console.log("Index: " + index);
-                    input = $($("input[name=" + propertyName + "]:visible")[index]);
-                    console.log(input);
-                } else {
-                    input = $("input[name=" + error.PropertyName.toLowerCase() + "]");
-                }
-
-                var group = input.parents(".input-group");
-                group.addClass("error");
-
-                var helpSpan = group.find("span.help-inline, span.help-block");
-                if (!helpSpan.length) {
-                    var form = input.parents("form");
-                    if (form.hasClass("form-horizontal"))
-                        helpSpan = $('<span class="help-inline"/>');
-                    else
-                        helpSpan = $('<span class="help-block"/>');
-                    
-                    if(input.attr("type") == "checkbox") {
-                        var label = input.parents("label");
-                        label.after(helpSpan);
-                    } else {
-                        input.after(helpSpan);
-                    }
-                }
-                helpSpan.text(error.Message);
-                helpSpan.show();
-            }
-        }
-    }
     
     // Activate search by press "/"
     $("body").keypress(function (e) {
@@ -264,5 +225,58 @@
 function ShowMessage(type, message) {
     $popupMessage.removeClass().addClass(type).find("span").text(message);
     $popupMessage.delay(200).slideDown();
+}
+
+
+function ParseErrors(errors) {
+    if (errors == null)
+        errors = Errors;
+    else {
+        errors = $.parseJSON(errors);
+    }
+
+    if (errors != null) {
+        ResetErrors();
+        for (var error in errors) {
+            error = errors[error];
+            if (!error.IsGlobal) { // property
+                var input;
+                var firstIndexChar = error.PropertyName.indexOf("[");
+                if (firstIndexChar > -1) {
+                    var propertyName = error.PropertyName.substring(0, firstIndexChar);
+                    var index = error.PropertyName.substring(firstIndexChar + 1, error.PropertyName.indexOf("]"));
+                    input = $($("input[name=" + propertyName + "]:visible")[index]);
+                } else {
+                    input = $("input[name=" + error.PropertyName.toLowerCase() + "]");
+                }
+
+                var group = input.parents(".input-group");
+                group.addClass("error");
+
+                var helpSpan = group.find("span.help-inline, span.help-block");
+                if (!helpSpan.length) {
+                    var form = input.parents("form");
+                    if (form.hasClass("form-horizontal"))
+                        helpSpan = $('<span class="help-inline"/>');
+                    else
+                        helpSpan = $('<span class="help-block"/>');
+
+                    if (input.attr("type") == "checkbox") {
+                        var label = input.parents("label");
+                        label.after(helpSpan);
+                    } else {
+                        input.after(helpSpan);
+                    }
+                }
+                helpSpan.text(error.Message);
+                helpSpan.show();
+            }
+        }
+    }
+}
+
+function ResetErrors() {
+    $(".error").removeClass("error");
+    $("span.help-block, span.help-inline").remove();
 }
 
