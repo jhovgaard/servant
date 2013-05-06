@@ -53,6 +53,7 @@ namespace Servant.Web.Modules
                 bool IsDevelopment;
                 bool.TryParse(System.Configuration.ConfigurationManager.AppSettings["IsDevelopment"], out IsDevelopment);
                 Model.IsDevelopment = IsDevelopment;
+                Model.AutoSendCrashReport = Configuration.AutoSendCrashReport;
 
                 return null;
             };
