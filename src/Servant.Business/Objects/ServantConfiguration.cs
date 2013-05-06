@@ -13,6 +13,7 @@ namespace Servant.Business.Objects
         public bool SetupCompleted { get; set; }
         public bool EnableErrorMonitoring { get; set; }
         public bool AutoSendCrashReport { get; set; }
+        public bool HaveSeenNewsletter { get; set; }
 
         public ServantConfiguration()
         {

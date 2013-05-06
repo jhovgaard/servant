@@ -46,7 +46,7 @@
                 </li>
                 <li class="settings"><a href="/settings/">Settings</a></li>
             </ul>
-            <p id="copyright">Servant for IIS 1.1 - Free Edition<br/> &copy; Copyright 2013 - 8seven</p>
+            <p id="copyright">Servant for IIS @Model.Version - Free Edition<br/> &copy; Copyright 2013 - 8seven</p>
         </div>
         <div id="maincontent">
             <div id="content-minwidth">
@@ -55,7 +55,7 @@
         </div>
         
         <script type="text/javascript">
-            var errors = @Html.Raw(Model.ErrorsAsJson);
+            var Errors = @Html.Raw(Model.ErrorsAsJson);
             var message = "@Html.Raw(Model.Message)";
         </script>
     

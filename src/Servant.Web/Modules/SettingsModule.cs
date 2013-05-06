@@ -45,9 +45,9 @@ namespace Servant.Web.Modules
 
                     formSettings.SetupCompleted = true;
                     formSettings.EnableErrorMonitoring = configuration.EnableErrorMonitoring;
-
+                    formSettings.HaveSeenNewsletter = configuration.HaveSeenNewsletter;
                     Helpers.ConfigurationHelper.UpdateConfiguration(formSettings);
-                    AddMessage("Settings have been saved.");
+                    AddMessage("Settings have been saved.", MessageType.Success);
 
                     if(bindingIsChanged)
                     {
