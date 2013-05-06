@@ -6,12 +6,26 @@
 
 <h1 class="pushdown-medium">Welcome to <strong>Servant for IIS</strong></h1>
 
-<p class="pushdown-long indent">
+<div class="pushdown-medium indent">
     Hi Administrator!<br/>
     <br/>
     We’re happy to help you manage your IIS. If you have any questions feel free to contact the team at <a href="mailto:hello@servant.io">hello@servant.io</a>.<br/>
     Found a bug or have a suggestion? Click <a href="javascript:UserVoice.showPopupWidget();">the feedback button</a> in the right side of the screen and let us know!
-</p>
+    <br/><br/>
+    <strong>Want to know about new features?</strong><br/>
+    We're constantly working on new features for Servant. To be able to reach you when a new version gets released, simply type in your infos below and we will email you - no spam, we promise!
+    
+    <form action="/subscribetonewsletter" method="POST" id="subscribeform" class="pushup-medium">
+        <div class="input-group">
+            <input type="text" name="email" style="width: 200px; padding: 8px 8px 7px; margin-bottom: 2px;" />
+            <input type="text" name="firstname" style="width: 200px; padding: 8px 8px 7px;" />
+            <input type="text" name="lastname" style="width: 200px; padding: 8px 8px 7px;" />
+            <input type="submit" value="Subscribe" class="btn-submit" />
+        </div>
+    </form>
+</div>
+
+
 <h2 class="bug">Latest unhandled exceptions</h2>
 @if(Model.UnhandledExceptions.Count != 0)
 {
@@ -49,4 +63,29 @@
 } else
 {
     <p class="pushup-medium indent">Awesome! Not a single error was found.</p>
+}
+
+@section javascript {
+    <script>
+        $(function() {
+            var form = $("#subscribeform");
+            form.find("input[name=firstname]").watermark("First name");
+            form.find("input[name=lastname]").watermark("Last name");
+            form.find("input[name=email]").watermark("Email");
+
+            $(form).submit(function () {
+                var url = $(this).attr("action");
+                var data = $(this).serialize();
+                $.post(url, data, function (response) {
+                    if (response == "true") {
+                        ShowMessage("success", "Thanks for signing up! Please see your inbox for confirmation.");
+                    } else {
+                        ShowMessage("error", response);
+                    }
+                });
+
+                return false;
+            });
+        });
+    </script>
 }
