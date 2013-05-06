@@ -172,23 +172,25 @@ namespace Servant.Web.Modules
                 ModelIncluders.IncludeApplicationPools(ref Model);
                 Site site = _siteManager.GetSiteById(p.Id);
 
-                string[] paths = Request.Form.Path.ToString().Split(',');
+                string[] paths = Request.Form.Path != null ? Request.Form.Path.ToString().Split(',') : null;
                 string[] applicationPools = Request.Form.ApplicationPool.ToString().Split(',');
                 string[] diskPaths = Request.Form.DiskPath.ToString().Split(',');
 
                 site.Applications.Clear();
-                for (int i = 0; i < paths.Length; i++)
-                {
+                
+                if(paths != null) {
+                    for (int i = 0; i < paths.Length; i++)
+                    {
                     
-                    site.Applications.Add(new SiteApplication
-                        {
-                            ApplicationPool = applicationPools[i],
-                            DiskPath = diskPaths[i],
-                            Path = paths[i]
-                        });
+                        site.Applications.Add(new SiteApplication
+                            {
+                                ApplicationPool = applicationPools[i],
+                                DiskPath = diskPaths[i],
+                                Path = paths[i]
+                            });
+                    }
+                    ValidateSiteApplications(site);
                 }
-
-                ValidateSiteApplications(site);
 
                 if(!HasErrors)
                 {

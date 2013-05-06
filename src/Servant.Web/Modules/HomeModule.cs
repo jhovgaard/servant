@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Servant.Business.Objects;
 using Servant.Web.Helpers;
 
 namespace Servant.Web.Modules
@@ -10,11 +11,12 @@ namespace Servant.Web.Modules
         public HomeModule()
         {
             Get["/"] = p => {
+                var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+
                 var latestErrors = EventLogHelper.GetByDateTimeDescending(5).ToList();
                 latestErrors = EventLogHelper.AttachSite(latestErrors);
                 Model.UnhandledExceptions = latestErrors;
-                var result = Helpers.MailchimpHelper.Subscribe("jjj@jhovgaard.dk", "Jonas", "Hovgaard");
-
+                Model.HaveSeenNewsletter = configuration.HaveSeenNewsletter;
                 return View["Index", Model];
             };
 
@@ -32,12 +34,20 @@ namespace Servant.Web.Modules
                     AddPropertyError("email", "Looks like the email is not valid.");
                 }
 
+                var result = MailchimpHelper.Subscribe(email, firstname, lastname);
+                if(result.ToString().Contains("\"code\":502"))
+                    AddPropertyError("email", "Looks like the email is not valid.");
+
                 if (HasErrors)
                 {
-                    new Nancy.Json.JavaScriptSerializer().Serialize(Model.Errors);
+                    return new Nancy.Json.JavaScriptSerializer().Serialize(Model.Errors);
                 }
 
-                return Helpers.MailchimpHelper.Subscribe(email, firstname, lastname);
+                var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+                configuration.HaveSeenNewsletter = true;
+                Helpers.ConfigurationHelper.UpdateConfiguration(configuration);
+
+                return result;
             };
         }
     }

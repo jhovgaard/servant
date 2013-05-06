@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using Nancy.Security;
@@ -47,7 +48,8 @@ namespace Servant.Web.Modules
                     Servername = System.Environment.MachineName,
                     Sites = _siteManager.GetSites().OrderBy(x => x.Name)
                 };
-
+                var fileVersion = FileVersionInfo.GetVersionInfo(typeof (BaseModule).Assembly.Location).FileVersion.Split('.');
+                Model.Version = string.Join(".", fileVersion.Take(2));
                 Model.Page = Page;
                 Model.Errors = new List<Error>();
                 bool IsDevelopment;
