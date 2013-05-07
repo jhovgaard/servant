@@ -65,9 +65,7 @@ namespace Servant.Web.Helpers
 
         private Servant.Business.Objects.Site ParseSite(Microsoft.Web.Administration.Site site)
         {
-            var allowedProtocols = new[] { "http", "https" };
-
-            if (site == null  ||site.Bindings.Any(x => !allowedProtocols.Contains(x.Protocol)))
+            if (site == null)
                 return null;
 
             var applicationPoolState = _manager.ApplicationPools[site.Applications[0].ApplicationPoolName].State;
@@ -108,14 +106,19 @@ namespace Servant.Web.Helpers
             {
                 var servantBinding = new Binding();
 
-                if (binding.Protocol == "https" && binding.CertificateHash != null)
+                if (binding.Protocol == "https")
                 {
+                    if(binding.CertificateHash == null)
+                        continue;
+
                     var certificate = certificates.SingleOrDefault(cert => cert.GetCertHash().SequenceEqual(binding.CertificateHash));
                     if (certificate != null)
                     {
                         servantBinding.CertificateName = certificate.FriendlyName;
-                        servantBinding.CertificateHash = binding.CertificateHash;    
+                        servantBinding.CertificateHash = binding.CertificateHash;
                     }
+                    else
+                        continue;
                 }
                 servantBinding.Protocol = (Protocol) Enum.Parse(typeof(Protocol), binding.Protocol);
                 servantBinding.Hostname = binding.Host;

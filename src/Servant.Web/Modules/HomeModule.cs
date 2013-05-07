@@ -34,21 +34,39 @@ namespace Servant.Web.Modules
                     AddPropertyError("email", "Looks like the email is not valid.");
                 }
 
-                var result = MailchimpHelper.Subscribe(email, firstname, lastname);
-                if(result.ToString().Contains("\"code\":502"))
-                    AddPropertyError("email", "Looks like the email is not valid.");
-
                 if (HasErrors)
                 {
                     return new Nancy.Json.JavaScriptSerializer().Serialize(Model.Errors);
                 }
 
+                var serializer = new Nancy.Json.JavaScriptSerializer();
+                var response = MailchimpHelper.Subscribe(email, firstname, lastname);
+
+                if (response != "true")
+                {
+                    MailchimpResponse result = serializer.Deserialize<MailchimpResponse>(response);
+
+                    if (result.Code == 502)
+                    {
+                        AddPropertyError("email", "Looks like the email is not valid.");
+                        return serializer.Serialize(Model.Errors);
+                    }
+                    
+                    return result.Error;
+                }
+
                 var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
-                configuration.HaveSeenNewsletter = true;
+                configuration.HaveSeenNewsletter = false;
                 Helpers.ConfigurationHelper.UpdateConfiguration(configuration);
 
-                return result;
+                return response;
             };
+        }
+
+        public class MailchimpResponse
+        {
+            public int Code { get; set; }
+            public string Error { get; set; }
         }
     }
 }
