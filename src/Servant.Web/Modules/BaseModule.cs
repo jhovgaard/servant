@@ -52,6 +52,7 @@ namespace Servant.Web.Modules
                 Model.Version = string.Join(".", fileVersion.Take(2));
                 Model.Page = Page;
                 Model.Errors = new List<Error>();
+                Model.InstallationGuid = Configuration.InstallationGuid;
                 bool IsDevelopment;
                 bool.TryParse(System.Configuration.ConfigurationManager.AppSettings["IsDevelopment"], out IsDevelopment);
                 Model.IsDevelopment = IsDevelopment;
