@@ -93,7 +93,7 @@ namespace Servant.Web.Modules
                     try
                     {
                         _siteManager.UpdateSite(site);
-                        AddMessage("Settings have been saved.");
+                        AddMessage("Settings have been saved.", MessageType.Success);
                     }
                     catch (System.ArgumentException ex)
                     {

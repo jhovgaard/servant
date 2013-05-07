@@ -2,12 +2,10 @@
 using Nancy;
 using Nancy.Helpers;
 using Nancy.ModelBinding;
-using Nancy.Security;
 using Nancy.Validation;
 using Servant.Business;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
-using Servant.Web.Infrastructure;
 
 namespace Servant.Web.Modules
 {

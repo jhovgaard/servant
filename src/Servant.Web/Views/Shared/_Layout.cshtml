@@ -83,7 +83,9 @@
                     'cookieDomain': 'none',
                 });
                 ga('set', 'anonymizeIp', true);
+                ga('set', 'dimension1', '@Model.InstallationGuid');
                 ga('send', 'pageview');
+                
             </script>
         }
         <script>
