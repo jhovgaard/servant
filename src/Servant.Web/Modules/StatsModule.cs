@@ -9,14 +9,12 @@ namespace Servant.Web.Modules
         public StatsModule() : base("/stats/")
         {
             Get["/"] = p => {
-                var siteManager = new SiteManager();
-                
                 var serverStats = new Business.Objects.Reporting.ServerStats();
                 
                 //serverStats.TotalRequests = logEntryService.GetTotalCount();
                 serverStats.DataRecieved = "Not available";
                 serverStats.DataSent = "Not available";
-                serverStats.TotalSites = siteManager.GetSites().Count();
+                serverStats.TotalSites = SiteManager.GetSites().Count();
 
 
                 //serverStats.AverageResponeTime = (int)logEntryService.GetAverageResponseTime();

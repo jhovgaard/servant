@@ -26,11 +26,9 @@ namespace Servant.Web.Tests
         [TestFixtureTearDown]
         public void Cleanup()
         {
-            var siteManager = new SiteManager();
-            siteManager = new Servant.Web.Helpers.SiteManager();
-            var site = siteManager.GetSiteByName(_testSite.Name);
+            var site = SiteManager.GetSiteByName(_testSite.Name);
             if(site != null)
-                siteManager.DeleteSite(site.IisId);
+                SiteManager.DeleteSite(site.IisId);
         }
 
         [Test]
@@ -191,14 +189,12 @@ namespace Servant.Web.Tests
 
         private Site GetTestSiteFromIis()
         {
-            var siteManager = new SiteManager(); // Refreshes SiteManager due to Can_Create_Site test
-
-            var testSite = siteManager.GetSiteByName(_testSite.Name);
+            var testSite = SiteManager.GetSiteByName(_testSite.Name);
 
             if (testSite == null)
-                siteManager.CreateSite(_testSite);
+                SiteManager.CreateSite(_testSite);
 
-            testSite = siteManager.GetSiteByName(_testSite.Name);
+            testSite = SiteManager.GetSiteByName(_testSite.Name);
 
             return testSite;
         }

@@ -15,60 +15,73 @@ using Site = Servant.Business.Objects.Site;
 
 namespace Servant.Web.Helpers
 {
-    public class SiteManager : IDisposable
+    public static class SiteManager
     {
-        private readonly Microsoft.Web.Administration.ServerManager _manager;
-
-        public SiteManager()
+        static SiteManager()
         {
-            _manager = new Microsoft.Web.Administration.ServerManager();
-            try
+            using (var manager = new ServerManager())
             {
-                var testForIis = _manager.Sites.FirstOrDefault();
-                var testForIisExpress = _manager.WorkerProcesses.FirstOrDefault();
-            }
-            catch (COMException)
-            {
-                throw new Exception("Looks like IIS is not installed.");
-            }
+                try
+                {
+                    var testForIis = manager.Sites.FirstOrDefault();
+                    var testForIisExpress = manager.WorkerProcesses.FirstOrDefault();
+                }
+                catch (COMException)
+                {
+                    throw new Exception("Looks like IIS is not installed.");
+                }
 
-            catch (NotImplementedException)
-            {
-                throw new Exception("Servant doesn't support IIS Express.");
+                catch (NotImplementedException)
+                {
+                    throw new Exception("Servant doesn't support IIS Express.");
+                }
             }
 
         }
 
-        public IEnumerable<Site> GetSites()
+        public static IEnumerable<Site> GetSites()
         {
-            foreach (var site in _manager.Sites)
+            using (var manager = new ServerManager())
             {
-                var parsedSite = ParseSite(site);
-                if(parsedSite != null)
-                    yield return parsedSite;
+                foreach (var site in manager.Sites)
+                {
+                    var parsedSite = ParseSite(site);
+                    if (parsedSite != null)
+                        yield return parsedSite;
+                }    
             }
         }
 
-        public Microsoft.Web.Administration.Site GetIisSiteById(int iisId)
+        public static Microsoft.Web.Administration.Site GetIisSiteById(int iisId)
         {
-            return _manager.Sites.SingleOrDefault(x => x.Id == iisId);
+            using (var manager = new ServerManager())
+            {
+                return manager.Sites.SingleOrDefault(x => x.Id == iisId);
+            }
         }
 
-        public Servant.Business.Objects.Site GetSiteById(int iisId) 
+        public static Servant.Business.Objects.Site GetSiteById(int iisId) 
         {
-            var iisSite = _manager.Sites.SingleOrDefault(x => x.Id == iisId);
-            
-            return iisSite == null
-                ? null
-                : ParseSite(iisSite);
+            using (var manager = new ServerManager())
+            {
+                var iisSite = manager.Sites.SingleOrDefault(x => x.Id == iisId);
+
+                return iisSite == null
+                    ? null
+                    : ParseSite(iisSite);    
+            }
         }
 
-        private Servant.Business.Objects.Site ParseSite(Microsoft.Web.Administration.Site site)
+        private static Servant.Business.Objects.Site ParseSite(Microsoft.Web.Administration.Site site)
         {
             if (site == null)
                 return null;
 
-            var applicationPoolState = _manager.ApplicationPools[site.Applications[0].ApplicationPoolName].State;
+            ObjectState applicationPoolState;
+            using (var manager = new ServerManager())
+            {
+                applicationPoolState = manager.ApplicationPools[site.Applications[0].ApplicationPoolName].State;    
+            }
 
             var servantSite = new Site {
                     IisId = (int)site.Id,
@@ -97,7 +110,7 @@ namespace Servant.Web.Helpers
             return servantSite;
         }
 
-        private IEnumerable<Binding> GetBindings(Microsoft.Web.Administration.Site iisSite)
+        private static IEnumerable<Binding> GetBindings(Microsoft.Web.Administration.Site iisSite)
         {
             var allowedProtocols = new[] { "http", "https" };
             var certificates = GetCertificates();
@@ -153,86 +166,98 @@ namespace Servant.Web.Helpers
             return bindingsToAdd.Distinct();
         }
 
-        public void UpdateSite(Servant.Business.Objects.Site site)
+        public static void UpdateSite(Servant.Business.Objects.Site site)
         {
-            var iisSite = _manager.Sites.SingleOrDefault(x => x.Id == site.IisId);
-            var mainApplication = iisSite.Applications.First();
-
-            mainApplication.VirtualDirectories[0].PhysicalPath = site.SitePath;
-            iisSite.Name = site.Name;
-            mainApplication.ApplicationPoolName = site.ApplicationPool;
-
-            // Commits bindings
-            iisSite.Bindings.Clear();
-            foreach (var binding in site.Bindings)
+            using (var manager = new ServerManager())
             {
-                if (binding.Protocol == Protocol.https)
-                    iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.CertificateHash, "My");
-                else
-                    iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.Protocol.ToString());
-            }
+                var iisSite = manager.Sites.SingleOrDefault(x => x.Id == site.IisId);
+                var mainApplication = iisSite.Applications.First();
 
-            //Intelligently updates virtual applications
-            foreach (var application in site.Applications)
-            {
-                var iisApp = iisSite.Applications.SingleOrDefault(x => x.Path == application.Path);
+                mainApplication.VirtualDirectories[0].PhysicalPath = site.SitePath;
+                iisSite.Name = site.Name;
+                mainApplication.ApplicationPoolName = site.ApplicationPool;
 
-                if (iisApp == null)
+                // Commits bindings
+                iisSite.Bindings.Clear();
+                foreach (var binding in site.Bindings)
                 {
-                    if (!application.Path.StartsWith("/"))
-                        application.Path = "/" + application.Path;
-
-                    iisSite.Applications.Add(application.Path, application.DiskPath);
-                    iisApp = iisSite.Applications.Single(x => x.Path == application.Path);
-
+                    if (binding.Protocol == Protocol.https)
+                        iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.CertificateHash, "My");
+                    else
+                        iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.Protocol.ToString());
                 }
 
-                iisApp.VirtualDirectories[0].PhysicalPath = application.DiskPath;
-                iisApp.ApplicationPoolName = application.ApplicationPool;
-            }
+                //Intelligently updates virtual applications
+                foreach (var application in site.Applications)
+                {
+                    var iisApp = iisSite.Applications.SingleOrDefault(x => x.Path == application.Path);
 
-            var applicationsToDelete = iisSite.Applications.Skip(1).Where(x => !site.Applications.Select(a => a.Path).Contains(x.Path));
-            foreach (var application in applicationsToDelete)
-            {
-                application.Delete();
-            }
+                    if (iisApp == null)
+                    {
+                        if (!application.Path.StartsWith("/"))
+                            application.Path = "/" + application.Path;
+
+                        iisSite.Applications.Add(application.Path, application.DiskPath);
+                        iisApp = iisSite.Applications.Single(x => x.Path == application.Path);
+
+                    }
+
+                    iisApp.VirtualDirectories[0].PhysicalPath = application.DiskPath;
+                    iisApp.ApplicationPoolName = application.ApplicationPool;
+                }
+
+                var applicationsToDelete = iisSite.Applications.Skip(1).Where(x => !site.Applications.Select(a => a.Path).Contains(x.Path));
+                foreach (var application in applicationsToDelete)
+                {
+                    application.Delete();
+                }
                 
-            _manager.CommitChanges();
-        }
-
-        public string[] GetApplicationPools()
-        {
-            return _manager.ApplicationPools.Select(x => x.Name).OrderBy(x => x).ToArray();
-        }
-
-        public Servant.Business.Objects.Enums.SiteStartResult StartSite(Servant.Business.Objects.Site site)
-        {
-            var iisSite = _manager.Sites.SingleOrDefault(x => x.Id == site.IisId);
-            if (iisSite == null)
-                throw new SiteNotFoundException("Site " + site.Name + " was not found on IIS");
-
-            try
-            {
-                iisSite.Start();
-                return SiteStartResult.Started;
-            }
-            catch (Microsoft.Web.Administration.ServerManagerException)
-            {
-                return SiteStartResult.BindingIsAlreadyInUse;
-            }
-            catch (FileLoadException)
-            {
-                return SiteStartResult.CannotAccessSitePath;
+                manager.CommitChanges();
             }
         }
 
-        public void StopSite(Servant.Business.Objects.Site site)
+        public static string[] GetApplicationPools()
         {
-            var iisSite = _manager.Sites.SingleOrDefault(x => x.Id == site.IisId);
-            if (iisSite == null)
-                throw new SiteNotFoundException("Site " + site.Name + " was not found on IIS");
+            using (var manager = new ServerManager())
+            {
+                return manager.ApplicationPools.Select(x => x.Name).OrderBy(x => x).ToArray();    
+            }
+        }
 
-            iisSite.Stop();
+        public static Servant.Business.Objects.Enums.SiteStartResult StartSite(Servant.Business.Objects.Site site)
+        {
+            using (var manager = new ServerManager())
+            {
+                var iisSite = manager.Sites.SingleOrDefault(x => x.Id == site.IisId);
+                if (iisSite == null)
+                    throw new SiteNotFoundException("Site " + site.Name + " was not found on IIS");
+
+                try
+                {
+                    iisSite.Start();
+                    return SiteStartResult.Started;
+                }
+                catch (Microsoft.Web.Administration.ServerManagerException)
+                {
+                    return SiteStartResult.BindingIsAlreadyInUse;
+                }
+                catch (FileLoadException)
+                {
+                    return SiteStartResult.CannotAccessSitePath;
+                }
+            }
+        }
+
+        public static void StopSite(Servant.Business.Objects.Site site)
+        {
+            using (var manager = new ServerManager())
+            {
+                var iisSite = manager.Sites.SingleOrDefault(x => x.Id == site.IisId);
+                if (iisSite == null)
+                    throw new SiteNotFoundException("Site " + site.Name + " was not found on IIS");
+
+                iisSite.Stop();    
+            }
         }
 
         public class SiteNotFoundException : Exception
@@ -240,30 +265,33 @@ namespace Servant.Web.Helpers
             public SiteNotFoundException(string message) : base(message) {}
         }
 
-        public Site GetSiteByName(string name)
+        public static Site GetSiteByName(string name)
         {
-            return ParseSite(_manager.Sites.SingleOrDefault(x => x.Name == name));
+            using (var manager = new ServerManager())
+            {
+                return ParseSite(manager.Sites.SingleOrDefault(x => x.Name == name));    
+            }
         }
 
-        public bool IsBindingInUse(string rawBinding, string ipAddress, int iisSiteId = 0)
+        public static bool IsBindingInUse(string rawBinding, string ipAddress, int iisSiteId = 0)
         {
             var binding = BindingHelper.ConvertToBinding(BindingHelper.FinializeBinding(rawBinding), ipAddress);
             return IsBindingInUse(binding, iisSiteId);
         }
 
-        public bool IsBindingInUse(Binding binding, int iisSiteId = 0)
+        public static bool IsBindingInUse(Binding binding, int iisSiteId = 0)
         {
             var bindingInformations = ConvertBindingsToBindingInformations(new[] {binding});
             return GetBindingInUse(iisSiteId, bindingInformations) != null;
         }
 
-        public Business.Objects.CreateSiteResult CreateSite(Site site)
+        public static Business.Objects.CreateSiteResult CreateSite(Site site)
         {
             var result = new Business.Objects.CreateSiteResult();
-            
 
-            var bindingInformations = site.Bindings.Select(x=> x.ToIisBindingInformation()).ToList();
-                
+
+            var bindingInformations = site.Bindings.Select(x => x.ToIisBindingInformation()).ToList();
+
             // Check bindings
             var bindingInUse = GetBindingInUse(0, bindingInformations); // 0 never exists
             if (bindingInUse != null)
@@ -272,115 +300,122 @@ namespace Servant.Web.Helpers
                 return result;
             }
 
-            // Create site
-            _manager.Sites.Add(site.Name, "http", bindingInformations.First(), site.SitePath);
-            var iisSite = _manager.Sites.SingleOrDefault(x => x.Name == site.Name);
-
-            // Add bindings
-            iisSite.Bindings.Clear();
-            foreach (var binding in bindingInformations)
-                iisSite.Bindings.Add(binding, "http");
-
-            // Set/create application pool
-            if (string.IsNullOrWhiteSpace(site.ApplicationPool)) // Auto create application pool
+            using (var manager = new ServerManager())
             {
-                var appPoolName = site.Name;
-                var existingApplicationPoolNames = _manager.ApplicationPools.Select(x => x.Name).ToList();
-                var newNameCount = 1;
+                // Create site
+                manager.Sites.Add(site.Name, "http", bindingInformations.First(), site.SitePath);
+                var iisSite = manager.Sites.SingleOrDefault(x => x.Name == site.Name);
 
-                while(existingApplicationPoolNames.Contains(appPoolName))
+                // Add bindings
+                iisSite.Bindings.Clear();
+                foreach (var binding in bindingInformations)
+                    iisSite.Bindings.Add(binding, "http");
+
+                // Set/create application pool
+                if (string.IsNullOrWhiteSpace(site.ApplicationPool)) // Auto create application pool
                 {
-                    appPoolName = site.Name + "_" + newNameCount;
-                    newNameCount++;
+                    var appPoolName = site.Name;
+                    var existingApplicationPoolNames = manager.ApplicationPools.Select(x => x.Name).ToList();
+                    var newNameCount = 1;
+
+                    while (existingApplicationPoolNames.Contains(appPoolName))
+                    {
+                        appPoolName = site.Name + "_" + newNameCount;
+                        newNameCount++;
+                    }
+
+                    manager.ApplicationPools.Add(appPoolName);
+                    iisSite.ApplicationDefaults.ApplicationPoolName = appPoolName;
+                }
+                else
+                {
+                    iisSite.ApplicationDefaults.ApplicationPoolName = site.ApplicationPool;
                 }
 
-                _manager.ApplicationPools.Add(appPoolName);
-                iisSite.ApplicationDefaults.ApplicationPoolName = appPoolName;
-            }
-            else
-            {
-                iisSite.ApplicationDefaults.ApplicationPoolName = site.ApplicationPool;
-            }
+                manager.CommitChanges();
 
-            _manager.CommitChanges();
-
-            var created = false;
-            var sw = new Stopwatch();
-            sw.Start();
-            while (!created || sw.Elapsed.TotalSeconds >= 3)
-            {
-                try
+                var created = false;
+                var sw = new Stopwatch();
+                sw.Start();
+                while (!created || sw.Elapsed.TotalSeconds >= 3)
                 {
-                    if (iisSite.State == ObjectState.Started)
-                        created = true;
-                }
-                catch (COMException)
-                {
-                    System.Threading.Thread.Sleep(100);
-                }
-                
-            }
-            sw.Stop();
+                    try
+                    {
+                        if (iisSite.State == ObjectState.Started)
+                            created = true;
+                    }
+                    catch (COMException)
+                    {
+                        System.Threading.Thread.Sleep(100);
+                    }
 
-            if (created)
-            {
-                result.Result = CreateSiteResult.Success;
-                result.IisSiteId = (int) iisSite.Id;
+                }
+                sw.Stop();
+
+                if (created)
+                {
+                    result.Result = CreateSiteResult.Success;
+                    result.IisSiteId = (int) iisSite.Id;
+                }
+                else
+                {
+                    result.Result = CreateSiteResult.Failed;
+                }
+
+                return result;
             }
-            else
-            {
-                result.Result = CreateSiteResult.Failed;
-            }
-            
-            return result;
         }
 
-        private string GetBindingInUse(int iisId, IEnumerable<string> bindingInformations)
+        private static string GetBindingInUse(int iisId, IEnumerable<string> bindingInformations)
         {
-            var sites = _manager.Sites.Where(x => x.Id != iisId);
-            foreach (var iisSite in sites)
-                foreach (var binding in iisSite.Bindings)
-                    if (bindingInformations.Contains(binding.BindingInformation))
-                        return binding.BindingInformation;
+            using (var manager = new ServerManager())
+            {
+                var sites = manager.Sites.Where(x => x.Id != iisId);
+                foreach (var iisSite in sites)
+                    foreach (var binding in iisSite.Bindings)
+                        if (bindingInformations.Contains(binding.BindingInformation))
+                            return binding.BindingInformation;
 
-            return null;
+                return null;    
+            }
         }
 
-        public void Dispose()
-        {
-            _manager.Dispose();
-        }
-
-        public void RestartSite(int iisSiteId)
+        public static void RestartSite(int iisSiteId)
         {
             var site = GetSiteById(iisSiteId);
             StopSite(site);
             StartSite(site);
         }
 
-        public void RecycleApplicationPoolBySite(int iisSiteId)
+        public static void RecycleApplicationPoolBySite(int iisSiteId)
         {
             var site = GetIisSiteById(iisSiteId);
-            _manager.ApplicationPools[site.Applications[0].ApplicationPoolName].Recycle();
+            using (var manager = new ServerManager())
+            {
+                manager.ApplicationPools[site.Applications[0].ApplicationPoolName].Recycle();    
+            }
         }
 
-        public void DeleteSite(int iisId)
+        public static void DeleteSite(int iisId)
         {
-            var siteToDelete = GetIisSiteById(iisId);
-            var applicationPoolname = siteToDelete.Applications[0].ApplicationPoolName;
+            using (var manager = new ServerManager())
+            {
+                var siteToDelete = manager.Sites.SingleOrDefault(x => x.Id == iisId);
+                var applicationPoolname = siteToDelete.Applications[0].ApplicationPoolName;
 
-            var sitesWithApplicationPoolname =
-                from site in _manager.Sites
-                let application = site.Applications[0]
-                where application.ApplicationPoolName == applicationPoolname
-                select site;
+                var sitesWithApplicationPoolname =
+                    from site in manager.Sites
+                    let application = site.Applications[0]
+                    where application.ApplicationPoolName == applicationPoolname
+                    select site;
 
-            siteToDelete.Delete();
-        
-            if (sitesWithApplicationPoolname.Count() == 1)
-                _manager.ApplicationPools[applicationPoolname].Delete();
+                siteToDelete.Delete();
 
-            _manager.CommitChanges();
+                if (sitesWithApplicationPoolname.Count() == 1)
+                    manager.ApplicationPools[applicationPoolname].Delete();
+
+                manager.CommitChanges();
+            }
 
             System.Threading.Thread.Sleep(500);
         }
