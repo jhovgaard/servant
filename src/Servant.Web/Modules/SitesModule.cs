@@ -15,8 +15,6 @@ namespace Servant.Web.Modules
 {
     public class SitesModule : BaseModule
     {
-        readonly SiteManager _siteManager = new SiteManager();
-
         public SitesModule() : base("/sites/")
         {           
             Get["/create/"] = p => {
@@ -24,7 +22,7 @@ namespace Servant.Web.Modules
                 
                 var site = new Site();
                 Model.Site = site;
-                Model.ApplicationPools = _siteManager.GetApplicationPools();
+                Model.ApplicationPools = SiteManager.GetApplicationPools();
                 return View["Create", Model];
             };
             
@@ -39,7 +37,7 @@ namespace Servant.Web.Modules
 
                 if(!HasErrors)
                 {
-                    var result = _siteManager.CreateSite(site);
+                    var result = SiteManager.CreateSite(site);
 
                     switch (result.Result)
                     {
@@ -67,10 +65,10 @@ namespace Servant.Web.Modules
                 ModelIncluders.IncludeCertificates(ref Model);
                 ModelIncluders.IncludeApplicationPools(ref Model);
 
-                Site site = _siteManager.GetSiteById(p.Id);
+                Site site = SiteManager.GetSiteById(p.Id);
 
                 Model.Site = site;
-                Model.ApplicationPools = _siteManager.GetApplicationPools();
+                Model.ApplicationPools = SiteManager.GetApplicationPools();
                 return View["Settings", Model];
             };
 
@@ -79,7 +77,7 @@ namespace Servant.Web.Modules
                 ModelIncluders.IncludeCertificates(ref Model);
                 ModelIncluders.IncludeApplicationPools(ref Model);
 
-                Site site = _siteManager.GetSiteById(p.Id);
+                Site site = SiteManager.GetSiteById(p.Id);
                 site.Name = Request.Form.Name;
                 site.SitePath = Request.Form.SitePath;
                 site.ApplicationPool = Request.Form.ApplicationPool;
@@ -92,7 +90,7 @@ namespace Servant.Web.Modules
                 {
                     try
                     {
-                        _siteManager.UpdateSite(site);
+                        SiteManager.UpdateSite(site);
                         AddMessage("Settings have been saved.", MessageType.Success);
                     }
                     catch (System.ArgumentException ex)
@@ -106,16 +104,16 @@ namespace Servant.Web.Modules
 
             Post[@"/(?<Id>[\d]{1,4})/stop/"] = p =>
             {
-                Site site = _siteManager.GetSiteById(p.Id);
-                _siteManager.StopSite(site);
+                Site site = SiteManager.GetSiteById(p.Id);
+                SiteManager.StopSite(site);
                 AddMessage("Site has been stopped.");
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
             Post[@"/(?<Id>[\d]{1,4})/start/"] = p =>
             {
-                Site site = _siteManager.GetSiteById(p.Id);
-                var result = _siteManager.StartSite(site);
+                Site site = SiteManager.GetSiteById(p.Id);
+                var result = SiteManager.StartSite(site);
 
                 switch (result)
                 {
@@ -135,24 +133,24 @@ namespace Servant.Web.Modules
 
             Post[@"/(?<Id>[\d]{1,4})/restart/"] = p =>
             {
-                Site site = _siteManager.GetSiteById(p.Id);
-                _siteManager.RestartSite(site.IisId);
+                Site site = SiteManager.GetSiteById(p.Id);
+                SiteManager.RestartSite(site.IisId);
                 AddMessage("Site has been restarted.");
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
             Post[@"/(?<Id>[\d]{1,4})/recycle/"] = p =>
             {
-                Site site = _siteManager.GetSiteById(p.Id);
-                _siteManager.RecycleApplicationPoolBySite(site.IisId);
+                Site site = SiteManager.GetSiteById(p.Id);
+                SiteManager.RecycleApplicationPoolBySite(site.IisId);
                 AddMessage("Application pool has been recycled.");
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
 
             Post[@"/(?<Id>[\d]{1,4})/delete/"] = p =>
             {
-                Site site = _siteManager.GetSiteById(p.Id);
-                _siteManager.DeleteSite(site.IisId);
+                Site site = SiteManager.GetSiteById(p.Id);
+                SiteManager.DeleteSite(site.IisId);
                 AddMessage("The site {0} was deleted.", site.Name);
                 return new RedirectResponse("/");
             };
@@ -160,17 +158,17 @@ namespace Servant.Web.Modules
             Get[@"/(?<Id>[\d]{1,4})/applications/"] = p =>
             {
                 ModelIncluders.IncludeApplicationPools(ref Model);
-                Site site = _siteManager.GetSiteById(p.Id);
+                Site site = SiteManager.GetSiteById(p.Id);
 
                 Model.Site = site;
-                Model.ApplicationPools = _siteManager.GetApplicationPools();
+                Model.ApplicationPools = SiteManager.GetApplicationPools();
                 return View["Applications", Model];
             };
 
             Post[@"/(?<Id>[\d]{1,4})/applications/"] = p =>
             {
                 ModelIncluders.IncludeApplicationPools(ref Model);
-                Site site = _siteManager.GetSiteById(p.Id);
+                Site site = SiteManager.GetSiteById(p.Id);
 
                 string[] paths = Request.Form.Path != null ? Request.Form.Path.ToString().Split(',') : null;
                 string[] applicationPools = Request.Form.ApplicationPool.ToString().Split(',');
@@ -194,12 +192,12 @@ namespace Servant.Web.Modules
 
                 if(!HasErrors)
                 {
-                    _siteManager.UpdateSite(site);
+                    SiteManager.UpdateSite(site);
                     AddMessage("Applications have been saved.", MessageType.Success);
                 }
 
                 Model.Site = site;
-                Model.ApplicationPools = _siteManager.GetApplicationPools();
+                Model.ApplicationPools = SiteManager.GetApplicationPools();
                 return View["Applications", Model];
             };
 
@@ -213,7 +211,7 @@ namespace Servant.Web.Modules
                 
                 Model.Range = range;
                 
-                Site site = _siteManager.GetSiteById(p.Id);
+                Site site = SiteManager.GetSiteById(p.Id);
                 var hasAnyErrors = true;
 
                 var sw = new Stopwatch();
@@ -231,7 +229,7 @@ namespace Servant.Web.Modules
             };
 
             Get[@"/(?<Id>[\d]{1,4})/errors/(?<EventLogId>[\d]{1,7})/"] = p =>{
-                Site site = _siteManager.GetSiteById(p.Id);
+                Site site = SiteManager.GetSiteById(p.Id);
                 ApplicationError exception = EventLogHelper.GetById(p.EventLogId);
                 Model.Site = site;
                 Model.Exception = exception;
@@ -264,7 +262,7 @@ namespace Servant.Web.Modules
                     AddPropertyError("bindingsuserinput[" + i + "]", "The binding is invalid.");
                     isValid = false;
                 }
-                else if (_siteManager.IsBindingInUse(finalizedHost, bindingsIpAddresses[i], site.IisId))
+                else if (SiteManager.IsBindingInUse(finalizedHost, bindingsIpAddresses[i], site.IisId))
                 {
                     AddPropertyError("bindingsuserinput[" + i + "]", string.Format("The binding {0} is already in use.", finalizedHost));
                     isValid = false;
@@ -297,7 +295,7 @@ namespace Servant.Web.Modules
             if (string.IsNullOrWhiteSpace(site.Name))
                 AddPropertyError("name", "Name is required.");
 
-            var existingSite = _siteManager.GetSiteByName(site.Name);
+            var existingSite = SiteManager.GetSiteByName(site.Name);
             if (site.Name != null && existingSite != null && existingSite.IisId != site.IisId)
                 AddPropertyError("name", "There's already a site with this name.");
 

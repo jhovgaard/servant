@@ -48,7 +48,6 @@ namespace Servant.Web.Helpers
 
         public static ApplicationError GetById(int eventLogId)
         {
-
             var query = string.Format(@"<QueryList>
                                             <Query Id=""0"" Path=""Application"">
                                             <Select Path=""Application"">*[System[(EventRecordID={0})]]</Select>
@@ -56,11 +55,13 @@ namespace Servant.Web.Helpers
                                         </QueryList>", eventLogId);
 
             var elq = new EventLogQuery("Application", PathType.LogName, query);
-            var elr = new EventLogReader(elq);
-            var eventInstance = elr.ReadEvent();
-            return eventInstance == null
-                ? null
-                : ParseEntry(eventInstance);
+            using (var elr = new EventLogReader(elq))
+            {
+                var eventInstance = elr.ReadEvent();
+                return eventInstance == null
+                    ? null
+                    : ParseEntry(eventInstance);
+            }
         }
 
         public static IEnumerable<ApplicationError> GetByDateTimeDescending(int max = 0)
@@ -72,16 +73,17 @@ namespace Servant.Web.Helpers
                             </QueryList>";
 
             var elq = new EventLogQuery("Application", PathType.LogName, query) {ReverseDirection = true};
-            var elr = new EventLogReader(elq);
+            using (var elr = new EventLogReader(elq))
+            {
+                var events = new List<EventRecord>();
 
-            var events = new List<EventRecord>();
+                max = (max == 0) ? int.MaxValue : max;
+                var i = 0;
+                for (var eventInstance = elr.ReadEvent(); null != eventInstance && i < max; eventInstance = elr.ReadEvent(), i++)
+                    events.Add(eventInstance);
 
-            max = (max == 0) ? int.MaxValue : max;
-            var i = 0;
-            for (var eventInstance = elr.ReadEvent(); null != eventInstance && i < max; eventInstance = elr.ReadEvent(), i++)
-                events.Add(eventInstance);
-
-            return events.Select(ParseEntry).Where(x => x != null && x.SiteIisId != 0);
+                return events.Select(ParseEntry).Where(x => x != null && x.SiteIisId != 0);
+            }
         }
 
         public static IEnumerable<ApplicationError> GetBySite(int siteIisId, StatsRange range)
@@ -108,22 +110,22 @@ namespace Servant.Web.Helpers
                             </QueryList>", (msLookback == 0) ? null : "and TimeCreated[timediff(@SystemTime) &lt;= " + msLookback + "]");
 
             var elq = new EventLogQuery("Application", PathType.LogName, query) { ReverseDirection = true};
-            var elr = new EventLogReader(elq);
 
-            var events = new List<EventRecord>();
-            for (var eventInstance = elr.ReadEvent(); null != eventInstance; eventInstance = elr.ReadEvent())
+            using (var elr = new EventLogReader(elq))
             {
-                if (eventInstance.Properties.Count() > 9 && eventInstance.Properties[8].Value.ToString().StartsWith("/LM/W3SVC/" + siteIisId + "/"))
-                    events.Add(eventInstance);
+                var events = new List<EventRecord>();
+                for (var eventInstance = elr.ReadEvent(); null != eventInstance; eventInstance = elr.ReadEvent())
+                {
+                    if (eventInstance.Properties.Count() > 9 && eventInstance.Properties[8].Value.ToString().StartsWith("/LM/W3SVC/" + siteIisId + "/"))
+                        events.Add(eventInstance);
+                }
+                return events.Select(ParseEntry);
             }
-
-            return events.Select(ParseEntry);
         }
 
         public static List<ApplicationError> AttachSite(IEnumerable<ApplicationError> errors)
         {
-            var siteManager = new SiteManager();
-            var sites = siteManager.GetSites().ToList();
+            var sites = SiteManager.GetSites().ToList();
             foreach (var applicationError in errors)
             {
                 applicationError.Site = sites.SingleOrDefault(x => x.IisId == applicationError.SiteIisId);
