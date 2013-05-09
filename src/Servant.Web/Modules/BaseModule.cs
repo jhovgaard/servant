@@ -18,7 +18,6 @@ namespace Servant.Web.Modules
         protected PageModel Page { get; set; }
         public bool HasErrors { get { return Model.Errors.Count != 0; }}
         public ServantConfiguration Configuration { get; set; }
-        private SiteManager _siteManager;
         private const string MessageKey = "Message";
         private const string MessageTypeKey = "MessageType";
 
@@ -35,7 +34,6 @@ namespace Servant.Web.Modules
         public void Setup()
         {
             Configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
-            _siteManager = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<SiteManager>();
 
             var nonAuthenticatedModules = new List<Type> { typeof(SetupModule) };
             var requiresAuthentication = !nonAuthenticatedModules.Contains(this.GetType());
@@ -46,7 +44,7 @@ namespace Servant.Web.Modules
                 Page = new PageModel
                 {
                     Servername = System.Environment.MachineName,
-                    Sites = _siteManager.GetSites().OrderBy(x => x.Name)
+                    Sites = SiteManager.GetSites().OrderBy(x => x.Name)
                 };
                 var fileVersion = FileVersionInfo.GetVersionInfo(typeof (BaseModule).Assembly.Location).FileVersion.Split('.');
                 Model.Version = string.Join(".", fileVersion.Take(2));
