@@ -51,6 +51,14 @@ namespace Servant.Business.Helpers
 
             finalizedBinding = finalizedBinding.Replace("*", WildcardIdentifier);
 
+            string ipAsString = "";
+            if (!string.IsNullOrWhiteSpace(ipAddress) && ipAddress != "*")
+            {
+                System.Net.IPAddress ip;
+                System.Net.IPAddress.TryParse(ipAddress ?? "", out ip);
+                ipAsString = ip.ToString();
+            }
+
             var uri = new Uri(finalizedBinding);
             var hostname = uri.Host == WildcardIdentifier ? "*" : uri.Host;
             return new Binding
@@ -60,8 +68,14 @@ namespace Servant.Business.Helpers
                     Protocol = (Protocol) Enum.Parse(typeof (Protocol), uri.Scheme),
                     CertificateName = certificate != null ? certificate.FriendlyName : null,
                     CertificateHash = certificate != null ? certificate.GetCertHash() : null,
-                    IpAddress = ipAddress ?? "*"
+                    IpAddress = ipAsString
                 };
+        }
+
+        public static bool IsIpValid(string ipAddress)
+        {
+            System.Net.IPAddress ip;
+            return System.Net.IPAddress.TryParse(ipAddress, out ip);
         }
     }
 }
