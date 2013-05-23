@@ -28,7 +28,7 @@ namespace Servant.Web.Tests
         }
 
         [Test]
-        public void CanSaveConfiguration()
+        public void Can_Save_Configuration()
         {
             var browser = new BrowserBuilder().WithoutConfiguration().Build();
             const string servantUrl = "http://localhost:54444/";

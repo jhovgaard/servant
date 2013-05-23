@@ -22,7 +22,8 @@
 
         <div id="sidemenu">
             <div id="servername">
-                \\@Model.Page.Servername
+                <span class="sprite sprite-icon-stack"></span>
+                <span>\\@Model.Page.Servername</span>
             </div>
             
             <div id="search">
@@ -30,9 +31,9 @@
             </div>
             
             <ul class="active-@ViewBag.ActiveMenuItem">
-                <li class="home"><a href="/">Home</a></li>
+                <li class="home"><a href="/"><span class="sprite sprite-menu-icon-home"></span><span class="text">Home</span></a></li>
                 <li class="sites">
-                    <a href="#">Sites<span class="arrow"></span></a>
+                    <a href="#"><span class="sprite sprite-menu-icon-sites"></span><span class="text">Sites</span><span class="sprite sprite-icon-arrow-down arrow"></span></a>
                     
                     <ul>
                         <li class="bold"><a href="/sites/create">Create new</a></li> 
@@ -44,7 +45,7 @@
                         }
                     </ul>
                 </li>
-                <li class="settings"><a href="/settings/">Settings</a></li>
+                <li class="settings"><a href="/settings/"><span class="sprite sprite-menu-icon-settings"></span><span class="text">Settings</span></a></li>
             </ul>
             <p id="copyright">Servant for IIS @Model.Version - Free Edition<br/> &copy; Copyright 2013 - 8seven</p>
         </div>
@@ -84,6 +85,7 @@
                 });
                 ga('set', 'anonymizeIp', true);
                 ga('set', 'dimension1', '@Model.InstallationGuid');
+                ga('set', 'dimension2', '@Model.Version');
                 ga('send', 'pageview');
                 
             </script>

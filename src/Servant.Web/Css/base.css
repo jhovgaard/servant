@@ -207,13 +207,16 @@ pre {
     }
 
 #servername {
-    background: url('/images/icon-stack.png') no-repeat left center;
-    padding: 10px 0 10px 40px;
     text-transform: uppercase;
     font-size: 16px;
     color: #828282;
-    margin: 15px 0 15px 20px;
+    margin: 15px 0 15px 0;
 }
+
+    #servername span:last-child {
+        padding: 12px 0;
+        display: block;
+    }
 
 #search {
     margin-left: 15px;
@@ -268,19 +271,21 @@ pre {
 #sidemenu > ul > li > a {
     background-position: 15px center;
     background-repeat: no-repeat;
-    padding: 16px 15px 16px 65px;
+    padding: 12px 15px 12px 20px;
     font-size: 16px;
     color: white;
     display: block;
     outline: 0;
 }
 
+#sidemenu > ul > li > a span.text {
+    display: inline-block;
+    padding: 5px 12px;
+}
+
     #sidemenu > ul > li > a span.arrow {
         display: block;
         float: right;
-        background: url('/images/icon-arrow-down.png') no-repeat;
-        width: 20px;
-        height: 7px;
         margin-top: 10px;
     }
 
@@ -318,23 +323,8 @@ pre {
     background-color: #682174;
 }
 
-
-#sidemenu ul li.home a {
-    background-image: url('/images/menu-icon-home.png');
-}
-
 #sidemenu ul.active-sites li ul {
     display: block;
-}
-
-
-#sidemenu ul li.sites > a {
-    background-image: url('/images/menu-icon-sites.png');
-}
-
-
-#sidemenu ul li.settings a {
-    background-image: url('/images/menu-icon-settings.png');
 }
 
 #topmenu {
@@ -441,9 +431,13 @@ input[type=text].white {
     }
 
 h2.bug {
-    background: url('/images/icon-bug.png') no-repeat 20px center #00BCF2;
-    padding-left: 60px;
+    background-color: #00BCF2;
+    padding-left: 15px;
 }
+    h2.bug span {
+        margin-right: 10px;
+    }
+
 
 .input-group {
     padding-bottom: 15px;
@@ -573,3 +567,22 @@ table#entries {
       display: inline-block;
       clear: both;
   }
+
+  /* SPRITE  */
+.sprite {
+    background-image: url("/images/servant.png");
+    float: left;
+    display: inline-block;
+}
+
+.sprite-menu-icon-home{background-position:0px -8px ; width: 32px ; height: 32px; }
+.sprite-menu-icon-sites{background-position:-42px -8px ; width: 32px ; height: 32px; }
+.sprite-menu-icon-settings{background-position:-84px -8px ; width: 32px ; height: 32px; }
+.sprite-icon-ok{background-position:-126px -8px ; width: 32px ; height: 32px; }
+.sprite-icon-bug{background-position:-168px -8px ; width: 32px ; height: 32px; }
+.sprite-icon-delete{background-position:-210px -8px ; width: 32px ; height: 32px; }
+.sprite-icon-recycle{background-position:-252px -8px ; width: 32px ; height: 32px; }
+.sprite-icon-restart{background-position:-294px -8px ; width: 32px ; height: 32px; }
+.sprite-icon-stack{background-position:-336px 0px ; width: 44px ; height: 48px; }
+.sprite-icon-cancel{background-position:-394px -8px ; width: 32px ; height: 32px; }
+.sprite-icon-arrow-down{background-position:-436px -16px ; width: 16px ; height: 16px; }
