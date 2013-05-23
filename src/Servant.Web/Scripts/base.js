@@ -223,7 +223,7 @@
 });
 
 function ShowMessage(type, message) {
-    $popupMessage.removeClass().addClass(type).find("span").text(message);
+    $popupMessage.removeClass().addClass(type).find("span").html(message);
     $popupMessage.delay(200).slideDown();
 }
 
