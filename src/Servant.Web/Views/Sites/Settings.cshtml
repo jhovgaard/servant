@@ -14,21 +14,21 @@
             <p class="text-error">Warning: The application pool isn't running!</p>
         }
         <form action="/sites/@Model.Site.IisId/stop/" method="POST" id="stop-site-form"  style="float:left; margin-right: 5px;">
-            <input type="submit" class="cancel" value="Stop site" class="margin-top10"/>
+            <input type="submit" class="stop" value="Stop site" class="margin-top10"/>
         </form>    
     
         <form action="/sites/@Model.Site.IisId/restart/" method="POST" style="float:left; margin-right: 5px;">
-            <input type="submit" class="warning restart" value="Restart site" class="margin-top10"/>
+            <input type="submit" class="restart" value="Restart site" class="margin-top10"/>
         </form>
     
         <form action="/sites/@Model.Site.IisId/recycle/" method="POST">
-            <input type="submit" class="warning recycle" value="Recycle application pool" class="margin-top10"/>
+            <input type="submit" class="recycle" value="Recycle application pool" class="margin-top10"/>
         </form>
     }
     else
     {
         <form action="/sites/@Model.Site.IisId/start/" method="POST">
-            <input type="submit" class="btn btn-success" value="Start site" class="margin-top10"/>
+            <input type="submit" value="Start site" class="start margin-top10"/>
         </form>
     }
 </div>

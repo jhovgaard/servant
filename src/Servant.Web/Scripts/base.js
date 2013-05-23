@@ -22,7 +22,7 @@
         $certificate.toggle();
     });
 
-    $("#bindings").on("keyup", "tr td input", function () {
+    $("#bindings").on("keyup", "tr td input[name=bindingsuserinput]", function () {
         var value = $(this).val();
         if (value.length > 3) {
             var $certificate = $(this).parents('tbody').find('tr.certificate');
@@ -43,7 +43,7 @@
         newBinding.find("td input[name=bindingsipaddress]").val('*');
         newBinding.find("td span.help-block, td span.help-inline").remove();
         bindings.append(newBinding);
-        bindings.find("tr td img").removeClass("hide");
+        bindings.find("tr td .remove-entry").removeClass("hide");
         newBinding.find("td input").first().focus();
         return false;
     });
@@ -76,13 +76,13 @@
         }
     });
 
-    $("#bindings").on("click", "tr td img.remove-binding", function () {
+    $("#bindings").on("click", "tr td .remove-entry", function () {
         if ($("#bindings tbody:visible").length > 1) {
             $(this).parent().parent().parent().remove();
         }
 
-        if ($("#bindings tr:visible").length == 1) {
-            $("#bindings tr td img").addClass("hide");
+        if ($("#bindings tbody:visible").length == 1) {
+            $("#bindings tr td .remove-entry").addClass("hide");
         }
 
     });
