@@ -61,9 +61,6 @@
     <Reference Include="Nancy.ViewEngines.Razor">
       <HintPath>..\packages\Nancy.Viewengines.Razor.0.16.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Text">
-      <HintPath>..\packages\ServiceStack.Text.3.9.37\lib\net35\ServiceStack.Text.dll</HintPath>
-    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System" />
     <Reference Include="System.Web.Razor, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -93,6 +90,7 @@
     <Content Include="Images\menu-icon-home.png" />
     <Content Include="Images\menu-icon-settings.png" />
     <Content Include="Images\menu-icon-sites.png" />
+    <Content Include="Images\servant.png" />
     <Content Include="Images\textbox-submit-search.png" />
     <Content Include="Scripts\base.js" />
     <Content Include="Scripts\bootstrap.min.js" />

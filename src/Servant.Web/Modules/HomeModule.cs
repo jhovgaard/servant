@@ -34,33 +34,44 @@ namespace Servant.Web.Modules
                     AddPropertyError("email", "Looks like the email is not valid.");
                 }
 
+                var serializer = new Nancy.Json.JavaScriptSerializer();
+
                 if (HasErrors)
                 {
-                    return new Nancy.Json.JavaScriptSerializer().Serialize(Model.Errors);
+                    return new { Type = MessageType.Error.ToString(), Errors = serializer.Serialize(Model.Errors) }; ;
                 }
 
-                var serializer = new Nancy.Json.JavaScriptSerializer();
                 var response = MailchimpHelper.Subscribe(email, firstname, lastname);
 
                 if (response != "true")
                 {
                     MailchimpResponse result = serializer.Deserialize<MailchimpResponse>(response);
 
+                    if (result.Code == 214)
+                    {
+                        SetNewsletterRead();
+                    }
+
                     if (result.Code == 502)
                     {
                         AddPropertyError("email", "Looks like the email is not valid.");
-                        return serializer.Serialize(Model.Errors);
+                        return new { Type = MessageType.Error, Errors = serializer.Serialize(Model.Errors) };
                     }
-                    
-                    return result.Error;
+
+                    return new { Message = result.Error, Type = MessageType.Error.ToString() };
                 }
 
-                var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
-                configuration.HaveSeenNewsletter = false;
-                Helpers.ConfigurationHelper.UpdateConfiguration(configuration);
+                SetNewsletterRead();
 
-                return response;
+                return new { Message = response, Type = MessageType.Success };
             };
+        }
+
+        private void SetNewsletterRead()
+        {
+            var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+            configuration.HaveSeenNewsletter = true;
+            Helpers.ConfigurationHelper.UpdateConfiguration(configuration);
         }
 
         public class MailchimpResponse

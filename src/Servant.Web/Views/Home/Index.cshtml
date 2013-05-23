@@ -15,7 +15,7 @@
     @if(!Model.HaveSeenNewsletter) {
         <div id="newslettersignup">
             <strong>Want to know about new features?</strong><br/>
-            We're constantly working on new features for Servant. To be able to reach you when a new version gets released, simply type in your info below and we will email you - no spam, we promise!
+            <p style="margin: 0;">We're constantly working on new features for Servant. To be able to reach you when a new version gets released, simply type in your info below and we will email you - no spam, we promise!</p>
             <form action="/subscribetonewsletter" method="POST" id="subscribeform" class="pushup-medium" style="float: left; padding-bottom: 10px;">
                 <div class="input-group" style="float:left; padding-right: 5px; padding-bottom: 5px;">
                     <input type="text" name="email" style="width: 200px; padding: 8px 8px 7px; margin-bottom: 2px;" />
@@ -38,7 +38,7 @@
 <div style="clear: both;"></div>
 
 
-<h2 class="bug">Latest unhandled exceptions</h2>
+<h2 class="bug"><span class="sprite sprite-icon-bug"></span>Latest unhandled exceptions</h2>
 @if(Model.UnhandledExceptions.Count != 0)
 {
     <table>
@@ -89,11 +89,15 @@
                 var url = $(this).attr("action");
                 var data = $(this).serialize();
                 $.post(url, data, function (response) {
-                    if (response == "true") {
+                    if (response.Type == "Success") {
                         $("#newslettersignup").slideUp().fadeOut();
                         ShowMessage("success", "Thanks for signing up! Please see your inbox for confirmation.");
                     } else {
-                        ParseErrors(response);
+                        if(response.Errors != null)
+                            ParseErrors(response.Errors);
+                        else {
+                            ShowMessage(response.Type.toLowerCase(), response.Message);
+                        }
                     }
                 });
 

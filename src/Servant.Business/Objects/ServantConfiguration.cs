@@ -1,5 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 namespace Servant.Business.Objects
 {
@@ -16,12 +19,14 @@ namespace Servant.Business.Objects
         public bool AutoSendCrashReport { get; set; }
         public bool HaveSeenNewsletter { get; set; }
         public Guid InstallationGuid { get; set; }
+        public string Version { get; set; }
 
         public ServantConfiguration()
         {
             ServantUrl = "http://localhost:54444/";
             Username = "admin";
             InstallationGuid = Guid.NewGuid();
+            
         }
 
         public bool IsHttps()
