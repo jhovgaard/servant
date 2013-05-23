@@ -123,7 +123,7 @@ pre {
 }
 
 .hide {
-    display: none;
+    display: none !important;
 }
 
 .pointer {
@@ -174,11 +174,17 @@ pre {
 }
 
 .add {
-    background: url('/images/icon-plus.png') no-repeat left center;
+    background-position: -12px -544px; 
     padding: 5px 0 5px 30px;
     color: #272727;
     text-decoration: none;
     font-weight: bold;
+}
+
+.remove-entry {
+    background-position: -12px -580px; width: 24px; height: 24px;
+    cursor: pointer;
+    margin: 3px;
 }
 
 .timeago {
@@ -244,7 +250,7 @@ pre {
     padding: 0;
 }
 
-#sidemenu > ul { margin-bottom: 40px; } /* UserVoice spacer */
+#sidemenu > ul { margin-bottom: 40px;margin-top: 25px; } /* UserVoice spacer */
 
 #sidemenu.search > ul {
     display: none;
@@ -469,9 +475,9 @@ h2.bug {
 }
 
 input[type=submit], .btn-submit, a.btn-submit:visited {
-    background: url('/images/icon-ok.png') no-repeat 10px center;
     padding: 10px 15px 10px 45px;
     background-color: #a8c019;
+    background-position: -2px -122px;
     color: white;
     border: 0;
     font-size: 16px;
@@ -484,8 +490,8 @@ input[type=submit], .btn-submit, a.btn-submit:visited {
     }
 
     input[type=submit].cancel {
-        background-image: url('/images/icon-cancel.png');
         background-color: #fb4050;
+        background-position: -2px -389px;
     }
 
         input[type=submit].cancel:hover {
@@ -501,8 +507,31 @@ input[type=submit], .btn-submit, a.btn-submit:visited {
             background-color: #ff8c00;
         }
 
-        input[type=submit].recycle { background-image: url('/images/icon-recycle.png'); background-position: 10px 12px }
-        input[type=submit].restart { background-image: url('/images/icon-restart.png'); }
+    input[type=submit].recycle {
+        background-position: -2px -247px;
+        background-color: #FFA840;
+    }
+    input[type=submit].restart {
+        background-color: #FFA840;
+        background-position: -2px -289px;
+    }
+    input[type=submit].recycle:hover,input[type=submit].restart:hover {
+        background-color: #ff8c00;
+    }
+
+    input[type=submit].start {
+        background-color: #a8c019;
+        background-position: -2px -457px;
+    }
+    input[type=submit].stop {
+        background-color: #ff0039;
+        background-position: -2px -499px;
+    }
+
+    input[type=submit].stop:hover { background-color: #e81123; }
+
+    
+    
 
 table#bindings {
     padding: 5px;
@@ -569,20 +598,26 @@ table#entries {
   }
 
   /* SPRITE  */
-.sprite {
+.sprite, input[type=submit], .add, .remove-entry {
     background-image: url("/images/servant.png");
+    background-repeat: no-repeat;
     float: left;
     display: inline-block;
 }
 
-.sprite-menu-icon-home{background-position:0px -8px ; width: 32px ; height: 32px; }
-.sprite-menu-icon-sites{background-position:-42px -8px ; width: 32px ; height: 32px; }
-.sprite-menu-icon-settings{background-position:-84px -8px ; width: 32px ; height: 32px; }
-.sprite-icon-ok{background-position:-126px -8px ; width: 32px ; height: 32px; }
-.sprite-icon-bug{background-position:-168px -8px ; width: 32px ; height: 32px; }
-.sprite-icon-delete{background-position:-210px -8px ; width: 32px ; height: 32px; }
-.sprite-icon-recycle{background-position:-252px -8px ; width: 32px ; height: 32px; }
-.sprite-icon-restart{background-position:-294px -8px ; width: 32px ; height: 32px; }
-.sprite-icon-stack{background-position:-336px 0px ; width: 44px ; height: 48px; }
-.sprite-icon-cancel{background-position:-394px -8px ; width: 32px ; height: 32px; }
-.sprite-icon-arrow-down{background-position:-436px -16px ; width: 16px ; height: 16px; }
+.sprite-menu-icon-home{background-position: -8px 0px; width: 32px; height: 32px; }
+.sprite-menu-icon-sites{background-position: -8px -42px; width: 32px; height: 32px; }
+.sprite-menu-icon-settings{background-position: -8px -84px; width: 32px; height: 32px; }
+.sprite-icon-ok{background-position: -8px -126px; width: 32px; height: 32px; }
+.sprite-icon-bug{background-position: -8px -168px; width: 32px; height: 32px; }
+.sprite-icon-delete{background-position: -8px -210px; width: 32px; height: 32px; }
+.sprite-icon-recycle{background-position: -8px -252px; width: 32px; height: 32px; }
+.sprite-icon-restart{background-position: -8px -294px; width: 32px; height: 32px; }
+.sprite-icon-stack{background-position: 0px -336px; width: 48px; height: 48px; }
+.sprite-icon-cancel{background-position: -8px -394px; width: 32px; height: 32px; }
+.sprite-icon-arrow-down{background-position: -16px -436px; width: 16px; height: 16px; }
+.sprite-Media-Play{background-position: -8px -462px; width: 32px; height: 32px; }
+.sprite-Stop{background-position: -8px -504px; width: 32px; height: 32px; }
+.sprite-Add{background-position: -12px -546px; width: 24px; height: 24px; }
+.sprite-Delete{background-position: -12px -580px; width: 24px; height: 24px; }
+

@@ -254,6 +254,8 @@ namespace Servant.Web.Modules
                     continue;
 
                 var isValid = true;
+                var userinput = bindingsUserInputs[i];
+                var isHttps = userinput.ToLower().StartsWith("https://");
 
                 var finalizedHost = BindingHelper.SafeFinializeBinding(bindingsUserInputs[i]);
 
@@ -267,6 +269,12 @@ namespace Servant.Web.Modules
                     AddPropertyError("bindingsuserinput[" + i + "]", string.Format("The binding {0} is already in use.", finalizedHost));
                     isValid = false;
                 }
+                var ip = bindingsIpAddresses[i];
+                if (isHttps && !BindingHelper.IsIpValid(ip))
+                {
+                    AddPropertyError("bindingsipaddress[" + i + "]", string.Format("The IP {0} is not valid.", ip));
+                }
+
                 Binding binding;
 
                 if (isValid)

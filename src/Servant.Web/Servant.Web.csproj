@@ -73,23 +73,9 @@
     <Content Include="Css\base.css" />
     <Content Include="Css\normalize.css" />
     <EmbeddedResource Include="Errors\500.html" />
-    <Content Include="Images\checkbox-checked.png" />
     <Content Include="Images\favicon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\icon-arrow-down.png" />
-    <Content Include="Images\icon-bug.png" />
-    <Content Include="Images\icon-cancel.png" />
-    <Content Include="Images\icon-delete.png" />
-    <Content Include="Images\icon-ok.png" />
-    <Content Include="Images\icon-plus.png" />
-    <Content Include="Images\icon-recycle.png" />
-    <Content Include="Images\icon-restart.png" />
-    <Content Include="Images\icon-stack.png" />
-    <Content Include="Images\icon-warning.png" />
-    <Content Include="Images\menu-icon-home.png" />
-    <Content Include="Images\menu-icon-settings.png" />
-    <Content Include="Images\menu-icon-sites.png" />
     <Content Include="Images\servant.png" />
     <Content Include="Images\textbox-submit-search.png" />
     <Content Include="Scripts\base.js" />
