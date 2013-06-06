@@ -85,7 +85,6 @@
     <Content Include="Scripts\jquery.filtr.min.js" />
     <Content Include="Scripts\jquery.timeago.js" />
     <Content Include="Scripts\jquery.watermark.min.js" />
-    <Content Include="Scripts\serveraddresschanger.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
