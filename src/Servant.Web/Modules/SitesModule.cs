@@ -242,7 +242,7 @@ namespace Servant.Web.Modules
         public void ValidateSite(ref Site site)
         {
             string[] bindingsUserInputs = Request.Form.BindingsUserInput.ToString().Split(',');
-            string[] bindingsCertificateName = Request.Form.BindingsCertificateName.ToString().Split(',');
+            string[] bindingsCertificateThumbprint = Request.Form.BindingsCertificateThumbprint.ToString().Split(',');
             string[] bindingsIpAddresses = Request.Form.BindingsIpAddress.ToString().Split(',');
 
             site.Bindings = new List<Binding>();
@@ -258,10 +258,19 @@ namespace Servant.Web.Modules
                 var isHttps = userinput.ToLower().StartsWith("https://");
 
                 var finalizedHost = BindingHelper.SafeFinializeBinding(bindingsUserInputs[i]);
+                var ip = bindingsIpAddresses[i];
+
+                if (string.IsNullOrWhiteSpace(ip))
+                    ip = "*";
 
                 if (finalizedHost == null)
                 {
                     AddPropertyError("bindingsuserinput[" + i + "]", "The binding is invalid.");
+                    isValid = false;
+                }
+                else if (!BindingHelper.IsIpValid(ip))
+                {
+                    AddPropertyError("bindingsipaddress[" + i + "]", string.Format("The IP {0} is not valid.", ip));
                     isValid = false;
                 }
                 else if (SiteManager.IsBindingInUse(finalizedHost, bindingsIpAddresses[i], site.IisId))
@@ -269,25 +278,21 @@ namespace Servant.Web.Modules
                     AddPropertyError("bindingsuserinput[" + i + "]", string.Format("The binding {0} is already in use.", finalizedHost));
                     isValid = false;
                 }
-                var ip = bindingsIpAddresses[i];
-                if (isHttps && !BindingHelper.IsIpValid(ip))
-                {
-                    AddPropertyError("bindingsipaddress[" + i + "]", string.Format("The IP {0} is not valid.", ip));
-                }
 
                 Binding binding;
 
                 if (isValid)
                 {
-                    var certificate = certificates.SingleOrDefault(x => x.FriendlyName == bindingsCertificateName[i]);
-                    binding = BindingHelper.ConvertToBinding(finalizedHost, bindingsIpAddresses[i], certificate);
+                    var certificate = certificates.SingleOrDefault(x => x.Thumbprint == bindingsCertificateThumbprint[i]);
+                    binding = BindingHelper.ConvertToBinding(finalizedHost, ip, certificate);
                 }
                 else
                 {
                     binding = new Binding()
                     {
-                        CertificateName = bindingsCertificateName[i],
-                        UserInput = bindingsUserInputs[i]
+                        CertificateName = bindingsCertificateThumbprint[i],
+                        UserInput = bindingsUserInputs[i],
+                        IpAddress = ip
                     };
                 }
 

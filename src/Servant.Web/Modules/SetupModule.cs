@@ -80,6 +80,7 @@ namespace Servant.Web.Modules
                         if (isHttps)
                         {
                             var port = new Uri(formSettings.ServantUrl).Port;
+                            host.RemoveCertificateBinding(port);
                             host.AddCertificateBinding(port);
                         }
 

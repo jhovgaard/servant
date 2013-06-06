@@ -75,6 +75,7 @@
     <Content Include="Images\facebook-64x64.png" />
     <Content Include="Images\facebook.png" />
     <Content Include="Images\icon_download.png" />
+    <Content Include="Images\servant-banner.gif" />
     <Content Include="Images\servant_logo.gif" />
     <Content Include="Images\servant_screenshot_1.gif" />
     <Content Include="Images\servant_screenshot_1_thumb.gif" />
