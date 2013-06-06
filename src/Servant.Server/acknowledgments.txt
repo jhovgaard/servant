@@ -3,3 +3,4 @@ Servant for IIS is using the following open source projects:
 - Nancy, Nancy.ViewEngines.Razor, Nancy.Hosting.Self, Nancy.Authentication.Basic, Nancy.Validation.DataAnnotations under the MIT license: http://www.opensource.org/licenses/mit-license.php
 - Pluralsight.Crypto - http://blog.pluralsight.com/2012/02/13/selfcert-create-a-self-signed-certificate-interactively-gui-or-programmatically-in-net/
 - Mindscape.Raygun4Net - https://raw.github.com/MindscapeHQ/raygun4net/1.0.5/LICENSE
+- Metro Studio - http://www.syncfusion.com/downloads/metrostudio

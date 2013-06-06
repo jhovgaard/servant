@@ -6,7 +6,7 @@ namespace Servant.Web.Helpers
     {
         public static void IncludeCertificates(ref dynamic model)
         {
-            model.Certificates = SiteManager.GetCertificates().Select(x => x.FriendlyName).ToList();
+            model.Certificates = SiteManager.GetCertificates().ToList();
         }
 
         public static void IncludeApplicationPools(ref dynamic model)

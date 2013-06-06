@@ -277,6 +277,6 @@ function ParseErrors(errors) {
 
 function ResetErrors() {
     $(".error").removeClass("error");
-    $("span.help-block, span.help-inline").remove();
+    $("span.help-block, span.help-inline").html();
 }
 

@@ -2,9 +2,10 @@
 @{
     Layout = "_Setup.cshtml";
 }
-<h1 class="pushdown-long">Welcome to Servant for IIS</h1> 
+
+<h1 class="pushdown-long">You're almost ready!</h1> 
         
-<p>You've succcesfully installed Servant on your server and to be honest, we couldn't be happier! We hate to bug you, but we need a few details from you before we're ready.</p>
+<p>You've succcesfully installed Servant on your server and to be honest, we couldn't be happier! We hate to bug you, but we need a few details before we're ready.</p>
         
 <form action="/setup/1/" method="POST" style="width: 400px; margin: auto;">
     <div class="input-group">
@@ -35,13 +36,13 @@
         <div style="width: 300px; margin: auto;">
             <label>
                 <input type="checkbox" tabindex="5" name="acceptterms" @((bool)Model.AcceptTerms ? Html.Raw("checked=\"checked\"") : null) />
-                I agree and accept <a href="#" target="_blank">the terms and conditions for using Servant for IIS</a>.
+                I agree and accept <a href="http://servant.io/license.txt" target="_blank">the terms and conditions for using Servant for IIS</a>.
             </label>
         </div>
     </div>
             
-    <div class="controls margin-top30">
-        <input type="submit" tabindex="6" value="Start Servant now!" class="btn btn-primary"/>
+    <div style="margin: auto; width: 200px;">
+        <input type="submit" tabindex="6" value="Start Servant now!" />
     </div>
 </form>
 
