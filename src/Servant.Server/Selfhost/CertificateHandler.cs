@@ -27,7 +27,7 @@ namespace Servant.Server.Selfhost
 
         private static string GetServantCertHash()
         {
-            var certificate = SiteManager.GetCertificates().SingleOrDefault(x => x.FriendlyName == "Servant");
+            var certificate = SiteManager.GetCertificates().SingleOrDefault(x => x.Name == "Servant");
             if (certificate == null)
                 return null;
 

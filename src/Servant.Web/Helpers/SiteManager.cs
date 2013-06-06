@@ -124,11 +124,11 @@ namespace Servant.Web.Helpers
                     if(binding.CertificateHash == null)
                         continue;
 
-                    var certificate = certificates.SingleOrDefault(cert => cert.GetCertHash().SequenceEqual(binding.CertificateHash));
+                    var certificate = certificates.SingleOrDefault(cert => cert.Hash.SequenceEqual(binding.CertificateHash));
                     if (certificate != null)
                     {
-                        servantBinding.CertificateName = certificate.FriendlyName;
-                        servantBinding.CertificateHash = binding.CertificateHash;
+                        servantBinding.CertificateName = certificate.Name;
+                        servantBinding.CertificateThumbprint = certificate.Thumbprint;
                     }
                     else
                         continue;
@@ -143,11 +143,27 @@ namespace Servant.Web.Helpers
             }
         }
 
-        public static List<X509Certificate2> GetCertificates()
+        public static IEnumerable<Certificate> GetCertificates()
         {
             var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
             store.Open(OpenFlags.OpenExistingOnly);
-            return store.Certificates.Cast<X509Certificate2>().Where(x => !string.IsNullOrWhiteSpace(x.FriendlyName)).ToList();
+            var certs = store.Certificates.Cast<X509Certificate2>().ToList();
+
+            foreach(var cert in certs)
+            {
+                var name = cert.FriendlyName;
+                if (string.IsNullOrWhiteSpace(name)) // Extracts common name if friendly name isn't available.
+                {
+                    var commonName = cert.Subject.Split(',').SingleOrDefault(x => x.StartsWith("CN"));
+                    if(commonName != null)
+                    {
+                        var locationOfEquals = commonName.IndexOf('=');
+                        name = commonName.Substring(locationOfEquals+1, commonName.Length-(locationOfEquals+1));
+                    }
+                }
+
+                yield return new Certificate { Name = name, Hash = cert.GetCertHash(), Thumbprint = cert.Thumbprint};
+            }
         }
 
         public static string GetSitename(Servant.Business.Objects.Site site) {
@@ -182,7 +198,10 @@ namespace Servant.Web.Helpers
                 foreach (var binding in site.Bindings)
                 {
                     if (binding.Protocol == Protocol.https)
-                        iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.CertificateHash, "My");
+                    {
+                        var certificate = GetCertificates().Single(x => x.Thumbprint == binding.CertificateThumbprint);
+                        iisSite.Bindings.Add(binding.ToIisBindingInformation(), certificate.Hash, "My");
+                    }
                     else
                         iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.Protocol.ToString());
                 }
@@ -282,7 +301,7 @@ namespace Servant.Web.Helpers
         public static bool IsBindingInUse(Binding binding, int iisSiteId = 0)
         {
             var bindingInformations = ConvertBindingsToBindingInformations(new[] {binding});
-            return GetBindingInUse(iisSiteId, bindingInformations) != null;
+            return GetBindingInUse(iisSiteId, bindingInformations.ToList()) != null;
         }
 
         public static Business.Objects.CreateSiteResult CreateSite(Site site)
@@ -366,15 +385,30 @@ namespace Servant.Web.Helpers
             }
         }
 
-        private static string GetBindingInUse(int iisId, IEnumerable<string> bindingInformations)
+        private static string GetBindingInUse(int iisId, List<string> bindingInformations)
         {
+            // IIS only allows one of each https binding.
+            var httpsBindings = new List<string>();
+
             using (var manager = new ServerManager())
             {
                 var sites = manager.Sites.Where(x => x.Id != iisId);
                 foreach (var iisSite in sites)
                     foreach (var binding in iisSite.Bindings)
+                    {
+                        if(binding.Protocol == "https")
+                            httpsBindings.Add(binding.BindingInformation.Substring(0, binding.BindingInformation.LastIndexOf(":")));
+
                         if (bindingInformations.Contains(binding.BindingInformation))
                             return binding.BindingInformation;
+                    }
+
+                foreach (var binding in bindingInformations)
+                {
+                    var ipPortCombi = binding.Substring(0, binding.LastIndexOf(":"));
+                    if (httpsBindings.Contains(ipPortCombi))
+                        return binding;
+                }
 
                 return null;    
             }

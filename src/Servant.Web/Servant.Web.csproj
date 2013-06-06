@@ -77,6 +77,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\servant.png" />
+    <Content Include="Images\servant_logo.gif" />
     <Content Include="Images\textbox-submit-search.png" />
     <Content Include="Scripts\base.js" />
     <Content Include="Scripts\bootstrap.min.js" />

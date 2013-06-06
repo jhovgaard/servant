@@ -1,38 +1,48 @@
 ﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>Servant for IIS</title>
-    <link href="Css/normalize.css" rel="stylesheet" />
-    <link href="Css/base.css" rel="stylesheet" />
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
-    <link href="Css/slimbox2.css" rel="stylesheet" />
+    <head>
+        <title>Servant for IIS</title>
+        <link href="Css/normalize.css" rel="stylesheet" />
+        <link href="Css/base.css" rel="stylesheet" />
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
+        <link href="Css/slimbox2.css" rel="stylesheet" />
     
-    <link rel="shortcut icon" href="favicon.ico" />
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="image_src" type="image/png" href="http://servant.io/images/servant_logo_square.png" />
-    <meta property="og:image"  content="http://servant.io/images/servant_logo_square.png" />
-    <meta property="og:title" content="Servant for IIS" />
-    <meta property="og:url" content="http://servant.io" />
-    <meta property="og:description" content="Servant for IIS is an extension to the IIS webserver. It enables an advanced browser-based interface with a lot of new features like live stats and more..." />
-    <meta name="description" content="Servant for IIS is an extension to the IIS webserver. It enables an advanced browser-based interface with a lot of new features like live stats and more..."/>
-</head>
+        <link rel="shortcut icon" href="favicon.ico" />
+        <link rel="icon" href="favicon.ico" type="image/x-icon">
+        <link rel="image_src" type="image/png" href="http://servant.io/images/servant_logo_square.png" />
+        <meta property="og:image"  content="http://servant.io/images/servant_logo_square.png" />
+        <meta property="og:title" content="Servant for IIS" />
+        <meta property="og:url" content="http://servant.io" />
+        <meta property="og:description" content="Servant for IIS is an extension to the IIS webserver. It enables an advanced browser-based interface with a lot of new features like live stats and more..." />
+        <meta name="description" content="Servant for IIS is an extension to the IIS webserver. It enables an advanced browser-based interface with a lot of new features like live stats and more..."/>
+    </head>
     <body>
-        <div class="container">
-            <img id="logo" src="Images/servant_logo.gif" alt="Servant for IIS logo" class="pushdown-long" />
+        <div id="top"></div>
+        <div id="container" class="container">
+            <img src="Images/servant_logo.gif" id="logo" alt="Servant for IIS logo"/>
+            <ul id="menu">
+                <li><a href="#download">Download</a></li>
+                <li><a href="#screenshots">Screenshots</a></li>
+                <li><a href="#">Blog</a></li>
+            </ul>
             
-            <div class="intro">
+            <div style="clear: both"></div>
+            
+            <div class="center">
                 <h1>Welcome to Servant for IIS</h1>
-            
+                
                 <p>Servant is a piece of software that transforms your regular Internet Information Services (IIS) Manager to a beautiful, fast and web-based management tool.</p>
                 <p>It's designed to fit your daily routines, optimized to track down your worst problems and created to stop you from wasting time on administration.</p>
                 
-                <p>
-                    <img src="Images/shanselman.jpg" />
-                    <strong>Scott Hanselman</strong><br/>
-                    "It's really a lovely piece of software. Nicely done!"
-                </p>
+                <div style="display: inline-block; text-align: left; margin-top: 20px;">
+                    <img src="Images/shanselman.jpg" style="border-radius: 5px; margin-right: 20px; margin-top: 11px; float: left;" />
+                    <div class="bubble">
+                        <strong>Scott Hanselman</strong><br/>
+                        It's really a lovely piece of software. Nicely done!
+                    </div>
+                </div>
             </div>
-            
+
             <div class="box">
                 <h2>IIS meets your browser</h2>
                 <p>Servant is accessed as any other website. You just enter your credentials from a web browser and you instantly get access to every setting on your IIS.</p>
@@ -46,6 +56,7 @@
             </div>
             
             <div class="fullbox">
+                <a id="download"></a>
                 <h2 class="pushdown-medium">Installation</h2>
                 
                 <ol style="clear: both; text-align: left; width: 445px; margin: 30px auto 40px auto;">

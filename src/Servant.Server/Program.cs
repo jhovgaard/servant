@@ -23,13 +23,14 @@ namespace Servant.Server
     static class Program
     {
         private static ServantConfiguration Configuration { get; set; }
+
         static void Init()
         {
             Nancy.TinyIoc.TinyIoCContainer.Current.Register<IHost, Selfhost.Host>().AsSingleton();
             TinyIoCContainer.Current.Register<ServantConfiguration>(ConfigurationHelper.GetConfigurationFromDisk());
         }
 
-        public static System.Reflection.Assembly Resolver(object sender, ResolveEventArgs args)
+        public static Assembly Resolver(object sender, ResolveEventArgs args)
         {
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
             AssemblyName assemblyName = new AssemblyName(args.Name);
@@ -84,14 +85,13 @@ namespace Servant.Server
         private static bool IsServantCertificateInstalled()
         {
             var certificates = SiteManager.GetCertificates();
-            return certificates.Any(x => x.FriendlyName == "Servant");
+            return certificates.Any(x => x.Name == "Servant");
         }
+
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(Resolver);
+            AppDomain.CurrentDomain.AssemblyResolve += Resolver;
             Init();
-
-
 
             if (!IsAnAdministrator())
             {
@@ -148,7 +148,17 @@ namespace Servant.Server
                         Console.ReadLine();
                         return;
                     }
-                    ManagedInstallerClass.InstallHelper(new[] {"/LogToConsole=false", Assembly.GetExecutingAssembly().Location });
+                    const string servantServiceName = "Servant for IIS";
+                    
+                    var existingServantService = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == servantServiceName);
+                    if (existingServantService != null)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Servant is already running on this machine.");
+                        Console.ReadLine();
+                        return;
+                    }
+                    ManagedInstallerClass.InstallHelper(new[] { "/LogToConsole=false", Assembly.GetExecutingAssembly().Location });
                     var startController = new ServiceController("Servant for IIS");
                     startController.Start();
                     StartBrowser();
@@ -200,7 +210,7 @@ namespace Servant.Server
 
         public static void StartServant()
         {   
-            var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
+            var host = TinyIoCContainer.Current.Resolve<IHost>();
             host.Start();
         }
 
