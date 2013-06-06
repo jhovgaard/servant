@@ -46,91 +46,6 @@ h2 {
     font-size: 25pt;
 }
 
-h3 {
-    font-size: 18px;
-    font-weight: normal;
-    padding: 10px 0;
-    margin: 0;
-}
-
-
-table {
-    background-color: #e2e2e2;
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    padding: 10px 0;
-    color: #272727;
-}
-
-    table thead {
-        margin-top: 10px;
-        color: white;
-        padding-top: 10px;
-    }
-
-        table thead tr th {
-            background-color: #272727;
-            padding: 10px 15px;
-            text-align: left;
-        }
-
-    table tbody tr td {
-        padding: 10px 15px;
-    }
-
-    table tbody tr:nth-child(even) td {
-        background-color: #efefef;
-    }
-
-input[type=text], input[type=password] {
-    border: 3px solid #a5a5a5;
-    padding: 6px 5px 6px;
-    color: #828282;
-    font-size: 15px;
-    outline: 0;
-    line-height: 21px;
-}
-
-select {
-    border: 3px solid #a5a5a5;
-    padding: 6px 5px 6px;
-    color: #828282;
-    font-size: 15px;
-    outline: 0;
-    line-height: 21px;
-}
-
-pre {
-    background-color: #ffffcc;
-    font-family: "Consolas","Lucida Console",Monospace;
-    font-size: 11pt;
-    line-height: 14pt;
-    margin: 0;
-    padding: 0.5em;
-    color: black;
-    white-space: pre;
-    overflow: auto;
-}
-
-.input-group {
-    padding-bottom: 15px;
-}
-
-    .input-group label {
-        display: block;
-        padding-bottom: 5px;
-    }
-
-    .input-group input[type=text], .input-group input[type=password], .input-group select {
-        width: 80%;
-    }
-
-    .input-group p {
-        margin: 0;
-        padding: 5px 0 0 0;
-        font-size: 12px;
-    }
 
     input[type=submit], .btn-submit, a.btn-submit:visited {
     background: url('icon-ok.png') no-repeat 10px center;
@@ -146,28 +61,6 @@ pre {
     input[type=submit]:hover {
         background-color: #bad80a;
     }
-
-    input[type=submit].cancel {
-        background-image: url('/images/icon-cancel.png');
-        background-color: #fb4050;
-    }
-
-        input[type=submit].cancel:hover {
-            background-color: #e81123;
-        }
-
-    input[type=submit].warning {
-        background-image: url('/images/icon-warning.png');
-        background-color: #FFA840;
-    }
-
-        input[type=submit].warning:hover {
-            background-color: #ff8c00;
-        }
-
-        input[type=submit].recycle { background-image: url('/images/icon-recycle.png'); background-position: 10px 12px }
-        input[type=submit].restart { background-image: url('/images/icon-restart.png'); }
-
 
 #top {
     width: 100%;
@@ -202,98 +95,9 @@ ul#menu li a:hover, ul#menu li a.active { color:#4dd7ff }
     position: absolute;
 }
 
+
 .center { text-align: center;}
 
-
-
-/* GLOBALS
------------------------*/
-.darkgray {
-    color: #272727;
-}
-
-.gray {
-    color: #a5a5a5;
-}
-
-.hide {
-    display: none;
-}
-
-.pointer {
-    cursor: pointer;
-}
-
-.box50 {
-    width: 50%;
-    float: left;
-}
-
-.box100 {
-    width: 100%;
-    float: left;
-}
-
-.pushdown-long {
-    margin-bottom: 50px;
-}
-
-.pushdown-medium {
-    margin-bottom: 20px;
-}
-
-.pushdown-short {
-    margin-bottom: 5px;
-}
-
-.pushup-short {
-    margin-top: 5px;
-}
-
-
-.bold {
-    font-weight: bold;
-}
-
-.indent {
-    padding-left: 20px;
-}
-
-.add {
-    background: url('/images/icon-plus.png') no-repeat left center;
-    padding: 5px 0 5px 30px;
-    color: #272727;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.timeago {
-    border-bottom: 0 !important;
-    color: gray;
-}
-
-    .timeago:first-letter {
-        text-transform:uppercase;
-    }
-
-
-
-.container {
-    width: 960px;
-    margin: 30px auto 0;
-
-}
-
-#logo {
-    margin: 0 auto 40px auto;
-    display: block;
-}
-
-.intro {
-    width: 600px;
-    margin: auto;
-    text-align: center;
-}
 
 .box {
     float: left;
@@ -302,6 +106,19 @@ ul#menu li a:hover, ul#menu li a.active { color:#4dd7ff }
     padding: 30px
 
 }
+
+.fullbox {
+    width: 100%;
+    text-align: center;
+    clear: both;
+    margin-bottom: 70px;
+}
+
+    .fullbox img {
+        padding: 5px;
+    }
+
+#screenshots img { width: 260px;}
 
 a.download {
     background: url('/images/icon_download.png') no-repeat 20px center #a8c019;
@@ -320,15 +137,6 @@ a.download {
         font-size: 10px;
     }
 
-.fullbox {
-    width: 100%;
-    text-align: center;
-    clear: both;
-}
-
-    .fullbox img {
-        padding: 5px;
-    }
 
 
 

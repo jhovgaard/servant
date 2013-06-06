@@ -89,6 +89,7 @@
     <Content Include="Images\twitter.png" />
     <Content Include="jquery.watermark.min.js" />
     <Content Include="slimbox2.js" />
+    <Content Include="smoothscroll.js" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\PublishProfiles\Profile.pubxml" />
