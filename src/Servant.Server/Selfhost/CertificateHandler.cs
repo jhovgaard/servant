@@ -49,6 +49,7 @@ namespace Servant.Server.Selfhost
             p.Start();
             var output = p.StandardOutput.ReadToEnd();
             return output;
+            
         }
     }
 }
