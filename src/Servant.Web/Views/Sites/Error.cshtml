@@ -19,13 +19,16 @@
 
 <b>URL:</b> <a href="@Model.Exception.Url" target="_blank">@Model.Exception.Url</a>
 <br/>
-<b>Exception:</b> @Model.Exception.Message
+<b>Message:</b> @Model.Exception.Message
 <br/>
 <b>Type:</b> @Model.Exception.ExceptionType
 <br/>
 <b>Client IP:</b> @Model.Exception.ClientIpAddress
 <br/>
-<b>Message:</b>
+<b>Description:</b><br/>
+<pre style="white-space:pre-wrap">@Html.Raw(Model.Exception.Description)</pre><br/>
+
+<b>Full message:</b>
 <pre>@Html.Raw(Model.Exception.FullMessage)</pre>
 <br/>
 <b>Thread information:</b>

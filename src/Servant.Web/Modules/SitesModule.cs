@@ -255,9 +255,8 @@ namespace Servant.Web.Modules
 
                 var isValid = true;
                 var userinput = bindingsUserInputs[i];
-                var isHttps = userinput.ToLower().StartsWith("https://");
 
-                var finalizedHost = BindingHelper.SafeFinializeBinding(bindingsUserInputs[i]);
+                var finalizedHost = BindingHelper.SafeFinializeBinding(userinput);
                 var ip = bindingsIpAddresses[i];
 
                 if (string.IsNullOrWhiteSpace(ip))
@@ -314,9 +313,20 @@ namespace Servant.Web.Modules
 
             if (string.IsNullOrWhiteSpace(site.SitePath))
                 AddPropertyError("sitepath", "Site path is required.");
-
-            if (site.SitePath != null && !FileSystemHelper.DirectoryExists(site.SitePath))
-                AddPropertyError("sitepath", "The entered directory doesn't exist.");
+            else
+            {
+                if (!FileSystemHelper.IsPathValid(site.SitePath))
+                {
+                    AddPropertyError("sitepath", "Path cannot contain the following characters: ?, ;, :, @, &, =, +, $, ,, |, \", <, >, *.");
+                }
+                else
+                {
+                    if (!FileSystemHelper.DirectoryExists(site.SitePath))
+                    {
+                        FileSystemHelper.CreateDirectory(site.SitePath);
+                    }    
+                }
+            }
         }
 
         public void ValidateSiteApplications(Site site)
@@ -328,17 +338,23 @@ namespace Servant.Web.Modules
                 if (!application.Path.StartsWith("/"))
                     application.Path = "/" + application.Path;
 
-                if (application.DiskPath != null && !FileSystemHelper.DirectoryExists(application.DiskPath))
+                if (string.IsNullOrWhiteSpace(application.DiskPath))
                 {
-                    AddPropertyError("diskpath["+ i + "]", "The entered directory doesn't exist.");    
+                    AddPropertyError("diskpath[" + i + "]", "Disk Path is required.");
                 }
-
+                else
+                {
+                    if (!FileSystemHelper.DirectoryExists(application.DiskPath))
+                    {
+                        FileSystemHelper.CreateDirectory(application.DiskPath);
+                    }
+                }
+                
                 if (string.IsNullOrWhiteSpace(application.Path))
                     AddPropertyError("path[" + i + "]", "Path is required.");
 
-                var invalidCharacters = new[] { '\\', '?', ';', ':', '@', '&', '=', '+', '$', ',', '|', '"', '<', '>', '*' };
-                if(invalidCharacters.Any(x => application.Path.ToArray().Contains(x)))
-                    AddPropertyError("path[" + i + "]", "Path cannot contain the following characters: \\, ?, ;, :, @, &, =, +, $, ,, |, \", <, >, *.");
+                if(!FileSystemHelper.IsPathValid(application.DiskPath))
+                    AddPropertyError("path[" + i + "]", "Path cannot contain the following characters: ?, ;, :, @, &, =, +, $, ,, |, \", <, >, *.");
 
                 var existingApplicationByPath = site.Applications.SingleOrDefault(x => x != site.Applications[i] && x.Path == site.Applications[i].Path);
                 if (site.SitePath != null && existingApplicationByPath != null)

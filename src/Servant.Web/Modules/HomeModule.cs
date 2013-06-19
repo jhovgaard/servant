@@ -63,7 +63,7 @@ namespace Servant.Web.Modules
 
                 SetNewsletterRead();
 
-                return new { Message = response, Type = MessageType.Success };
+                return new { Message = response, Type = MessageType.Success.ToString() };
             };
         }
 

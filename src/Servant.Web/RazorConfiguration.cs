@@ -7,12 +7,12 @@ namespace Servant.Web
     {
         public IEnumerable<string> GetAssemblyNames()
         {
-            return new[] { typeof(Business.IHost).Assembly.ToString() };
+            return new[] { typeof(Business.IHost).Assembly.ToString(), typeof(RazorConfiguration).Assembly.ToString() };
         }
 
         public IEnumerable<string> GetDefaultNamespaces()
         {
-            return null;
+            yield return typeof (Helpers.StringHelper).Namespace;
         }
 
         public bool AutoIncludeModelNamespace { get { return false; } }

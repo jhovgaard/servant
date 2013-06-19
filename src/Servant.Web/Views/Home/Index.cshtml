@@ -1,4 +1,5 @@
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+﻿@using Servant.Web.Helpers
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
     Layout = "Shared/_Layout.cshtml";
     ViewBag.ActiveMenuItem = "home";
@@ -50,7 +51,8 @@
 
             </tr>
         </thead>
-        @foreach(var error in Model.UnhandledExceptions) {
+        @foreach (Servant.Business.Objects.ApplicationError error in Model.UnhandledExceptions)
+        {
             <tr>
                 <td style="min-width: 60px">
                     @if (error.Site != null){
@@ -61,7 +63,7 @@
                 </td>
                 <td>
                     @if(error.Site != null) {
-                        <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.ExceptionType</a>
+                        <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.ExceptionType: @error.Description.EllipticizeForErrorDescription()</a>
                     } else {
                         <a href="/errors/@error.Id/">@error.ExceptionType</a>
                     }

@@ -296,7 +296,7 @@ pre {
     }
 
 #sidemenu ul li ul {
-    background-color: #ffa840;
+    background-color: #792687;
     display: none;
 }
 
@@ -320,13 +320,14 @@ pre {
 #sidemenu ul li.sites.active,
 #sidemenu ul li.sites ul li a:hover,
 #sidemenu ul li.sites ul li.active a {
-    background-color: #ff8c00;
+    background-color: #682174;
 }
 
 #sidemenu ul.active-settings li.settings,
 #sidemenu ul li.settings:hover,
 #sidemenu ul li.settings.active {
-    background-color: #682174;
+    background-color: #7fba00;
+    
 }
 
 #sidemenu ul.active-sites li ul {
@@ -373,13 +374,13 @@ pre {
 }
 
     #topmenu ul li.settings a:hover,
-    #topmenu ul.active-settings li.settings a { border-bottom: 5px solid #682174; }
+    #topmenu ul.active-settings li.settings a { border-bottom: 5px solid #7fba00; }
 
     #topmenu ul li.errors a:hover,
     #topmenu ul.active-errors li.errors a {border-bottom: 5px solid #00bcf2;}
 
     #topmenu ul li.applications a:hover,
-    #topmenu ul.active-applications li.applications a {border-bottom: 5px solid #ff8c00;}
+    #topmenu ul.active-applications li.applications a {border-bottom: 5px solid #682174;}
 
 #maincontent {
     float: left;
@@ -620,4 +621,4 @@ table#entries {
 .sprite-Stop{background-position: -8px -504px; width: 32px; height: 32px; }
 .sprite-Add{background-position: -12px -546px; width: 24px; height: 24px; }
 .sprite-Delete{background-position: -12px -580px; width: 24px; height: 24px; }
-
+.sprite-small-add{background-position: -16px -614px; width: 16px; height: 16px; }

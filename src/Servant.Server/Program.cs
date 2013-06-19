@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceProcess;
@@ -56,33 +57,36 @@ namespace Servant.Server
             }
         }
 
-        private static void InstallServantCertificate()
+        public static void InstallServantCertificate()
         {
             var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
             store.Open(OpenFlags.ReadWrite);
+
+            //CRASH!
+                // Servant certifikatet kan ikke bindes til Azure serveren, ved mindre det bliver eksporteret og importeret først. Den siger det der med local user blablal.. 
 
             X509Certificate2 cert;
             using (var ctx = new CryptContext())
             {
                 ctx.Open();
-
                 cert = ctx.CreateSelfSignedCertificate(
                     new SelfSignedCertProperties
                     {
                         IsPrivateKeyExportable = true,
                         KeyBitLength = 4096,
                         Name = new X500DistinguishedName("CN=\"Servant\"; C=\"Denmark\"; O=\"Denmark\"; OU=\"Denmark\";"),
-                        ValidFrom = DateTime.Today.AddDays(-1),
-                        ValidTo = DateTime.Today.AddYears(30),
+                        ValidFrom = DateTime.Today,
+                        ValidTo = DateTime.Today.AddYears(10)
                     });
             }
-
             cert.FriendlyName = "Servant";
             store.Add(cert);
             store.Close();
-        }
 
-        private static bool IsServantCertificateInstalled()
+            System.Threading.Thread.Sleep(1000); // Wait for certificate to be installed
+        }
+        
+        public static bool IsServantCertificateInstalled()
         {
             var certificates = SiteManager.GetCertificates();
             return certificates.Any(x => x.Name == "Servant");
