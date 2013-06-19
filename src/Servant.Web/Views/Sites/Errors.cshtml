@@ -1,6 +1,5 @@
-﻿@using System.Collections.Generic
-@using System.Linq
-@using Servant.Business.Objects.Enums
+﻿@using Servant.Business.Objects.Enums
+@using Servant.Web.Helpers
 @inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
     Layout = "Sites/_Details.cshtml";
@@ -37,7 +36,7 @@ else
             {
                 <tr>
                     <td>
-                        <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.ExceptionType</a>
+                        <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.Description.EllipticizeForErrorDescription()</a>
                     </td>
                     <td style="width: 170px;">
                         <abbr class="timeago" title="@error.DateTime.ToString("o")">@error.DateTime</abbr>

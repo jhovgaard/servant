@@ -45,6 +45,9 @@ namespace Servant.Web.Helpers
             {
                 foreach (var site in manager.Sites)
                 {
+                    if (site.Bindings.Select(x => x.Protocol).Any(x => x == "ftp")) // Servant doesn't support FTP sites
+                        continue;
+
                     var parsedSite = ParseSite(site);
                     if (parsedSite != null)
                         yield return parsedSite;
@@ -190,7 +193,12 @@ namespace Servant.Web.Helpers
                 var mainApplication = iisSite.Applications.First();
 
                 mainApplication.VirtualDirectories[0].PhysicalPath = site.SitePath;
-                iisSite.Name = site.Name;
+
+                // In some scenarios Microsoft.Web.Administation fails to save site if property-set is detected with same name. 
+                //I believe it deletes and insert sites on updates and this makes a name conflict. Fixed by the hack below:
+                if(site.Name != iisSite.Name) 
+                    iisSite.Name = site.Name;
+
                 mainApplication.ApplicationPoolName = site.ApplicationPool;
 
                 // Commits bindings

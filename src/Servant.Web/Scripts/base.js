@@ -1,7 +1,7 @@
 ﻿$(function () {
     var $searchTextbox = $("#search input[type=text]");
     var searchResultInFocus = null;
-    $searchTextbox.watermark("Search");
+    $searchTextbox.watermark("Search (just type)");
 
     $("abbr.timeago").timeago();
 
@@ -26,7 +26,6 @@
         var value = $(this).val();
         if (value.length > 3) {
             var $certificate = $(this).parents('tbody').find('tr.certificate');
-            console.log($certificate)
             if (value.substring(0, 5).toLowerCase() == "https") {
                 $certificate.show();
             } else {
@@ -106,7 +105,7 @@
     // Activate search by press "/"
     $("body").keypress(function (e) {
         var activeElement = $(document.activeElement);
-        if (e.which == 47 && !activeElement.is(':input')) {
+        if (!activeElement.is(':input')) { //if (e.which == 47 && !activeElement.is(':input')) {
             var charcheck = /[a-zA-Z0-9]/;
             var keyPressed = String.fromCharCode(e.which);
             if (!charcheck.test(keyPressed)) {

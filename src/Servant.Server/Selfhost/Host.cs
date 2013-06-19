@@ -126,6 +126,12 @@ namespace Servant.Server.Selfhost
 
         public void AddCertificateBinding(int port)
         {
+            // Ensure Certificate is installed
+            if (!Program.IsServantCertificateInstalled())
+            {
+                Program.InstallServantCertificate();
+            }
+
             CertificateHandler.AddCertificateBinding(port);
         }
 

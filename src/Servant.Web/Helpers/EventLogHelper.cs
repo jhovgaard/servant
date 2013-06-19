@@ -23,7 +23,7 @@ namespace Servant.Web.Helpers
 
                 if (iisIdResult == 0)
                     return null;
-
+                var fullMessage = eventRecord.Properties[18].Value.ToString();
                 var error = new ApplicationError
                 {
                     Id = (int)eventRecord.RecordId,
@@ -31,11 +31,16 @@ namespace Servant.Web.Helpers
                     DateTime = eventRecord.TimeCreated.Value.ToUniversalTime(),
                     ExceptionType = eventRecord.Properties[17].Value.ToString(),
                     Message = eventRecord.Properties[1].Value.ToString(),
-                    FullMessage = eventRecord.Properties[18].Value.ToString().Replace(Environment.NewLine, "<br />").Trim(),
+                    FullMessage = fullMessage.Replace(Environment.NewLine, "<br />").Trim(),
                     ThreadInformation = eventRecord.Properties[29].Value.ToString().Replace(Environment.NewLine, "<br />").Trim(),
                     Url = eventRecord.Properties[19].Value.ToString(),
                     ClientIpAddress = eventRecord.Properties[21].Value.ToString()
                 };
+
+                var indexOfBreak = fullMessage.IndexOf("\n   ", System.StringComparison.InvariantCulture);
+                var description = fullMessage.Substring(0, indexOfBreak);
+                
+                error.Description = description;
 
                 return error;
             }
@@ -68,7 +73,7 @@ namespace Servant.Web.Helpers
         {
             var query = @"<QueryList>
                               <Query Id=""0"" Path=""Application"">
-                                <Select Path=""Application"">*[System[Provider[@Name='ASP.NET 2.0.50727.0' or @Name='ASP.NET 4.0.30319.0'] and (Level=2 or Level=3)]]</Select>
+                                <Select Path=""Application"">*[System[Provider[@Name='ASP.NET 2.0.50727.0' or @Name='ASP.NET 4.0.30319.0'] and (Level=2 or Level=3 or Level=4)]]</Select>
                               </Query>
                             </QueryList>";
 
@@ -79,10 +84,17 @@ namespace Servant.Web.Helpers
 
                 max = (max == 0) ? int.MaxValue : max;
                 var i = 0;
-                for (var eventInstance = elr.ReadEvent(); null != eventInstance && i < max; eventInstance = elr.ReadEvent(), i++)
-                    events.Add(eventInstance);
+                var entries = 0;
 
-                return events.Select(ParseEntry).Where(x => x != null && x.SiteIisId != 0);
+                for (var eventInstance = elr.ReadEvent(); null != eventInstance && entries < max; eventInstance = elr.ReadEvent(), i++)
+                {
+                    var parsedEvent = ParseEntry(eventInstance);
+                    if (parsedEvent != null && parsedEvent.SiteIisId != 0)
+                    {
+                        entries++;
+                        yield return parsedEvent;
+                    }
+                }
             }
         }
 
