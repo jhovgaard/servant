@@ -60,33 +60,34 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Css\base.css">
+    <Content Include="css\base.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Css\closelabel.gif" />
-    <Content Include="Css\icon-ok.png" />
-    <Content Include="Css\loading.gif" />
-    <Content Include="Css\nextlabel.gif" />
-    <Content Include="Css\normalize.css" />
-    <Content Include="Css\prevlabel.gif" />
-    <Content Include="Css\slimbox2.css" />
+    <Content Include="css\closelabel.gif" />
+    <Content Include="css\icon-ok.png" />
+    <Content Include="css\loading.gif" />
+    <Content Include="css\nextlabel.gif" />
+    <Content Include="css\normalize.css" />
+    <Content Include="css\prevlabel.gif" />
+    <Content Include="css\slimbox2.css" />
     <Content Include="Default.htm" />
     <Content Include="favicon.ico" />
-    <Content Include="Images\facebook-64x64.png" />
-    <Content Include="Images\facebook.png" />
-    <Content Include="Images\icon_download.png" />
-    <Content Include="Images\servant-banner.gif" />
-    <Content Include="Images\servant_logo.gif" />
-    <Content Include="Images\servant_screenshot_1.gif" />
-    <Content Include="Images\servant_screenshot_1_thumb.gif" />
-    <Content Include="Images\servant_screenshot_2.gif" />
-    <Content Include="Images\servant_screenshot_2_thumb.gif" />
-    <Content Include="Images\servant_screenshot_3.gif" />
-    <Content Include="Images\servant_screenshot_3_thumb.gif" />
-    <Content Include="Images\servant_logo_square.png" />
-    <Content Include="Images\shanselman.jpg" />
-    <Content Include="Images\twitter-64x64.png" />
-    <Content Include="Images\twitter.png" />
+    <Content Include="images\erez.jpg" />
+    <Content Include="images\facebook-64x64.png" />
+    <Content Include="images\facebook.png" />
+    <Content Include="images\icon_download.png" />
+    <Content Include="images\servant-banner.gif" />
+    <Content Include="images\servant_logo.gif" />
+    <Content Include="images\servant_screenshot_1.gif" />
+    <Content Include="images\servant_screenshot_1_thumb.gif" />
+    <Content Include="images\servant_screenshot_2.gif" />
+    <Content Include="images\servant_screenshot_2_thumb.gif" />
+    <Content Include="images\servant_screenshot_3.gif" />
+    <Content Include="images\servant_screenshot_3_thumb.gif" />
+    <Content Include="images\servant_logo_square.png" />
+    <Content Include="images\shanselman.jpg" />
+    <Content Include="images\twitter-64x64.png" />
+    <Content Include="images\twitter.png" />
     <Content Include="jquery.watermark.min.js" />
     <Content Include="slimbox2.js" />
     <Content Include="smoothscroll.js" />
