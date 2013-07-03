@@ -1,0 +1,36 @@
+﻿@using Servant.Business.Objects.Enums
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+<table id="bindings" class="pushdown-short">
+    @foreach(var binding in Model.Site.Bindings)
+    {
+        <tbody class="input-group">
+            <tr>
+                <td>
+                    <label for="bindingsuserinput">Binding</label>
+                </td>
+                <td><input type="text" name="bindingsuserinput" value="@binding.UserInput" style="width: 100%;" /></td>
+                <td rowspan="3" style="width: 30px; text-align: center; padding-top: 15px; vertical-align: top;"><span class="remove-entry@(((Model.Site.Bindings).Count) == 1 ? " hide" : "")"></span></td>
+            </tr>
+            <tr class="certificate" style="@(binding.Protocol == Protocol.https ? "" : "display: none;")">
+                <td><label>Certificate</label></td>
+                <td>
+                    <select style="width: 100%;" name="bindingscertificatethumbprint">
+                        @foreach (var certificate in Model.Certificates)
+                        {
+                            <option value="@certificate.Thumbprint" @Html.Raw(binding.CertificateThumbprint == certificate.Thumbprint ? " selected=\"selected\"" : null)>@certificate.Name</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr class="last">
+                <td style="width: 70px;"><label>IP</label></td>
+                <td>
+                    <input type="text" name="bindingsipaddress" value="@binding.IpAddress" style="width: 100%;" />
+                    <span class="help-block"></span>
+                </td>
+            </tr>
+        </tbody>
+    }
+</table>
+
+<a href="#" class="add" id="add-binding">Add more</a>

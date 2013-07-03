@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.ServiceProcess;
-using Servant.Manager.Infrastructure;
+using Servant.Web.Infrastructure;
 
 namespace Servant.Server.WindowsService
 {

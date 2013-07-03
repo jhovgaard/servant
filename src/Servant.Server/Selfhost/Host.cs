@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Net;
 using System.Timers;
 using Nancy.Hosting.Self;
+using Servant.Business;
 using Servant.Business.Objects;
-using Servant.Manager.Helpers;
-using Servant.Manager.Infrastructure;
+using Servant.Web.Helpers;
+using Servant.Web.Infrastructure;
 
 namespace Servant.Server.Selfhost
 {
@@ -13,7 +15,6 @@ namespace Servant.Server.Selfhost
         public bool LogParsingStarted { get; set; }
         public bool Debug { get; set; }
         public DateTime StartupTime { get; set; }
-        private static Settings _settings;
         private static Timer _timer;
 
         public Host()
@@ -24,30 +25,56 @@ namespace Servant.Server.Selfhost
             _timer.Elapsed += SyncDatabaseJob;
         }
 
-        public void Start(Settings settings = null)
+        public void Start(ServantConfiguration configuration = null)
         {
-            _settings = settings;
-
-            
-            if (settings == null)
+            if (configuration == null)
             {
-                _settings = SettingsHelper.Settings;
-                Debug = _settings.Debug;
+                configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+                Debug = configuration.Debug;
             }
 
             if (ServantHost == null)
             {
-                var uri = new Uri(_settings.ServantUrl.Replace("*", "localhost"));
-                ServantHost = new NancyHost(uri);
-            }
-            
-            ServantHost.Start();
+                var uri = new Uri(configuration.ServantUrl.Replace("*", "localhost"));
+                CreateHost(uri);
 
-            if(_settings.ParseLogs)
+                //StartLogParsing();
+                try
+                {
+                    ServantHost.Start();
+                }
+                catch (HttpListenerException) // Tries to start Servant on another port
+                {
+                    var servantUrl = configuration.ServantUrl.Replace("*", "localhost");
+                    var portPosition = servantUrl.LastIndexOf(":");
+                    if (portPosition != -1)
+                        servantUrl = servantUrl.Substring(0, portPosition);
+                    servantUrl += ":54445";
+
+                    var newUri = new Uri(servantUrl);
+                    CreateHost(uri);
+                    ServantHost.Start();
+
+                    configuration.ServantUrl = newUri.ToString();
+                    ConfigurationHelper.UpdateConfiguration(configuration);
+                }
+                
+            }
+
+            if(configuration.EnableErrorMonitoring)
                 _timer.Start();
 
             if(Debug)
-                Console.WriteLine("Host started on {0}", _settings.ServantUrl);
+                Console.WriteLine("Host started on {0}", configuration.ServantUrl);
+        }
+
+        private void CreateHost(Uri uri)
+        {
+            ServantHost = new NancyHost(uri, new Bootstrapper(), new HostConfiguration { UnhandledExceptionCallback = ex =>
+                {
+                    var client = new Mindscape.Raygun4Net.RaygunClient("YtmedAsAZw/ptG3cy4bSXg==");
+                    client.Send(ex);
+                } });
         }
 
         public void Stop()
@@ -80,20 +107,39 @@ namespace Servant.Server.Selfhost
 
         public void StopLogParsing()
         {
-            if (_settings.Debug)
+            var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+
+            if (configuration.Debug)
                 Console.WriteLine("Stopping log parsing...");
 
             LogParsingStarted = false;
             _timer.Stop();
 
-            if (_settings.Debug)
+            if (configuration.Debug)
                 Console.WriteLine("Log parsing stopped.");
+        }
+
+        public void RemoveCertificateBinding(int port)
+        {
+            CertificateHandler.RemoveCertificateBinding(port);
+        }
+
+        public void AddCertificateBinding(int port)
+        {
+            // Ensure Certificate is installed
+            if (!Program.IsServantCertificateInstalled())
+            {
+                Program.InstallServantCertificate();
+            }
+
+            CertificateHandler.AddCertificateBinding(port);
         }
 
         void SyncDatabaseJob(object sender, ElapsedEventArgs e)
         {
+            var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
             _timer.Stop();
-            if (_settings.Debug)
+            if (configuration.Debug)
                 Console.WriteLine("Started SyncDatabaseJob (IsRunning: {0})", LogParsingStarted);
            
             try

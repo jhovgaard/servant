@@ -1,0 +1,94 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Shared/_Layout.cshtml";
+    ViewBag.ActiveMenuItem = "sites";
+    ViewBag.ActiveSiteName = "createnew";
+}
+
+<h1 class="pushdown-medium">Create new site</h1>
+
+<form action="/sites/create/" method="POST">
+    <div class="box50 pushdown-medium">
+        <h3>General</h3>
+       
+        <div class="input-group">
+            <label for="name">Site name</label>
+            <input type="text" id="name" name="name" value="@Model.Site.Name" />
+        </div>
+
+        <div class="input-group">
+            <label for="sitepath">Site path (i.e.: C:\Sites\MyWebsite\)</label>
+            <input type="text" id="sitepath" name="sitepath" value="@Model.Site.SitePath" />
+        </div>
+
+        <div class="input-group">
+            <label for="applicationpool">Application pool</label>
+            <select name="applicationpool" id="applicationpool">
+                <option value="">Automatically create new</option>
+                @foreach (var appPool in Model.ApplicationPools)
+                {
+                    if(appPool == Model.Site.ApplicationPool)
+                    {
+                        <option selected="selected">@appPool</option>
+                    } else {
+                        <option>@appPool</option>
+                    }
+                }
+            </select>
+        </div>       
+    </div>
+
+    <div class="box50">
+        <h3>Bindings</h3>
+        @Html.Partial("Bindings", Model)
+    </div>
+    
+    <div class="box100 pushdown-medium">
+        <input type="submit" class="btn btn-primary" value="Create site" />
+    </div>
+</form>
+
+
+
+@*<h1>Create new website</h1>
+
+<form action="/sites/create/" method="POST">
+    <div class="box50">
+        <h3>General</h3>
+    
+        <div class="input-group">
+            <label for="sitename">Site name</label>
+            <input type="text" class="input-medium span4" id="sitename" name="name" value="@Model.Site.Name" />
+        </div>
+
+        <div class="input-group">
+            <label for="sitepath">Site path (i.e.: C:\Sites\MyWebsite\)</label>
+            <input type="text" class="input-medium span4" id="sitepath" name="sitepath" value="@Model.Site.SitePath" />
+        </div>
+    
+        <div class="input-group">
+            <label for="applicationpool">Application pool</label>
+            <select name="applicationpool" id="applicationpool">
+                <option value="">Automatically create new</option>
+                @foreach (var appPool in Model.ApplicationPools)
+                {
+                    if(appPool == Model.Site.ApplicationPool)
+                    {
+                        <option selected="selected">@appPool</option>
+                    } else {
+                        <option>@appPool</option>
+                    }
+                
+                }   
+
+            </select>
+        </div>
+    
+        <input type="submit" class="btn btn-primary" value="Create site" />
+    </div>
+
+    <div class="box50">
+        <h3>Bindings</h3>        
+        @Html.Partial("Bindings", Model)
+    </div>
+</form>*@
