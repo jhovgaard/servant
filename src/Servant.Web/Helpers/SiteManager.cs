@@ -364,10 +364,11 @@ namespace Servant.Web.Helpers
                 var created = false;
                 var sw = new Stopwatch();
                 sw.Start();
-                while (!created || sw.Elapsed.TotalSeconds >= 3)
+                while (!created && sw.Elapsed.TotalSeconds < 3)
                 {
                     try
                     {
+                        System.Threading.Thread.Sleep(3001);
                         if (iisSite.State == ObjectState.Started)
                             created = true;
                     }
