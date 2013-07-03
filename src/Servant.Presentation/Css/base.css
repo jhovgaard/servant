@@ -6,6 +6,8 @@
     font-size: 100%;
 }
 
+html { margin: 0;}
+
 body, input, label {
     font-family: 'Open Sans', sans-serif;
     font-weight: normal;
@@ -44,163 +46,58 @@ h2 {
     font-size: 25pt;
 }
 
-h3 {
-    font-size: 18px;
-    font-weight: normal;
-    padding: 10px 0;
-    margin: 0;
-}
 
-
-table {
-    background-color: #e2e2e2;
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    padding: 10px 0;
-    color: #272727;
-}
-
-    table thead {
-        margin-top: 10px;
-        color: white;
-        padding-top: 10px;
-    }
-
-        table thead tr th {
-            background-color: #272727;
-            padding: 10px 15px;
-            text-align: left;
-        }
-
-    table tbody tr td {
-        padding: 10px 15px;
-    }
-
-    table tbody tr:nth-child(even) td {
-        background-color: #efefef;
-    }
-
-input[type=text], input[type=password] {
-    border: 3px solid #a5a5a5;
-    padding: 6px 5px 6px;
-    color: #828282;
-    font-size: 15px;
-    outline: 0;
-    line-height: 21px;
-}
-
-select {
-    border: 3px solid #a5a5a5;
-    padding: 6px 5px 6px;
-    color: #828282;
-    font-size: 15px;
-    outline: 0;
-    line-height: 21px;
-}
-
-pre {
-    background-color: #ffffcc;
-    font-family: "Consolas","Lucida Console",Monospace;
-    font-size: 11pt;
-    line-height: 14pt;
-    margin: 0;
-    padding: 0.5em;
-    color: black;
-    white-space: pre;
-    overflow: auto;
-}
-
-
-
-/* GLOBALS
------------------------*/
-.darkgray {
-    color: #272727;
-}
-
-.gray {
-    color: #a5a5a5;
-}
-
-.hide {
-    display: none;
-}
-
-.pointer {
+    input[type=submit], .btn-submit, a.btn-submit:visited {
+    background: url('icon-ok.png') no-repeat 10px center;
+    padding: 10px 15px 10px 45px;
+    background-color: #a8c019;
+    color: white;
+    border: 0;
+    font-size: 16px;
     cursor: pointer;
-}
-
-.box50 {
-    width: 50%;
-    float: left;
-}
-
-.box100 {
-    width: 100%;
-    float: left;
-}
-
-.pushdown-long {
-    margin-bottom: 50px;
-}
-
-.pushdown-medium {
-    margin-bottom: 20px;
-}
-
-.pushdown-short {
-    margin-bottom: 5px;
-}
-
-.pushup-short {
-    margin-top: 5px;
-}
-
-
-.bold {
-    font-weight: bold;
-}
-
-.indent {
-    padding-left: 20px;
-}
-
-.add {
-    background: url('/images/icon-plus.png') no-repeat left center;
-    padding: 5px 0 5px 30px;
-    color: #272727;
     text-decoration: none;
-    font-weight: bold;
 }
 
-.timeago {
-    border-bottom: 0 !important;
-    color: gray;
-}
-
-    .timeago:first-letter {
-        text-transform:uppercase;
+    input[type=submit]:hover {
+        background-color: #bad80a;
     }
 
-
-
-.container {
-    width: 960px;
-    margin: 30px auto 0;
-
+#top {
+    width: 100%;
+    background-color: #202020;
+    height: 80px;
+    position: absolute;
+    top: 0;
+    z-index: 1;
 }
+
+#container {
+    margin: 0 auto;  
+    z-index: 2;
+    position: relative;
+    width: 800px;
+}
+
+ul#menu {
+    list-style: none;
+    float: right;
+    margin: 0 0 40px 0;
+    padding: 30px 0;
+}
+
+ul#menu li { float: left;padding-left: 30px; }
+
+ul#menu li a { text-transform: uppercase;text-decoration: none;font-weight: bold;color: silver;}
+ul#menu li a:hover, ul#menu li a.active { color:#4dd7ff }
+
 
 #logo {
-    margin: 0 auto 40px auto;
-    display: block;
+    position: absolute;
 }
 
-.intro {
-    width: 600px;
-    margin: auto;
-    text-align: center;
-}
+
+.center { text-align: center;}
+
 
 .box {
     float: left;
@@ -209,6 +106,19 @@ pre {
     padding: 30px
 
 }
+
+.fullbox {
+    width: 100%;
+    text-align: center;
+    clear: both;
+    margin-bottom: 70px;
+}
+
+    .fullbox img {
+        padding: 5px;
+    }
+
+#screenshots img { width: 260px;}
 
 a.download {
     background: url('/images/icon_download.png') no-repeat 20px center #a8c019;
@@ -227,12 +137,76 @@ a.download {
         font-size: 10px;
     }
 
-.fullbox {
-    width: 100%;
-    text-align: center;
-    clear: both;
+
+
+
+
+/* Bubble from http://www.ilikepixels.co.uk/drop/bubbler/ - thanks guys! */
+.bubble 
+{
+    width: 485px;
+    position: relative;
+    padding: 15px;
+    border: #c0c0c0 solid 1px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    float: left;
 }
 
-    .fullbox img {
-        padding: 5px;
-    }
+.bubble-left:after 
+{
+    content: "";
+    position: absolute;
+    top: 25px;
+    left: -16px;
+    border-style: solid;
+    border-width: 11px 16px 11px 0;
+    border-color: transparent #FFFFFF;
+    display: block;
+    width: 0;
+    z-index: 1;
+}
+
+.bubble-left:before 
+{
+    content: "";
+    position: absolute;
+    top: 25px;
+    left: -17px;
+    border-style: solid;
+    border-width: 11px 16px 11px 0;
+    border-color: transparent #c0c0c0;
+    display: block;
+    width: 0;
+    z-index: 0;
+}
+
+
+.bubble-right:after 
+{
+    content: "";
+    position: absolute;
+    top: 17px;
+    right: -15px;
+    border-style: solid;
+    border-width: 11px 0 11px 16px;
+    border-color: transparent #FFFFFF;
+    display: block;
+    width: 0;
+    z-index: 1;
+}
+
+.bubble-right:before 
+{
+    content: "";
+    position: absolute;
+    top: 17px;
+    left: 484px;
+    border-style: solid;
+    border-width: 11px 0 11px 16px;
+    border-color: transparent #c0c0c0;
+    display: block;
+    width: 0;
+    z-index: 0;
+}

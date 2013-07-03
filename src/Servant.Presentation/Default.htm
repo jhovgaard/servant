@@ -1,36 +1,60 @@
 ﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>Servant for IIS</title>
-    <link href="Css/normalize.css" rel="stylesheet" />
-    <link href="Css/base.css" rel="stylesheet" />
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
-    <link href="Css/slimbox2.css" rel="stylesheet" />
+    <head>
+        <title>Servant for IIS</title>
+        <link href="css/normalize.css" rel="stylesheet" />
+        <link href="css/base.css?1" rel="stylesheet" />
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
+        <link href="css/slimbox2.css" rel="stylesheet" />
     
-    <link rel="shortcut icon" href="favicon.ico" />
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="image_src" type="image/png" href="http://servant.io/images/servant_logo_square.png" />
-    <meta property="og:image"  content="http://servant.io/images/servant_logo_square.png" />
-    <meta property="og:title" content="Servant for IIS" />
-    <meta property="og:url" content="http://servant.io" />
-    <meta property="og:description" content="Servant for IIS is an extension to the IIS webserver. It enables an advanced browser-based interface with a lot of new features like live stats and more..." />
-    <meta name="description" content="Servant for IIS is an extension to the IIS webserver. It enables an advanced browser-based interface with a lot of new features like live stats and more..."/>
-</head>
+        <link rel="shortcut icon" href="favicon.ico" />
+        <link rel="icon" href="favicon.ico" type="image/x-icon">
+        <link rel="image_src" type="image/png" href="http://servant.io/images/servant_logo_square.png" />
+        <meta property="og:image"  content="http://servant.io/images/servant_logo_square.png" />
+        <meta property="og:title" content="Servant for IIS" />
+        <meta property="og:url" content="http://servant.io" />
+        <meta property="og:description" content="Servant for IIS is an extension to the IIS webserver. It enables an advanced browser-based interface with a lot of new features like live stats and more..." />
+        <meta name="description" content="Servant for IIS is an extension to the IIS webserver. It enables an advanced browser-based interface with a lot of new features like live stats and more..."/>
+    </head>
     <body>
-        <div class="container">
-            <img id="logo" src="Images/servant_logo.gif" alt="Servant for IIS logo" class="pushdown-long" />
+        <div id="top"></div>
+        <div id="container" class="container">
+            <a href="/">
+                <img src="images/servant_logo.gif" id="logo" alt="Servant for IIS logo"/>
+            </a>
+            <ul id="menu">
+                <li><a href="#download">Download</a></li>
+                <li><a href="#screenshots">Screenshots</a></li>
+            </ul>
             
-            <div class="intro">
+            <div style="clear: both"></div>
+            
+            <div class="center">
                 <h1>Welcome to Servant for IIS</h1>
-            
+                
                 <p>Servant is a piece of software that transforms your regular Internet Information Services (IIS) Manager to a beautiful, fast and web-based management tool.</p>
                 <p>It's designed to fit your daily routines, optimized to track down your worst problems and created to stop you from wasting time on administration.</p>
+                
+                <div style="display: inline-block; text-align: left; margin-top: 20px;">
+                    <img src="images/shanselman.jpg" style="border-radius: 5px; margin-right: 20px; margin-top: 11px; float: left;" />
+                    <div class="bubble bubble-left">
+                        <a href="http://www.hanselman.com/" target="_blank" style="font-weight: bold;">Scott Hanselman</a><br/>
+                        "It's really a lovely piece of software. Nicely done!"
+                    </div>
+                </div>
+                <div style="display: inline-block; text-align: left; margin-top: 20px;">
+                    <img src="images/erez.jpg" style="border-radius: 5px; margin-left: 20px; margin-top: 11px; float: right;" />
+                    <div class="bubble bubble-right">
+                        <a href="http://blogs.technet.com/b/erezs_iis_blog/archive/2013/05/10/servant-here-to-serve-you.aspx" target="_blank" style="font-weight: bold;"> Erez Benari, Program Manager for IIS</a><br/>
+                        "This kind of innovation (not to mention terrific visual style) is a great achievement and speaks highly to the quality of the IIS community."
+                    </div>
+                </div>
             </div>
-            
+
             <div class="box">
                 <h2>IIS meets your browser</h2>
                 <p>Servant is accessed as any other website. You just enter your credentials from a web browser and you instantly get access to every setting on your IIS.</p>
-                <p>The web interface is the core of Servant. There isn't any application nor server console - everything happens in the browser. You'll never need to remote connect to your server or install any additional software on your computer to manage your server. You just enter the URL of your Servant-enabled IIS, even from your smartphone.</p>
+                <p>The web interface is the core of Servant. You'll never need to remote connect to your server or install any additional software on your workstation to manage your server. As soon as the Servant Windows Service is running on your server you have access, even from your smartphone.</p>
             </div>
             
             <div class="box">
@@ -40,6 +64,7 @@
             </div>
             
             <div class="fullbox">
+                <a id="download"></a>
                 <h2 class="pushdown-medium">Installation</h2>
                 
                 <ol style="clear: both; text-align: left; width: 445px; margin: 30px auto 40px auto;">
@@ -49,37 +74,47 @@
                     <li>Follow instructions on screen.</li>
                 </ol>
 
-                <a href="http://storage.servant.io/files/servant-1.0.5.zip" class="download pushdown-medium" target="_blank" onclick="_gaq.push(['_trackEvent','Download','Servant',this.href]);">Download Servant for IIS now!
-                    <span>Servant for IIS Free 1.0 - 940 kb</span>
+                <a href="http://storage.servant.io/files/servant-1.1.zip" class="download pushdown-medium" target="_blank" onclick="_gaq.push(['_trackEvent','Download','Servant',this.href]);">Download Servant for IIS now!
+                    <span>Servant for IIS Free 1.1 - 728 kb</span>
                 </a>
                 
             </div>
-
+            
+            
             
             <div class="fullbox pushdown-long" id="screenshots">
                 <h2>Screenshots</h2>
-                <a href="Images/servant_screenshot_1.gif"><img src="Images/servant_screenshot_1_thumb.gif" rel="lightbox" alt="Servant Screenshot - Home" /></a>
-                <a href="Images/servant_screenshot_2.gif"><img src="Images/servant_screenshot_2_thumb.gif" alt="Servant Screenshot - Site settings" /></a>
-                <a href="Images/servant_screenshot_3.gif"><img src="Images/servant_screenshot_3_thumb.gif" alt="Servant Screenshot - Site errors/exceptions" /></a>
+                <a href="images/servant_screenshot_1.gif"><img src="images/servant_screenshot_1_thumb.gif" rel="lightbox" alt="Servant Screenshot - Home" /></a>
+                <a href="images/servant_screenshot_2.gif"><img src="images/servant_screenshot_2_thumb.gif" alt="Servant Screenshot - Site settings" /></a>
+                <a href="images/servant_screenshot_3.gif"><img src="images/servant_screenshot_3_thumb.gif" alt="Servant Screenshot - Site errors/exceptions" /></a>
 
+            </div>
+            
+            <div class="fullbox">
+                <h2>Sign up for the newsletter</h2>
+                <p>Do you want to get updated when we release new awesome features? Subscribe below. We promise no spam!</p>
+                <form action="http://servant.us5.list-manage1.com/subscribe/post?u=03f7634d8f38f00fa95264d15&amp;id=dea225a6ba" method="post" target="_blank">
+                    <div class="input-group">
+                        <div style="width: 600px; margin: auto;">
+                            <input type="text" value="" name="EMAIL" style="padding: 8px 8px 7px; width: 450px;">
+                            <input type="submit"  value="Subscribe" class="btn-submit" />
+                        </div>
+                    </div>
+                </form>
             </div>
 
             <div class="fullbox pushdown-long">
-                <a href="https://twitter.com/servantforiis" target="_blank"><img src="Images/twitter-64x64.png" /></a>
-                <a href="https://facebook.com/servantforiis" target="_blank"><img src="Images/facebook-64x64.png" /></a>
+                <a href="https://twitter.com/servantforiis" target="_blank"><img src="images/twitter-64x64.png" /></a>
+                <a href="https://facebook.com/servantforiis" target="_blank"><img src="images/facebook-64x64.png" /></a>
             </div>
             
             <p style="font-size: 10px; color: silver; width: 100%; text-align: center;">© Copyright 2013 - 8seven</p>
         </div>
         
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js" type="text/javascript"></script>
+        <script src="jquery.watermark.min.js"></script>
         <script src="slimbox2.js"></script>
-        <script>
-            $("#screenshots a").slimbox({
-                resizeDuration: 200,
-                captionAnimationDuration: 50,
-            });
-        </script>
+        <script src="smoothscroll.js"></script>
         <script type="text/javascript">
             var _gaq = _gaq || [];
             _gaq.push(['_setAccount', 'UA-9004302-4']);
@@ -90,6 +125,14 @@
                 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
                 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
             })();
+
+            $(function() {
+                $('input[name=EMAIL]').watermark('Your email address');
+                $('#screenshots a').slimbox({
+                    resizeDuration: 200,
+                    captionAnimationDuration: 50,
+                });
+            });
         </script>
     </body>
 </html>

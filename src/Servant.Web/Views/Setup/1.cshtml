@@ -1,0 +1,55 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "_Setup.cshtml";
+}
+
+<h1 class="pushdown-long">You're almost ready!</h1> 
+        
+<p>You've succcesfully installed Servant on your server and to be honest, we couldn't be happier! We hate to bug you, but we need a few details before we're ready.</p>
+        
+<form action="/setup/1/" method="POST" style="width: 400px; margin: auto;">
+    <div class="input-group">
+        <label for="servanturl">URL to Servant</label>
+        <input type="text" tabindex="1" name="servanturl" id="servanturl" class="input-medium span4" value="@Model.Configuration.ServantUrl" />
+    </div>
+            
+    <div class="input-group">
+        <label for="username">Username</label>
+        <input type="text" tabindex="3" name="username" id="username" class="input-medium span4" value="@Model.Configuration.Username" />
+    </div>
+            
+    <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" tabindex="4" name="password" id="password" class="input-medium span4" value="" />
+    </div>
+    
+    <div class="input-group">
+        <div style="width: 300px; margin: auto;">
+            <label>
+                <input type="checkbox" tabindex="7" name="autosendcrashreport" @((bool)Model.AutoSendCrashReport ? Html.Raw("checked=\"checked\"") : null) />
+                Help improve Servant by sending crash reports and usage statistics to the Servant team automatically.
+            </label>
+        </div>
+    </div>
+            
+    <div class="input-group">
+        <div style="width: 300px; margin: auto;">
+            <label>
+                <input type="checkbox" tabindex="5" name="acceptterms" @((bool)Model.AcceptTerms ? Html.Raw("checked=\"checked\"") : null) />
+                I agree and accept <a href="http://servant.io/license.txt" target="_blank">the terms and conditions for using Servant for IIS</a>.
+            </label>
+        </div>
+    </div>
+            
+    <div style="margin: auto; width: 200px;">
+        <input type="submit" tabindex="6" value="Start Servant now!" />
+    </div>
+</form>
+
+@section javascript {
+    <script type="text/javascript">
+        $(function() {
+            $('#password').focus();
+        });
+    </script>
+}

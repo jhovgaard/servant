@@ -1,0 +1,110 @@
+﻿@using Servant.Web.Helpers
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Shared/_Layout.cshtml";
+    ViewBag.ActiveMenuItem = "home";
+}
+
+<h1 class="pushdown-medium">Welcome to <strong>Servant for IIS</strong></h1>
+
+<div class="pushdown-medium indent">
+    Hi Administrator!<br/>
+    <br/>
+    We’re happy to help you manage your IIS. If you have any questions feel free to contact the team at <a href="mailto:hello@servant.io">hello@servant.io</a>.<br/>
+    Found a bug or have a suggestion? Click <a href="javascript:UserVoice.showPopupWidget();">the feedback button</a> in the right side of the screen and let us know!
+    <br/><br/>
+    @if(!Model.HaveSeenNewsletter) {
+        <div id="newslettersignup">
+            <strong>Want to know about new features?</strong><br/>
+            <p style="margin: 0;">We're constantly working on new features for Servant. To be able to reach you when a new version gets released, simply type in your info below and we will email you - no spam, we promise!</p>
+            <form action="/subscribetonewsletter" method="POST" id="subscribeform" class="pushup-medium" style="float: left; padding-bottom: 10px;">
+                <div class="input-group" style="float:left; padding-right: 5px; padding-bottom: 5px;">
+                    <input type="text" name="email" style="width: 200px; padding: 8px 8px 7px; margin-bottom: 2px;" />
+                </div>
+                <div class="input-group" style="float:left; padding-right: 5px; padding-bottom: 5px;">
+                    <input type="text" name="firstname" style="width: 200px; padding: 8px 8px 7px; margin-bottom: 2px;" />
+                </div>
+
+                <div class="input-group" style="float:left; padding-right: 5px; padding-bottom: 5px;">
+                    <input type="text" name="lastname" style="width: 200px; padding: 8px 8px 7px; margin-bottom: 2px;" />
+                </div>
+                <div class="input-group" style="float:left; padding-right: 5px;">
+                    <input type="submit" value="Subscribe" class="btn-submit" />
+                </div>
+            </form>
+        </div>
+    }
+</div>
+
+<div style="clear: both;"></div>
+
+
+<h2 class="bug"><span class="sprite sprite-icon-bug"></span>Latest unhandled exceptions</h2>
+@if(Model.UnhandledExceptions.Count != 0)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Site</th>
+                <th>Exception</th>
+                <th>Timestamp</th>
+
+            </tr>
+        </thead>
+        @foreach (Servant.Business.Objects.ApplicationError error in Model.UnhandledExceptions)
+        {
+            <tr>
+                <td style="min-width: 60px">
+                    @if (error.Site != null){
+                        <a href="/sites/@error.SiteIisId/settings/">@error.Site.Name</a>
+                    } else {
+                        @:Unknown
+                    }
+                </td>
+                <td>
+                    @if(error.Site != null) {
+                        <a href="/sites/@error.SiteIisId/errors/@error.Id/">@error.ExceptionType: @error.Description.EllipticizeForErrorDescription()</a>
+                    } else {
+                        <a href="/errors/@error.Id/">@error.ExceptionType</a>
+                    }
+                </td>
+                <td style="width: 170px;">
+                    <abbr class="timeago" title="@error.DateTime.ToString("o")">@error.DateTime</abbr>
+                </td>
+            </tr>
+        }
+    </table>
+} else
+{
+    <p class="pushup-medium indent">Awesome! Not a single error was found.</p>
+}
+
+@section javascript {
+    <script>
+        $(function() {
+            var form = $("#subscribeform");
+            form.find("input[name=firstname]").watermark("First name (optional)");
+            form.find("input[name=lastname]").watermark("Last name (optional)");
+            form.find("input[name=email]").watermark("Email");
+
+            $(form).submit(function () {
+                var url = $(this).attr("action");
+                var data = $(this).serialize();
+                $.post(url, data, function (response) {
+                    if (response.Type == "Success") {
+                        $("#newslettersignup").slideUp().fadeOut();
+                        ShowMessage("success", "Thanks for signing up! Please see your inbox for confirmation.");
+                    } else {
+                        if(response.Errors != null)
+                            ParseErrors(response.Errors);
+                        else {
+                            ShowMessage(response.Type.toLowerCase(), response.Message);
+                        }
+                    }
+                });
+
+                return false;
+            });
+        });
+    </script>
+}

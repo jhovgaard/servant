@@ -44,12 +44,20 @@ namespace Servant.Business.Helpers
                                  uri.AbsolutePath);
         }
 
-        public static Binding ConvertToBinding(string finalizedBinding, string ipAddress, X509Certificate2 certificate = null)
+        public static Binding ConvertToBinding(string finalizedBinding, string ipAddress, Certificate certificate = null)
         {
             if (finalizedBinding == null)
                 return null;
 
             finalizedBinding = finalizedBinding.Replace("*", WildcardIdentifier);
+
+            string ipAsString = "*";
+            if (!string.IsNullOrWhiteSpace(ipAddress) && ipAddress != "*")
+            {
+                System.Net.IPAddress ip;
+                System.Net.IPAddress.TryParse(ipAddress ?? "", out ip);
+                ipAsString = ip.ToString();
+            }
 
             var uri = new Uri(finalizedBinding);
             var hostname = uri.Host == WildcardIdentifier ? "*" : uri.Host;
@@ -58,10 +66,20 @@ namespace Servant.Business.Helpers
                     Hostname = hostname,
                     Port = uri.Port,
                     Protocol = (Protocol) Enum.Parse(typeof (Protocol), uri.Scheme),
-                    CertificateName = certificate != null ? certificate.FriendlyName : null,
-                    CertificateHash = certificate != null ? certificate.GetCertHash() : null,
-                    IpAddress = ipAddress ?? "*"
+                    CertificateName = certificate != null ? certificate.Name : null,
+                    CertificateThumbprint = certificate != null ? certificate.Thumbprint : null,
+                    IpAddress = ipAsString
                 };
+        }
+
+        public static bool IsIpValid(string ipAddress)
+        {
+            System.Net.IPAddress ip;
+            
+            if (ipAddress == "*" || string.IsNullOrWhiteSpace(ipAddress))
+                return true;
+
+            return System.Net.IPAddress.TryParse(ipAddress, out ip);
         }
     }
 }

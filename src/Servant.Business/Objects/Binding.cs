@@ -4,6 +4,11 @@ namespace Servant.Business.Objects
 {
     public class Binding
     {
+        public Binding()
+        {
+            IpAddress = "*";
+        }
+
         private string _userInput;
         public string UserInput
         {
@@ -16,7 +21,7 @@ namespace Servant.Business.Objects
         public int Port { get; set; }
         public string IpAddress { get; set; }
         public string CertificateName { get; set; }
-        public byte[] CertificateHash { get; set; }
+        public string CertificateThumbprint { get; set; }
         public new string ToString()
         {
             return Protocol.ToString() + "://" + (string.IsNullOrWhiteSpace(Hostname) ? "*" : Hostname) + ":" + Port;
