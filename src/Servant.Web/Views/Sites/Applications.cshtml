@@ -1,0 +1,92 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    Layout = "Sites/_Details.cshtml";
+    ViewBag.ActiveSubmenuItem = "applications";
+}
+
+
+<form action="/sites/@Model.Site.IisId/applications/" method="POST">
+    <table class="pushdown-short @(!Model.Site.HasApplications() ? "hide" : "")" id="entries">
+        <tbody class="hide">
+            <tr class="input-group">
+                <td><label for="Path">Name (path)</label></td>
+                <td><input type="text" name="path" value="" style="width: 100%;" /></td>
+                <td rowspan="3" style="width: 30px; text-align: center; padding-top: 8px; vertical-align: top;">
+                    <span class="remove-entry hide"></span>
+                </td>
+            </tr>
+            <tr class="input-group">
+                <td><label>Application pool</label></td>
+                <td>
+                    <select name="applicationpool" id="applicationpool" style="width: 100%">
+                        @foreach (var appPool in Model.ApplicationPools)
+                        {
+                            if(appPool == Model.Site.ApplicationPool)
+                            {
+                                <option selected="selected">@appPool</option>
+                            } else {
+                                <option>@appPool</option>
+                            }
+                
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr class="last input-group">
+                <td><label>Disk path</label></td>
+                <td><input type="text" name="diskpath" value="" style="width: 100%;" /></td>
+            </tr>
+        </tbody>
+        @foreach(var application in Model.Site.Applications)
+        {
+            <tbody>
+                <tr class="input-group">
+                    <td><label for="Path">Name (path)</label></td>
+                    <td><input type="text" name="path" value="@application.Path" style="width: 100%;" /></td>
+                    <td rowspan="3" style="width: 30px; text-align: center; padding-top: 8px; vertical-align: top;">
+                        <span class="remove-entry"></span>
+                    </td>
+                </tr>
+                <tr class="input-group">
+                    <td><label>Application pool</label></td>
+                    <td>
+                        <select name="applicationpool" id="applicationpool" style="width: 100%">
+                            @foreach (var appPool in Model.ApplicationPools)
+                            {
+                                if(appPool == application.ApplicationPool)
+                                {
+                                    <option selected="selected">@appPool</option>
+                                } else {
+                                    <option>@appPool</option>
+                                }
+                
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr class="last input-group">
+                    <td><label>Disk path</label></td>
+                    <td><input type="text" name="diskpath" value="@application.DiskPath" style="width: 100%;" /></td>
+                </tr>
+            </tbody>
+        }
+    </table>
+
+    <a href="#" class="add" id="add-entry">Add application</a>
+        
+    <div class="box100 pushup-medium">
+        <input type="submit" class="btn btn-primary" value="Save applications" />
+    </div>
+</form>
+
+
+@section javascript {
+    <script>
+        $(function () {
+            $("form").submit(function () {
+                var $entries = $("#entries");
+                $entries.find("tbody:hidden").remove();
+            });
+        });
+    </script>
+}

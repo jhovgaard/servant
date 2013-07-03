@@ -1,1 +1,0 @@
-Servant.Server.exe uninstall
