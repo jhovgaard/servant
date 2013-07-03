@@ -144,6 +144,7 @@ a.download {
 /* Bubble from http://www.ilikepixels.co.uk/drop/bubbler/ - thanks guys! */
 .bubble 
 {
+    width: 485px;
     position: relative;
     padding: 15px;
     border: #c0c0c0 solid 1px;
@@ -153,7 +154,7 @@ a.download {
     float: left;
 }
 
-.bubble:after 
+.bubble-left:after 
 {
     content: "";
     position: absolute;
@@ -167,7 +168,7 @@ a.download {
     z-index: 1;
 }
 
-.bubble:before 
+.bubble-left:before 
 {
     content: "";
     position: absolute;
@@ -175,6 +176,35 @@ a.download {
     left: -17px;
     border-style: solid;
     border-width: 11px 16px 11px 0;
+    border-color: transparent #c0c0c0;
+    display: block;
+    width: 0;
+    z-index: 0;
+}
+
+
+.bubble-right:after 
+{
+    content: "";
+    position: absolute;
+    top: 17px;
+    right: -15px;
+    border-style: solid;
+    border-width: 11px 0 11px 16px;
+    border-color: transparent #FFFFFF;
+    display: block;
+    width: 0;
+    z-index: 1;
+}
+
+.bubble-right:before 
+{
+    content: "";
+    position: absolute;
+    top: 17px;
+    left: 484px;
+    border-style: solid;
+    border-width: 11px 0 11px 16px;
     border-color: transparent #c0c0c0;
     display: block;
     width: 0;
