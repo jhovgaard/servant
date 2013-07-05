@@ -353,12 +353,15 @@ namespace Servant.Web.Modules
                 if (string.IsNullOrWhiteSpace(application.Path))
                     AddPropertyError("path[" + i + "]", "Path is required.");
 
-                if(!FileSystemHelper.IsPathValid(application.DiskPath))
+                if (!FileSystemHelper.IsPathValid(application.Path))
                     AddPropertyError("path[" + i + "]", "Path cannot contain the following characters: ?, ;, :, @, &, =, +, $, ,, |, \", <, >, *.");
-
+                
                 var existingApplicationByPath = site.Applications.SingleOrDefault(x => x != site.Applications[i] && x.Path == site.Applications[i].Path);
                 if (site.SitePath != null && existingApplicationByPath != null)
                     AddPropertyError("path[" + i + "]", "There's already an application with this path.");
+
+                if (!FileSystemHelper.IsPathValid(application.DiskPath))
+                    AddPropertyError("diskpath[" + i + "]", "Path cannot contain the following characters: ?, ;, :, @, &, =, +, $, ,, |, \", <, >, *.");
             }
         }
     }

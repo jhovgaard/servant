@@ -10,7 +10,7 @@ namespace Servant.Web.Tests.Helpers
 
         public BrowserBuilder()
         {
-            _bootstrapper = new Servant.Server.Bootstrapper();
+            _bootstrapper = new Bootstrapper();
         }
 
         public BrowserBuilder WithoutConfiguration()
