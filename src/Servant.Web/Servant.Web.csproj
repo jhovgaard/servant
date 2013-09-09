@@ -136,9 +136,7 @@
     <EmbeddedResource Include="Views\Sites\Error.cshtml" />
     <EmbeddedResource Include="Views\Sites\Errors.cshtml" />
     <EmbeddedResource Include="Views\Sites\Index.cshtml" />
-    <EmbeddedResource Include="Views\Sites\Request.cshtml" />
     <EmbeddedResource Include="Views\Sites\Settings.cshtml" />
-    <EmbeddedResource Include="Views\Sites\Stats.cshtml" />
     <EmbeddedResource Include="Views\Stats\CleanupApplicationPools.cshtml" />
     <EmbeddedResource Include="Views\Stats\Index.cshtml" />
     <EmbeddedResource Include="Views\Sites\Applications.cshtml" />

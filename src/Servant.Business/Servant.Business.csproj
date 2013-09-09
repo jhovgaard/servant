@@ -55,12 +55,7 @@
     <Compile Include="Objects\Enums\InstanceState.cs" />
     <Compile Include="Objects\Enums\StatsRange.cs" />
     <Compile Include="Objects\Error.cs" />
-    <Compile Include="Objects\IisLogFile.cs" />
     <Compile Include="Objects\LogEntry.cs" />
-    <Compile Include="Objects\Reporting\MostActiveClient.cs" />
-    <Compile Include="Objects\Reporting\MostActiveUrl.cs" />
-    <Compile Include="Objects\Reporting\MostExpensiveRequest.cs" />
-    <Compile Include="Objects\Reporting\ServerStats.cs" />
     <Compile Include="Objects\ServantConfiguration.cs" />
     <Compile Include="Objects\Site.cs" />
     <Compile Include="Objects\ApplicationError.cs" />
