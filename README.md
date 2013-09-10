@@ -1,7 +1,3 @@
-<div style="text-align: center;">
-  <img src="http://www.jhovgaard.com/postfiles/servant-banner.png" />
-</div>
-
 Servant for IIS
 ===============
 
