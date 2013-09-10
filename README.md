@@ -12,3 +12,8 @@ Installation
 2. Extract files to desired folder.
 3. Double-click the file "Install Servant Service.bat"
 4. Follow instructions on screen.
+
+
+License
+--------------
+Servant is licensed under MIT. Refer to license.txt for more information.
