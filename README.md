@@ -1,5 +1,9 @@
+<div style="text-align: center;">
+  <img src="http://www.jhovgaard.com/postfiles/servant-banner.png" />
+</div>
+
 Servant for IIS
-=======
+===============
 
 Servant is a piece of software that transforms your regular Internet Information Services (IIS) Manager to a beautiful, fast and web-based management tool.
 
