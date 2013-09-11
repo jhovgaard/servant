@@ -9,7 +9,7 @@ using Nancy.TinyIoc;
 using Servant.Business;
 using Servant.Business.Objects;
 using Servant.Web.Helpers;
-using Servant.Web.Infrastructure;
+using Servant.Web.Infrastructure; 
 
 namespace Servant.Web
 {
