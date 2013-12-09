@@ -373,14 +373,16 @@ pre {
     line-height: 23px;
 }
 
-    #topmenu ul li.settings a:hover,
-    #topmenu ul.active-settings li.settings a { border-bottom: 5px solid #7fba00; }
+#topmenu ul li.settings a:hover,
+#topmenu ul.active-settings li.settings a,
+#topmenu ul.active-general li.general a { border-bottom: 5px solid #7fba00; }
 
-    #topmenu ul li.errors a:hover,
-    #topmenu ul.active-errors li.errors a {border-bottom: 5px solid #00bcf2;}
+#topmenu ul li.applications a:hover,
+#topmenu ul.active-applications li.applications a,
+#topmenu ul.active-api li.api a {border-bottom: 5px solid #682174;}
 
-    #topmenu ul li.applications a:hover,
-    #topmenu ul.active-applications li.applications a {border-bottom: 5px solid #682174;}
+#topmenu ul li.errors a:hover,
+#topmenu ul.active-errors li.errors a {border-bottom: 5px solid #00bcf2;}
 
 #maincontent {
     float: left;

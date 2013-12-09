@@ -9,7 +9,9 @@ using Nancy.TinyIoc;
 using Servant.Business;
 using Servant.Business.Objects;
 using Servant.Web.Helpers;
-using Servant.Web.Infrastructure; 
+using Servant.Web.Infrastructure;
+using Servant.Web.Performance;
+using Timer = System.Timers.Timer;
 
 namespace Servant.Web
 {
@@ -36,6 +38,8 @@ namespace Servant.Web
 
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
+            PerformanceData.Run();
+
             var host = TinyIoCContainer.Current.Resolve<IHost>();
 
             pipelines.EnableBasicAuthentication(new BasicAuthenticationConfiguration(container.Resolve<IUserValidator>(), "Servant"));
