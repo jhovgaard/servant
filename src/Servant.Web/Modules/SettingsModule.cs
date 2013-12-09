@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Threading;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Validation;
 using Servant.Business;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
-using Servant.Web.Infrastructure;
 
 namespace Servant.Web.Modules
 {
@@ -94,6 +92,20 @@ namespace Servant.Web.Modules
                 Helpers.ConfigurationHelper.UpdateConfiguration(configuration);
                 
                 return Response.AsRedirect("/settings/");
+            };
+
+            Get["/api/"] = p =>
+            {
+                Model.Settings = configuration;
+                return View["Api", Model];
+            };
+
+            Post["/api/"] = p =>
+            {
+                configuration.EnableApi = Request.Form.enableapi.HasValue;
+                Helpers.ConfigurationHelper.UpdateConfiguration(configuration);
+
+                return Response.AsRedirect("/settings/api");
             };
         }
     }
