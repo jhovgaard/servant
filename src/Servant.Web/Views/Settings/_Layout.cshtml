@@ -1,0 +1,18 @@
+﻿@{
+    Layout = "Shared/_Layout.cshtml";
+    ViewBag.ActiveMenuItem = "settings";
+}
+
+<div id="topmenu">
+    <ul class="active-@ViewBag.ActiveSubmenuItem">
+        <li><h1><a href="/settings/">Settings</a></h1></li>
+        <li class="general"><a href="/settings">General</a></li>
+        <li class="api"><a href="/settings/api/">API</a></li>
+    </ul>
+</div>
+
+@RenderBody()
+
+@section javascript {
+    @RenderSection("javascript", false)
+}

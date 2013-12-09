@@ -1,9 +1,8 @@
 ﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
-    Layout = "Shared/_Layout.cshtml";
-    ViewBag.ActiveMenuItem = "settings";
+    Layout = "Settings/_Layout.cshtml";
+    ViewBag.ActiveSubmenuItem = "general";
 }
-<h1>Settings</h1>
 
 <div class="box50">
     <h3>General</h3> 
@@ -48,28 +47,6 @@
         </div>
     </form>
 </div>
-
-@*<div class="box50">
-    <h3>Error monitoring</h3>
-        
-    <p class="margin-top10">Error monitoring checks your IIS for new application errors every 5 minutes. 
-        Error monitoring is currently <strong>@Html.Raw((bool)Model.Configuration.EnableErrorMonitoring ? "activated" : "deactived")</strong>.</p>
-        
-    @if((bool)Model.Configuration.EnableErrorMonitoring)
-    {
-        <form method="POST" action="/settings/startlogparsing/">
-            <input type="hidden" value="false" name="start"/>
-            <input type="submit" class="cancel" value="Deactivate"/>      
-        </form>
-    } else
-    {
-        <form method="POST" action="/settings/startlogparsing/">
-            <input type="hidden" value="true" name="start"/>
-            <input type="submit" value="Activate"/>
-        </form>
-    }
-</div>*@
-
 
 @section javascript {
     <script type="text/javascript">
