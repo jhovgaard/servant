@@ -122,7 +122,6 @@
     <Content Include="Install Servant Service.vbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="app.config" />
     <None Include="packages.config" />
     <Content Include="Uninstall Servant Service.vbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
