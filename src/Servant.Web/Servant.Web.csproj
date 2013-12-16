@@ -145,7 +145,7 @@
     <EmbeddedResource Include="Views\Stats\Index.cshtml" />
     <EmbeddedResource Include="Views\Sites\Applications.cshtml" />
     <Content Include="Views\Settings\_Layout.cshtml" />
-    <Content Include="Views\Settings\Index.cshtml" />
+    <EmbeddedResource Include="Views\Settings\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
