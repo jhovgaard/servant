@@ -368,7 +368,6 @@ namespace Servant.Web.Helpers
                 {
                     try
                     {
-                        System.Threading.Thread.Sleep(3001);
                         if (iisSite.State == ObjectState.Started)
                             created = true;
                     }
