@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Nancy.Testing;
+using NUnit.Framework;
 using Nancy;
 using Servant.Business.Objects;
 using Servant.Web.Helpers;
@@ -20,7 +21,7 @@ namespace Servant.Web.Tests
                     with.Authenticated();
                 });
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            ServantAsserts.ResponseIsOkAndContainsData(response);
         }
 
         [Test]
@@ -29,7 +30,7 @@ namespace Servant.Web.Tests
             var browser = new BrowserBuilder().WithDefaultConfiguration().Build();
             var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
-            var response = browser.Post("/settings/", with =>
+            BrowserResponse response = browser.Post("/settings/", with =>
                 {
                     with.Authenticated();
                     with.HttpRequest();

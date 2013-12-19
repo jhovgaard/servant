@@ -41,7 +41,7 @@ namespace Servant.Web.Tests
                     with.HttpRequest();
                 });
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            ServantAsserts.ResponseIsOkAndContainsData(response);
         }
  
         [Test]
@@ -83,7 +83,7 @@ namespace Servant.Web.Tests
                     with.Authenticated();
                 });
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            ServantAsserts.ResponseIsOkAndContainsData(response);
         }
         
         [Test]

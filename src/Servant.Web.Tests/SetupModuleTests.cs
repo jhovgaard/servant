@@ -24,7 +24,7 @@ namespace Servant.Web.Tests
             var browser = new BrowserBuilder().WithoutConfiguration().Build();
             var response = browser.Get("/setup/1/", with => with.HttpRequest());
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            ServantAsserts.ResponseIsOkAndContainsData(response);
         }
 
         [Test]
