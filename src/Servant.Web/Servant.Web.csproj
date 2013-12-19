@@ -117,6 +117,7 @@
     <Compile Include="Modules\SitesModule.cs" />
     <Compile Include="Modules\StatsModule.cs" />
     <Compile Include="Modules\TestModule.cs" />
+    <Compile Include="Performance\LimitedSizeStack.cs" />
     <Compile Include="Performance\PerformanceData.cs" />
     <Compile Include="Performance\SystemInfoWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

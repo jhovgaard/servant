@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Nancy;
 using Servant.Business.Objects;
@@ -10,14 +13,18 @@ namespace Servant.Web.Modules
 {
     public class ApiModule : BaseModule
     {
-        public ApiModule()
-            : base("/api/")
+        public ApiModule() : base("/api/")
         {
             var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
             Before += ctx => !configuration.EnableApi ? new NotFoundResponse() : null;
 
             Get["/"] = p => "Servant API";
+
+            //Get["/test"] = p =>
+            //{
+            //    //return "Count:" + PerformanceData.
+            //};
 
             #region Stats
             Get["/stats/"] = p =>
@@ -32,8 +39,9 @@ namespace Servant.Web.Modules
                     PerformanceData.SystemUpTime,
                     PerformanceData.TotalMemory,
                     PerformanceData.PhysicalAvailableMemory,
-                    PerformanceData.CpuUsage,
-                    PerformanceData.TotalGetRequestsSec,
+                    PerformanceData.AverageCpuUsage,
+                    PerformanceData.AverageGetRequestPerSecond,
+                    PerformanceData.CurrentConnections,
                     Drives = drives,
                     Sites = sites.Count(),
                     SitesStopped = sites.Count(x => x.SiteState != InstanceState.Started)
