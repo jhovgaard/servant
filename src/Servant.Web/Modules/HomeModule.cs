@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Servant.Business.Objects;
@@ -14,7 +15,7 @@ namespace Servant.Web.Modules
                 var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
                 var latestErrors = EventLogHelper.GetByDateTimeDescending(5).ToList();
-                latestErrors = EventLogHelper.AttachSite(latestErrors);
+                latestErrors = EventLogHelper.AttachSite(latestErrors, Page.Sites);
                 Model.UnhandledExceptions = latestErrors;
                 Model.HaveSeenNewsletter = configuration.HaveSeenNewsletter;
                 return View["Index", Model];

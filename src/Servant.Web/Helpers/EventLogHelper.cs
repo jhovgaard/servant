@@ -135,9 +135,8 @@ namespace Servant.Web.Helpers
             }
         }
 
-        public static List<ApplicationError> AttachSite(IEnumerable<ApplicationError> errors)
+        public static List<ApplicationError> AttachSite(IEnumerable<ApplicationError> errors, IEnumerable<Site> sites)
         {
-            var sites = SiteManager.GetSites().ToList();
             foreach (var applicationError in errors)
             {
                 applicationError.Site = sites.SingleOrDefault(x => x.IisId == applicationError.SiteIisId);

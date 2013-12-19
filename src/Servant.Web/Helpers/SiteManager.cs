@@ -39,7 +39,7 @@ namespace Servant.Web.Helpers
 
         }
 
-        public static IEnumerable<Site> GetSites()
+        public static IEnumerable<Site> GetSites(bool excludeAppPools = false)
         {
             using (var manager = new ServerManager())
             {
@@ -48,7 +48,7 @@ namespace Servant.Web.Helpers
                     if (site.Bindings.Select(x => x.Protocol).Any(x => x == "ftp")) // Servant doesn't support FTP sites
                         continue;
 
-                    var parsedSite = ParseSite(site);
+                    var parsedSite = ParseSite(site, excludeAppPools);
                     if (parsedSite != null)
                         yield return parsedSite;
                 }    
@@ -75,16 +75,12 @@ namespace Servant.Web.Helpers
             }
         }
 
-        private static Servant.Business.Objects.Site ParseSite(Microsoft.Web.Administration.Site site)
+        private static Site ParseSite(Microsoft.Web.Administration.Site site, bool excludeAppPools = false)
         {
             if (site == null)
                 return null;
 
-            ObjectState applicationPoolState;
-            using (var manager = new ServerManager())
-            {
-                applicationPoolState = manager.ApplicationPools[site.Applications[0].ApplicationPoolName].State;    
-            }
+
 
             var servantSite = new Site {
                     IisId = (int)site.Id,
@@ -92,10 +88,22 @@ namespace Servant.Web.Helpers
                     ApplicationPool = site.Applications[0].ApplicationPoolName,
                     SitePath = site.Applications[0].VirtualDirectories[0].PhysicalPath,
                     SiteState = (InstanceState)Enum.Parse(typeof(InstanceState), site.State.ToString()),
-                    ApplicationPoolState = (InstanceState)Enum.Parse(typeof(InstanceState),  applicationPoolState.ToString()),
                     LogFileDirectory = site.LogFile.Directory,
                     Bindings = GetBindings(site).ToList(),
                 };
+
+
+
+            
+            if (!excludeAppPools)
+            {
+                using (var manager = new ServerManager())
+                {
+                    ObjectState applicationPoolState = manager.ApplicationPools[site.Applications[0].ApplicationPoolName].State;
+                    servantSite.ApplicationPoolState = (InstanceState)Enum.Parse(typeof(InstanceState),  applicationPoolState.ToString());
+                }
+            }
+
 
             if (site.Applications.Count > 1)
             {

@@ -44,7 +44,7 @@ namespace Servant.Web.Modules
                 Page = new PageModel
                 {
                     Servername = System.Environment.MachineName,
-                    Sites = SiteManager.GetSites().OrderBy(x => x.Name)
+                    Sites = SiteManager.GetSites(true).OrderBy(x => x.Name)
                 };
                 var fileVersion = FileVersionInfo.GetVersionInfo(typeof (BaseModule).Assembly.Location).FileVersion.Split('.');
                 Model.Version = string.Join(".", fileVersion.Take(2));

@@ -29,7 +29,7 @@ namespace Servant.Web.Modules
             #region Stats
             Get["/stats/"] = p =>
             {
-                var sites = SiteManager.GetSites().ToList();
+                var sites = SiteManager.GetSites(true).ToList();
                 var drives = DriveInfo.GetDrives().Where(x => x.DriveType == DriveType.Fixed).Select(
                         x => new { x.Name, x.TotalSize, x.AvailableFreeSpace });
 
