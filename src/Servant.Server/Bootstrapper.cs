@@ -35,7 +35,7 @@ namespace Servant.Server
             base.ConfigureApplicationContainer(container);
 
             var assembly = typeof(Servant.Web.Bootstrapper).Assembly;
-            ResourceViewLocationProvider.Ignore.Add(Assembly.Load("Nancy.ViewEngines.Razor, Version=0.17.1.0, Culture=neutral, PublicKeyToken=null"));
+            ResourceViewLocationProvider.Ignore.Add(Assembly.Load("Nancy.ViewEngines.Razor, Version=0.21.1.0, Culture=neutral, PublicKeyToken=null"));
             ResourceViewLocationProvider.RootNamespaces.Clear();
             ResourceViewLocationProvider.RootNamespaces.Add(assembly, "Servant.Web.Views");
         }
