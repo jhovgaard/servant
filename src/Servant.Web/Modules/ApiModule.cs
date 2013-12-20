@@ -52,11 +52,11 @@ namespace Servant.Web.Modules
             #region Sites
             Get["/sites/{id?}/"] = p =>
             {
-                var id = (int?)p.id;
+                var id = p.id;
 
                 if (id.HasValue)
                 {
-                    var site = SiteManager.GetSiteById(id.Value);
+                    var site = SiteManager.GetSiteById((int) id);
 
                     return site == null ? new NotFoundResponse() : Response.AsJson(site);
                 }
