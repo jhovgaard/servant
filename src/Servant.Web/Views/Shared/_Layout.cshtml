@@ -99,13 +99,6 @@
                     @:$popupMessage.delay(200).slideDown();
                 @:});
             }
-
-            var uvOptions = {};
-            (function() {
-                var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
-                uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/ntkZvVjd0zcNeUeKbxKL8Q.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
-            })();
         </script>
 
         @RenderSection("javascript", false)
