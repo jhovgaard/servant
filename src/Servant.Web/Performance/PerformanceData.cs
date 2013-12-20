@@ -14,7 +14,7 @@ namespace Servant.Web.Performance
         public static TimeSpan SystemUpTime { get; set; }
         private static BackgroundWorker _backgroundWorker;
         private static LimitedSizeStack<float> GetRequests = new LimitedSizeStack<float>(60);
-        private static LimitedSizeStack<float> CpuUsage = new LimitedSizeStack<float>(60);
+        private static LimitedSizeStack<float> CpuUsage = new LimitedSizeStack<float>(5);
         public static float CurrentConnections { get; private set; }
 
         public static float AverageGetRequestPerSecond { get { return GetRequests.Any() ? GetRequests.Average() : 0; }}
