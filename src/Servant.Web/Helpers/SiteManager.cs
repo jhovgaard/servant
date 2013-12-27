@@ -376,8 +376,10 @@ namespace Servant.Web.Helpers
                 {
                     try
                     {
-                        if (iisSite.State == ObjectState.Started)
+                        if (iisSite.State == ObjectState.Started || iisSite.State == ObjectState.Stopped)
+                        {
                             created = true;
+                        }
                     }
                     catch (COMException)
                     {
