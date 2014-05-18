@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Validation;
@@ -34,6 +35,7 @@ namespace Servant.Web.Modules
                 AddValidationErrors(validationResult);
 
                 var bindingIsChanged = formSettings.ServantUrl != configuration.ServantUrl;
+                var changedServantIoKey = formSettings.ServantIoKey != configuration.ServantIoKey;
                 
                 if(!HasErrors)
                 {
@@ -69,6 +71,21 @@ namespace Servant.Web.Modules
 
                         Model.NewUrl = formSettings.ServantUrl;
                         return View["BindingChanged", Model];
+                    }
+
+                    if (changedServantIoKey)
+                    {
+                        if (!string.IsNullOrWhiteSpace(formSettings.ServantIoKey))
+                        {
+                            new System.Net.WebClient().UploadValues("http://localhost:2720/account/authorize-server/", "POST"
+                                , new NameValueCollection
+                                {
+                                    { "InstallationGuid", configuration.InstallationGuid.ToString() },
+                                    { "ServantUrl", configuration.ServantUrl },
+                                    { "Servername", System.Environment.MachineName },
+                                    { "ServantIoKey" , formSettings.ServantIoKey }
+                                });
+                        }
                     }
                 }
 

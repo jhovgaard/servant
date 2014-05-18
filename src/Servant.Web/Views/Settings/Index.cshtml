@@ -41,6 +41,12 @@
             <input type="password" class="input-medium span4" id="password" name="password" value="" />
             <p class="gray">Only enter a password if you want to change the current.</p>
         </div>
+        
+        <div class="input-group">
+            <label for="servantiokey">Servant.io key</label>
+            <input type="text" class="input-medium span4" id="servantiokey" name="servantiokey" value="@Model.Settings.ServantIoKey" />
+            <p class="gray">Only fill out this field if you want to use this server from Servant.io.</p>
+        </div>
     
         <div class="margin-top30">
             <input type="submit" value="Save settings" />

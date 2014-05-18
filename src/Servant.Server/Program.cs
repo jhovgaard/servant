@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Configuration.Install;
 using System.Diagnostics;
 using System.Globalization;
@@ -7,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceProcess;

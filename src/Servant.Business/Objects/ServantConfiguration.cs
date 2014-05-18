@@ -21,6 +21,7 @@ namespace Servant.Business.Objects
         public bool HaveSeenNewsletter { get; set; }
         public Guid InstallationGuid { get; set; }
         public string Version { get; set; }
+        public string ServantIoKey { get; set; }
 
         public ServantConfiguration()
         {

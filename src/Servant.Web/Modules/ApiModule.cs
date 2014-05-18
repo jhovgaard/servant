@@ -21,11 +21,6 @@ namespace Servant.Web.Modules
 
             Get["/"] = p => "Servant API";
 
-            //Get["/test"] = p =>
-            //{
-            //    //return "Count:" + PerformanceData.
-            //};
-
             #region Stats
             Get["/stats/"] = p =>
             {
