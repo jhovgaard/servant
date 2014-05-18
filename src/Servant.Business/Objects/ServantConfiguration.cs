@@ -26,9 +26,7 @@ namespace Servant.Business.Objects
         public ServantConfiguration()
         {
             ServantUrl = "http://localhost:54444/";
-            Username = "admin";
-            InstallationGuid = Guid.NewGuid();
-            
+            Username = "admin";           
         }
 
         public bool IsHttps()

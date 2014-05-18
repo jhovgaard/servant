@@ -46,6 +46,7 @@ namespace Servant.Web.Modules
                     formSettings.SetupCompleted = true;
                     formSettings.EnableErrorMonitoring = configuration.EnableErrorMonitoring;
                     formSettings.HaveSeenNewsletter = configuration.HaveSeenNewsletter;
+                    formSettings.InstallationGuid = configuration.InstallationGuid;
                     Helpers.ConfigurationHelper.UpdateConfiguration(formSettings);
                     AddMessage("Settings have been saved.", MessageType.Success);
 
@@ -77,7 +78,7 @@ namespace Servant.Web.Modules
                     {
                         if (!string.IsNullOrWhiteSpace(formSettings.ServantIoKey))
                         {
-                            new System.Net.WebClient().UploadValues("http://localhost:2720/account/authorize-server/", "POST"
+                            new System.Net.WebClient().UploadValues("http://my.servant.io/account/authorize-server/", "POST"
                                 , new NameValueCollection
                                 {
                                     { "InstallationGuid", configuration.InstallationGuid.ToString() },

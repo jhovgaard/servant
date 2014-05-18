@@ -35,7 +35,7 @@ namespace Servant.Web.Modules
         {
             Configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
-            var nonAuthenticatedModules = new List<Type> { typeof(SetupModule) };
+            var nonAuthenticatedModules = new List<Type> { typeof(SetupModule), typeof(ApiModule) };
             var requiresAuthentication = !nonAuthenticatedModules.Contains(this.GetType());
 
             Before += ctx =>

@@ -71,6 +71,7 @@ namespace Servant.Web.Modules
                         formSettings.Password = SecurityHelper.HashPassword(formSettings.Password);
                         formSettings.SetupCompleted = true;
                         formSettings.AutoSendCrashReport = (bool)Request.Form.AutoSendCrashReport;
+                        formSettings.InstallationGuid = Guid.NewGuid();
                         Helpers.ConfigurationHelper.UpdateConfiguration(formSettings);
                         
                         if (!configuration.EnableErrorMonitoring && formSettings.EnableErrorMonitoring) 

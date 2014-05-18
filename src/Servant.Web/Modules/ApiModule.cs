@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ICSharpCode.SharpZipLib.Zip;
 using Nancy;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
@@ -17,7 +18,15 @@ namespace Servant.Web.Modules
         {
             var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
-            Before += ctx => !configuration.EnableApi ? new NotFoundResponse() : null;
+            Before += ctx =>
+            {
+                if (!configuration.EnableApi && (string) ctx.Request.Query.Key != configuration.ServantIoKey)
+                {
+                    return new NotFoundResponse();
+                }
+
+                return null;
+            };
 
             Get["/"] = p => "Servant API";
 
@@ -113,6 +122,33 @@ namespace Servant.Web.Modules
 
                 Site site = SiteManager.GetSiteById(p.Id);
                 SiteManager.RecycleApplicationPoolBySite(site.IisId);
+                return Response.AsJson(site);
+            };
+
+            Post["/sites/{id}/deploy/"] = p =>
+            {
+                var id = (int?) p.id;
+                if (!id.HasValue)
+                {
+                    return Response.AsText("IIS Site ID is missing.").WithStatusCode(HttpStatusCode.BadRequest);
+                }
+
+                if (!Request.Files.Any())
+                {
+                    return Response.AsText("Zipfile is missing.").WithStatusCode(HttpStatusCode.BadRequest);
+                }
+
+                Site site = SiteManager.GetSiteById(p.Id);
+                
+                // Delete existing files
+                var directoryInfo = new DirectoryInfo(site.SitePath);
+                foreach (FileInfo file in directoryInfo.GetFiles()) file.Delete();
+                foreach (var subDirectory in directoryInfo.GetDirectories()) subDirectory.Delete(true);
+
+                var zip = Request.Files.First().Value;
+                var fastZip = new FastZip();
+                fastZip.ExtractZip(zip, site.SitePath, FastZip.Overwrite.Always, null, null, null, true, true);
+
                 return Response.AsJson(site);
             };
             #endregion
