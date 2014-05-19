@@ -139,15 +139,22 @@ namespace Servant.Web.Modules
                 }
 
                 Site site = SiteManager.GetSiteById(p.Id);
-                
-                // Delete existing files
-                var directoryInfo = new DirectoryInfo(site.SitePath);
-                foreach (FileInfo file in directoryInfo.GetFiles()) file.Delete();
-                foreach (var subDirectory in directoryInfo.GetDirectories()) subDirectory.Delete(true);
+                var rootPath = site.SitePath;
+                var directoryName = new DirectoryInfo(rootPath).Name;
+                if (directoryName.StartsWith("servant-"))
+                {
+                    rootPath = Directory.GetParent(rootPath).FullName;
+                }
+
+                var newPath = Path.Combine(rootPath, "servant-" + Path.GetFileNameWithoutExtension(Request.Files.First().Name));
+                Directory.CreateDirectory(newPath);
 
                 var zip = Request.Files.First().Value;
                 var fastZip = new FastZip();
-                fastZip.ExtractZip(zip, site.SitePath, FastZip.Overwrite.Always, null, null, null, true, true);
+                fastZip.ExtractZip(zip, newPath, FastZip.Overwrite.Always, null, null, null, true, true);
+
+                site.SitePath = newPath;
+                SiteManager.UpdateSite(site);
 
                 return Response.AsJson(site);
             };
