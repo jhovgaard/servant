@@ -5,9 +5,11 @@ using System.IO;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
 using Nancy;
+using Nancy.ModelBinding;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Servant.Web.Helpers;
+using Servant.Web.Infrastructure;
 using Servant.Web.Performance;
 
 namespace Servant.Web.Modules
@@ -29,6 +31,15 @@ namespace Servant.Web.Modules
             };
 
             Get["/"] = p => "Servant API";
+
+            Get["/info/"] = p =>
+            {
+                var info = new ServantServerInfo();
+                info.ApplicationPools = SiteManager.GetApplicationPools();
+                info.Certificates = Helpers.SiteManager.GetCertificates().ToList();
+
+                return Response.AsJson(info);
+            };
 
             #region Stats
             Get["/stats/"] = p =>
@@ -123,6 +134,45 @@ namespace Servant.Web.Modules
                 Site site = SiteManager.GetSiteById(p.Id);
                 SiteManager.RecycleApplicationPoolBySite(site.IisId);
                 return Response.AsJson(site);
+            };
+
+            Post["/sites/{id}/update/"] = p =>
+            {
+                var id = (int?)p.id;
+
+                if (!id.HasValue)
+                {
+                    return new NotFoundResponse();
+                }
+
+                Site site = SiteManager.GetSiteById(p.Id);
+                var postedSite = this.Bind<Site>();
+
+                site.ApplicationPool = postedSite.ApplicationPool;
+                site.Name = postedSite.Name;
+                site.SiteState = postedSite.SiteState;
+                site.Bindings = postedSite.Bindings;
+                site.LogFileDirectory = postedSite.LogFileDirectory;
+                site.SitePath = postedSite.SitePath;
+
+                SiteManager.UpdateSite(site);
+
+                return Response.AsJson(site);
+            };
+
+            Post["/sites/{id}/delete/"] = p =>
+            {
+                var id = (int?)p.id;
+
+                if (!id.HasValue)
+                {
+                    return new NotFoundResponse();
+                }
+                Site site = SiteManager.GetSiteById(p.Id);
+
+                SiteManager.DeleteSite(site.IisId);
+
+                return Response.AsJson(new { Success = true});
             };
 
             Post["/sites/{id}/deploy/"] = p =>

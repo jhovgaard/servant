@@ -9,7 +9,6 @@ namespace Servant.Web.Modules
         public StatsModule() : base("/stats/")
         {
             Get["/cleanupapplicationpools/"] = p => {
-                Model.UnusedApplicationPools = ApplicationPoolHelper.GetUnusedApplicationPools();
                 return View["CleanupApplicationPools", Model];
             };
 

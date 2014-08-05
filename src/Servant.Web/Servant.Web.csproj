@@ -110,6 +110,7 @@
     <Compile Include="Helpers\SiteManager.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Infrastructure\DummyHost.cs" />
+    <Compile Include="Infrastructure\ServantServerInfo.cs" />
     <Compile Include="Infrastructure\UserIdentity.cs" />
     <Compile Include="Infrastructure\UserValidator.cs" />
     <Compile Include="Modules\ApiModule.cs" />
