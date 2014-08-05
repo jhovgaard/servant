@@ -136,6 +136,17 @@ namespace Servant.Web.Modules
                 return Response.AsJson(site);
             };
 
+            Post["/sites/{id}/create/"] = p =>
+            {
+                var site = this.Bind<Site>();
+                var bindings = this.Bind<List<Binding>>();
+                site.Bindings = bindings;
+
+                SiteManager.CreateSite(site);
+
+                return Response.AsJson(site);
+            };
+
             Post["/sites/{id}/update/"] = p =>
             {
                 var id = (int?)p.id;
@@ -147,6 +158,7 @@ namespace Servant.Web.Modules
 
                 Site site = SiteManager.GetSiteById(p.Id);
                 var postedSite = this.Bind<Site>();
+                var bindings = this.Bind<List<Binding>>();
 
                 site.ApplicationPool = postedSite.ApplicationPool;
                 site.Name = postedSite.Name;
@@ -154,6 +166,7 @@ namespace Servant.Web.Modules
                 site.Bindings = postedSite.Bindings;
                 site.LogFileDirectory = postedSite.LogFileDirectory;
                 site.SitePath = postedSite.SitePath;
+                site.Bindings = bindings;
 
                 SiteManager.UpdateSite(site);
 
