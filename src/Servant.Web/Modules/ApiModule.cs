@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
 using Nancy;
+using Nancy.Json;
 using Nancy.ModelBinding;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
@@ -19,6 +20,7 @@ namespace Servant.Web.Modules
         public ApiModule() : base("/api/")
         {
             var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+            var serializer = new JavaScriptSerializer();
 
             Before += ctx =>
             {
@@ -136,15 +138,12 @@ namespace Servant.Web.Modules
                 return Response.AsJson(site);
             };
 
-            Post["/sites/{id}/create/"] = p =>
+            Post["/sites/create/"] = p =>
             {
-                var site = this.Bind<Site>();
-                var bindings = this.Bind<List<Binding>>();
-                site.Bindings = bindings;
+                Site site = serializer.Deserialize<Site>(Request.Form.Data);
+                var result = SiteManager.CreateSite(site);
 
-                SiteManager.CreateSite(site);
-
-                return Response.AsJson(site);
+                return Response.AsText(result.IisSiteId.ToString());
             };
 
             Post["/sites/{id}/update/"] = p =>
@@ -157,8 +156,7 @@ namespace Servant.Web.Modules
                 }
 
                 Site site = SiteManager.GetSiteById(p.Id);
-                var postedSite = this.Bind<Site>();
-                var bindings = this.Bind<List<Binding>>();
+                var postedSite = serializer.Deserialize<Site>(Request.Form.Data);
 
                 site.ApplicationPool = postedSite.ApplicationPool;
                 site.Name = postedSite.Name;
@@ -166,7 +164,7 @@ namespace Servant.Web.Modules
                 site.Bindings = postedSite.Bindings;
                 site.LogFileDirectory = postedSite.LogFileDirectory;
                 site.SitePath = postedSite.SitePath;
-                site.Bindings = bindings;
+                site.Bindings = postedSite.Bindings;
 
                 SiteManager.UpdateSite(site);
 
