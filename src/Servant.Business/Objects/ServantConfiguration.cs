@@ -22,11 +22,13 @@ namespace Servant.Business.Objects
         public Guid InstallationGuid { get; set; }
         public string Version { get; set; }
         public string ServantIoKey { get; set; }
+        public string ServantIoUrl { get; set; }
 
         public ServantConfiguration()
         {
             ServantUrl = "http://localhost:54444/";
-            Username = "admin";           
+            Username = "admin";
+            ServantIoUrl = "http://preview.servant.io";
         }
 
         public bool IsHttps()

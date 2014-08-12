@@ -78,7 +78,7 @@ namespace Servant.Web.Modules
                     {
                         if (!string.IsNullOrWhiteSpace(formSettings.ServantIoKey))
                         {
-                            new System.Net.WebClient().UploadValues("http://my.servant.io/account/authorize-server/", "POST"
+                            new System.Net.WebClient().UploadValues(configuration.ServantIoUrl + "/account/authorize-server/", "POST"
                                 , new NameValueCollection
                                 {
                                     { "InstallationGuid", configuration.InstallationGuid.ToString() },
