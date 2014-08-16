@@ -44,9 +44,11 @@ namespace Servant.Web.Modules
                         : Business.Helpers.SecurityHelper.HashPassword(formSettings.Password);
 
                     formSettings.SetupCompleted = true;
+
                     formSettings.EnableErrorMonitoring = configuration.EnableErrorMonitoring;
                     formSettings.HaveSeenNewsletter = configuration.HaveSeenNewsletter;
                     formSettings.InstallationGuid = configuration.InstallationGuid;
+                    formSettings.ServantIoUrl = configuration.ServantIoUrl;
                     Helpers.ConfigurationHelper.UpdateConfiguration(formSettings);
                     AddMessage("Settings have been saved.", MessageType.Success);
 
