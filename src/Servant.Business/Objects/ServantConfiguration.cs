@@ -28,7 +28,7 @@ namespace Servant.Business.Objects
         {
             ServantUrl = "http://localhost:54444/";
             Username = "admin";
-            ServantIoUrl = "http://preview.servant.io";
+            ServantIoUrl = "preview.servant.io:2650";
         }
 
         public bool IsHttps()

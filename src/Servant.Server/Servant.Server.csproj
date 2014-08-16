@@ -95,12 +95,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\System.Web.Razor.Unofficial.2.0.2\lib\net40\System.Web.Razor.Unofficial.dll</HintPath>
     </Reference>
+    <Reference Include="websocket-sharp">
+      <HintPath>..\packages\WebSocketSharp.1.0.3-rc4\lib\websocket-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Selfhost\CertificateHandler.cs" />
     <Compile Include="Selfhost\ErrorWriter.cs" />
+    <Compile Include="SocketClient\SocketClient.cs" />
+    <Compile Include="SocketClient\CommandRequest.cs" />
     <Compile Include="WindowsService\ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>

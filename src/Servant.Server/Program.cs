@@ -193,6 +193,7 @@ namespace Servant.Server
                         StartServant();
                         Console.WriteLine("You can now manage your server from " + Configuration.ServantUrl);
                         StartBrowser();
+                        SocketClient.SocketClient.Connect();
                         while (true)
                             Console.ReadLine();
                     }
