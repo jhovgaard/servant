@@ -80,14 +80,11 @@ namespace Servant.Web.Modules
                     {
                         if (!string.IsNullOrWhiteSpace(formSettings.ServantIoKey))
                         {
-                            new System.Net.WebClient().UploadValues(configuration.ServantIoUrl + "/account/authorize-server/", "POST"
-                                , new NameValueCollection
-                                {
-                                    { "InstallationGuid", configuration.InstallationGuid.ToString() },
-                                    { "ServantUrl", configuration.ServantUrl },
-                                    { "Servername", System.Environment.MachineName },
-                                    { "ServantIoKey" , formSettings.ServantIoKey }
-                                });
+                            host.StartWebSocket();
+                        }
+                        else
+                        {
+                            //Afmeld server
                         }
                     }
                 }

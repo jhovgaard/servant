@@ -15,5 +15,6 @@ namespace Servant.Business
         void StopLogParsing();
         void RemoveCertificateBinding(int port);
         void AddCertificateBinding(int port);
+        void StartWebSocket();
     }
 }

@@ -36,5 +36,9 @@ namespace Servant.Web.Infrastructure
         public void AddCertificateBinding(int port)
         {
         }
+
+        public void StartWebSocket()
+        {
+        }
     }
 }

@@ -135,6 +135,11 @@ namespace Servant.Server.Selfhost
             CertificateHandler.AddCertificateBinding(port);
         }
 
+        public void StartWebSocket()
+        {
+            SocketClient.SocketClient.Connect();
+        }
+
         void SyncDatabaseJob(object sender, ElapsedEventArgs e)
         {
             var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
