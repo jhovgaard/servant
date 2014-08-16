@@ -146,16 +146,16 @@ namespace Servant.Web.Modules
                 return Response.AsText(result.IisSiteId.ToString());
             };
 
-            Post["/sites/{id}/update/"] = p =>
+            Post["/sites/update/"] = p =>
             {
-                var id = (int?)p.id;
+                string name = Request.Query.Name;
 
-                if (!id.HasValue)
+                if (name == null)
                 {
                     return new NotFoundResponse();
                 }
 
-                Site site = SiteManager.GetSiteById(p.Id);
+                Site site = SiteManager.GetSiteByName(name);
                 var postedSite = serializer.Deserialize<Site>(Request.Form.Data);
 
                 site.ApplicationPool = postedSite.ApplicationPool;
