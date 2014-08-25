@@ -19,6 +19,7 @@ using Servant.Server.WindowsService;
 
 namespace Servant.Server
 {
+
     static class Program
     {
         private static ServantConfiguration Configuration { get; set; }
@@ -193,7 +194,6 @@ namespace Servant.Server
                         StartServant();
                         Console.WriteLine("You can now manage your server from " + Configuration.ServantUrl);
                         StartBrowser();
-                        SocketClient.SocketClient.Connect();
                         while (true)
                             Console.ReadLine();
                     }
@@ -215,6 +215,7 @@ namespace Servant.Server
         {   
             var host = TinyIoCContainer.Current.Resolve<IHost>();
             host.Start();
+            host.StartWebSocket();
         }
 
         public static void StartBrowser()

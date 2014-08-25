@@ -56,13 +56,16 @@
     <OutputPath>bin\Something\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Exceptionless">
+      <HintPath>..\packages\Exceptionless.1.5.2092\lib\net40\Exceptionless.dll</HintPath>
+    </Reference>
+    <Reference Include="Exceptionless.Models">
+      <HintPath>..\packages\Exceptionless.1.5.2092\lib\net40\Exceptionless.Models.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Administration, Version=7.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\dependencies\Microsoft.Web.Administration.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Mindscape.Raygun4Net">
-      <HintPath>..\packages\Mindscape.Raygun4Net.1.0.5\lib\net35\Mindscape.Raygun4Net.dll</HintPath>
     </Reference>
     <Reference Include="Nancy, Version=0.21.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -127,6 +130,7 @@
     <Content Include="Install Servant Service.vbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="App.config" />
     <None Include="packages.config" />
     <Content Include="Uninstall Servant Service.vbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

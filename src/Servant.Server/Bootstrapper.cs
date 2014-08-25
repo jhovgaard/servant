@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using Exceptionless;
 using Nancy.Bootstrapper;
 using Nancy.TinyIoc;
 using Nancy.ViewEngines;
@@ -16,8 +17,7 @@ namespace Servant.Server
             pipelines.OnError.AddItemToEndOfPipeline((ctx, ex) =>
             {
                 ErrorWriter.WriteEntry(ex.ToString(), EventLogEntryType.Error);
-                var client = new Mindscape.Raygun4Net.RaygunClient("MpnyAIdZ9T5iQjP/NrOl3w==");
-                new Thread(() => client.Send(ex)).Start();
+                ex.ToExceptionless().Submit();
                 return null;
             });
         }

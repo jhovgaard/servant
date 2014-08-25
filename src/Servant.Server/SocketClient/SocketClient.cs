@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Runtime.Remoting.Channels;
 using Nancy.Json;
 using Nancy.TinyIoc;
 using Servant.Business.Objects;
 using Servant.Web.Helpers;
 using WebSocketSharp;
-using WebSocketSharp.Server;
 
 namespace Servant.Server.SocketClient
 {
@@ -108,7 +106,9 @@ namespace Servant.Server.SocketClient
 
             ws.OnClose += (sender, args) =>
             {
+                ws = null;
                 var client = GetClient(configuration);
+
                 client.Connect();
             };
 

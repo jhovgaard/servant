@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Timers;
+using Exceptionless;
 using Nancy.Hosting.Self;
 using Servant.Business;
 using Servant.Business.Objects;
@@ -70,11 +71,7 @@ namespace Servant.Server.Selfhost
 
         private void CreateHost(Uri uri)
         {
-            ServantHost = new NancyHost(uri, new Bootstrapper(), new HostConfiguration { UnhandledExceptionCallback = ex =>
-                {
-                    var client = new Mindscape.Raygun4Net.RaygunClient("YtmedAsAZw/ptG3cy4bSXg==");
-                    client.Send(ex);
-                } });
+            ServantHost = new NancyHost(uri, new Bootstrapper(), new HostConfiguration { UnhandledExceptionCallback = ex => ex.ToExceptionless().Submit()});
         }
 
         public void Stop()
