@@ -20,6 +20,7 @@ namespace Servant.Server.SocketClient
         StopSite,
         StartSite,
         RestartSite,
-        RecycleApplicationPool
+        RecycleApplicationPool,
+        Unauthorized
     }
 }

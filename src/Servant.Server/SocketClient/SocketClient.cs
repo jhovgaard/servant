@@ -18,103 +18,118 @@ namespace Servant.Server.SocketClient
                 return;
             }
 
-            var client = GetClient(configuration);
-            client.Connect();
+            bool connected = false;
+            while (!connected)
+            {
+                configuration = TinyIoCContainer.Current.Resolve<ServantConfiguration>(); // Genindlæser så man kan ændre key.
+                var client = GetClient(configuration);
+                client.Connect();
+                connected = client.IsAlive;
+            }
         }
 
         private static WebSocket GetClient(ServantConfiguration configuration)
         {
             var url = "ws://" + configuration.ServantIoUrl + "/Client?installationGuid=" + configuration.InstallationGuid + "&organizationGuid=" + configuration.ServantIoKey + "&servername=" + System.Environment.MachineName;
-            var ws = new WebSocket(url);
-            var serializer = new JavaScriptSerializer();
-
-            ws.OnMessage += (sender, e) =>
+            using (var ws = new WebSocket(url))
             {
-                var request = serializer.Deserialize<CommandRequest>(e.Data);
+                var serializer = new JavaScriptSerializer();
 
-                switch (request.Command)
+                ws.OnMessage += (sender, e) =>
                 {
-                    case CommandRequestType.GetSites:
-                        var sites = SiteManager.GetSites();
-                        var result = serializer.Serialize(sites);
-                        ws.Send(result);
-                        break;
-                    case CommandRequestType.UpdateSite:
-                        var site = serializer.Deserialize<Site>(request.JsonObject);
+                    var request = serializer.Deserialize<CommandRequest>(e.Data);
 
-                        Site originalSite = SiteManager.GetSiteByName(request.Value);
+                    switch (request.Command)
+                    {
+                        case CommandRequestType.Unauthorized:
+                            ws.Close();
+                            break;
+                        case CommandRequestType.GetSites:
+                            var sites = SiteManager.GetSites();
+                            var result = serializer.Serialize(sites);
+                            ws.Send(result);
+                            break;
+                        case CommandRequestType.UpdateSite:
+                            var site = serializer.Deserialize<Site>(request.JsonObject);
 
-                        originalSite.ApplicationPool = site.ApplicationPool;
-                        originalSite.Name = site.Name;
-                        originalSite.SiteState = site.SiteState;
-                        originalSite.Bindings = site.Bindings;
-                        originalSite.LogFileDirectory = site.LogFileDirectory;
-                        originalSite.SitePath = site.SitePath;
-                        originalSite.Bindings = site.Bindings;
+                            Site originalSite = SiteManager.GetSiteByName(request.Value);
 
-                        SiteManager.UpdateSite(originalSite);
+                            originalSite.ApplicationPool = site.ApplicationPool;
+                            originalSite.Name = site.Name;
+                            originalSite.SiteState = site.SiteState;
+                            originalSite.Bindings = site.Bindings;
+                            originalSite.LogFileDirectory = site.LogFileDirectory;
+                            originalSite.SitePath = site.SitePath;
+                            originalSite.Bindings = site.Bindings;
 
-                        ws.Send("ok");
-                        break;
-                    case CommandRequestType.GetApplicationPools:
-                        var appPools = SiteManager.GetApplicationPools();
-                        ws.Send(serializer.Serialize(appPools));
-                        break;
-                    case CommandRequestType.GetCertificates:
-                        ws.Send(serializer.Serialize(SiteManager.GetCertificates()));
-                        break;
-                    case CommandRequestType.StartSite:
-                        var startSite = SiteManager.GetSiteByName(request.Value);
-                        SiteManager.StartSite(startSite);
-                        ws.Send("ok");
-                        break;
-                    case CommandRequestType.StopSite:
-                        var stopSite = SiteManager.GetSiteByName(request.Value);
-                        SiteManager.StopSite(stopSite);
-                        ws.Send("ok");
-                        break;
-                    case CommandRequestType.RecycleApplicationPool:
-                        var recycleSite = SiteManager.GetSiteByName(request.Value);
-                        SiteManager.RecycleApplicationPoolBySite(recycleSite.IisId);
-                        ws.Send("ok");
-                        break;
-                    case CommandRequestType.RestartSite:
-                        var restartSite = SiteManager.GetSiteByName(request.Value);
-                        SiteManager.RestartSite(restartSite.IisId);
-                        ws.Send("ok");
-                        break;
-                    case CommandRequestType.DeleteSite:
-                        var deleteSite = SiteManager.GetSiteByName(request.Value);
-                        SiteManager.DeleteSite(deleteSite.IisId);
-                        ws.Send("ok");
-                        break;
-                    case CommandRequestType.CreateSite:
-                        var createSite = serializer.Deserialize<Site>(request.JsonObject);
-                        var id = SiteManager.CreateSite(createSite);
-                        ws.Send(id.ToString());
-                        break;
-                }
-            };
+                            SiteManager.UpdateSite(originalSite);
 
-            ws.OnError += (sender, args) =>
-            {
-                if (args.Message == "A WebSocket connection has already been established.")
-                    return;
+                            ws.Send("ok");
+                            break;
+                        case CommandRequestType.GetApplicationPools:
+                            var appPools = SiteManager.GetApplicationPools();
+                            ws.Send(serializer.Serialize(appPools));
+                            break;
+                        case CommandRequestType.GetCertificates:
+                            ws.Send(serializer.Serialize(SiteManager.GetCertificates()));
+                            break;
+                        case CommandRequestType.StartSite:
+                            var startSite = SiteManager.GetSiteByName(request.Value);
+                            SiteManager.StartSite(startSite);
+                            ws.Send("ok");
+                            break;
+                        case CommandRequestType.StopSite:
+                            var stopSite = SiteManager.GetSiteByName(request.Value);
+                            SiteManager.StopSite(stopSite);
+                            ws.Send("ok");
+                            break;
+                        case CommandRequestType.RecycleApplicationPool:
+                            var recycleSite = SiteManager.GetSiteByName(request.Value);
+                            SiteManager.RecycleApplicationPoolBySite(recycleSite.IisId);
+                            ws.Send("ok");
+                            break;
+                        case CommandRequestType.RestartSite:
+                            var restartSite = SiteManager.GetSiteByName(request.Value);
+                            SiteManager.RestartSite(restartSite.IisId);
+                            ws.Send("ok");
+                            break;
+                        case CommandRequestType.DeleteSite:
+                            var deleteSite = SiteManager.GetSiteByName(request.Value);
+                            SiteManager.DeleteSite(deleteSite.IisId);
+                            ws.Send("ok");
+                            break;
+                        case CommandRequestType.CreateSite:
+                            var createSite = serializer.Deserialize<Site>(request.JsonObject);
+                            var id = SiteManager.CreateSite(createSite);
+                            ws.Send(id.ToString());
+                            break;
+                    }
+                };
 
-                ws.Close();
-            };
+                ws.OnError += (sender, args) =>
+                {
+                    var socket = (WebSocketSharp.WebSocket)sender;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Error: " + args.Message);
+                    Console.ResetColor();
 
-            ws.OnClose += (sender, args) =>
-            {
-                ws = null;
-                var client = GetClient(configuration);
+                    if (socket.ReadyState == WebSocketState.Open)
+                    {
+                        Connect();
+                    }
+                };
 
-                client.Connect();
-            };
+                ws.OnClose += (sender, args) =>
+                {
+                    Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Lost connection to Servant.io");
+                };
 
-            ws.OnOpen += (sender, args) => Console.WriteLine("Successfully connected to ws://" + configuration.ServantIoUrl);
+                ws.OnOpen += (sender, args) => Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Successfully connected to ws://" + configuration.ServantIoUrl);
+                ws.Log.Output = (data, s) => { };
+                ws.Log.Level = LogLevel.Fatal;
 
-            return ws;
+                return ws;
+            }
         }
     }
 }
