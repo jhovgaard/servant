@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Nancy.Json;
 using Nancy.TinyIoc;
 using Servant.Business.Objects;
@@ -34,6 +35,12 @@ namespace Servant.Server.SocketClient
             using (var ws = new WebSocket(url))
             {
                 var serializer = new JavaScriptSerializer();
+                var pingTimer = new System.Timers.Timer(2000);
+                pingTimer.Elapsed += (sender, args) =>
+                                     {
+                                         ws.Ping();
+                                     };
+                pingTimer.Enabled = false;
 
                 ws.OnMessage += (sender, e) =>
                 {
@@ -122,9 +129,15 @@ namespace Servant.Server.SocketClient
                 ws.OnClose += (sender, args) =>
                 {
                     Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Lost connection to Servant.io");
+                    pingTimer.Enabled = false;
                 };
 
-                ws.OnOpen += (sender, args) => Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Successfully connected to ws://" + configuration.ServantIoUrl);
+                ws.OnOpen +=
+                    (sender, args) =>
+                    {
+                        Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Successfully connected to ws://" + configuration.ServantIoUrl);
+                        pingTimer.Enabled = true;
+                    };
                 ws.Log.Output = (data, s) => { };
                 ws.Log.Level = LogLevel.Fatal;
 
