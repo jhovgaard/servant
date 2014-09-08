@@ -9,9 +9,12 @@ using WebSocketSharp;
 namespace Servant.Server.SocketClient
 {
     public static class SocketClient
-    {   
+    {
+        static bool _isRetrying; 
+
         public static void Connect()
         {
+
             var configuration = TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
             if (string.IsNullOrWhiteSpace(configuration.ServantIoKey))
@@ -20,6 +23,7 @@ namespace Servant.Server.SocketClient
             }
 
             bool connected = false;
+            _isRetrying = true;
             while (!connected)
             {
                 configuration = TinyIoCContainer.Current.Resolve<ServantConfiguration>(); // Genindlæser så man kan ændre key.
@@ -27,6 +31,7 @@ namespace Servant.Server.SocketClient
                 client.Connect();
                 connected = client.IsAlive;
             }
+            _isRetrying = false;
         }
 
         private static WebSocket GetClient(ServantConfiguration configuration)
@@ -115,12 +120,14 @@ namespace Servant.Server.SocketClient
 
                 ws.OnError += (sender, args) =>
                 {
-                    var socket = (WebSocketSharp.WebSocket)sender;
+                    var isInternalError = args.Message == "An exception has occurred while receiving a message.";
+
+                    var socket = (WebSocket)sender;
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Error: " + args.Message);
                     Console.ResetColor();
 
-                    if (socket.ReadyState == WebSocketState.Open)
+                    if (socket.ReadyState == WebSocketState.Open && !isInternalError)
                     {
                         Connect();
                     }
@@ -130,6 +137,11 @@ namespace Servant.Server.SocketClient
                 {
                     Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Lost connection to Servant.io");
                     pingTimer.Enabled = false;
+
+                    if (!_isRetrying)
+                    {
+                        Connect();
+                    }
                 };
 
                 ws.OnOpen +=
