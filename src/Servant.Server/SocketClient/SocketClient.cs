@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Permissions;
 using System.Threading;
 using Nancy.Json;
 using Nancy.TinyIoc;
@@ -10,11 +11,11 @@ namespace Servant.Server.SocketClient
 {
     public static class SocketClient
     {
-        static bool _isRetrying; 
+        static bool _isRetrying;
+        public static bool IsStopped;
 
         public static void Connect()
         {
-
             var configuration = TinyIoCContainer.Current.Resolve<ServantConfiguration>();
 
             if (string.IsNullOrWhiteSpace(configuration.ServantIoKey))
@@ -24,7 +25,7 @@ namespace Servant.Server.SocketClient
 
             bool connected = false;
             _isRetrying = true;
-            while (!connected)
+            while (!connected && !IsStopped)
             {
                 configuration = TinyIoCContainer.Current.Resolve<ServantConfiguration>(); // Genindlæser så man kan ændre key.
                 var client = GetClient(configuration);
@@ -54,6 +55,11 @@ namespace Servant.Server.SocketClient
                     switch (request.Command)
                     {
                         case CommandRequestType.Unauthorized:
+                            IsStopped = true;
+                            Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Servant.io key was not recognized.");
+                            Console.ResetColor();
                             ws.Close();
                             break;
                         case CommandRequestType.GetSites:
@@ -144,8 +150,7 @@ namespace Servant.Server.SocketClient
                     }
                 };
 
-                ws.OnOpen +=
-                    (sender, args) =>
+                ws.OnOpen += (sender, args) =>
                     {
                         Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Successfully connected to ws://" + configuration.ServantIoUrl);
                         pingTimer.Enabled = true;

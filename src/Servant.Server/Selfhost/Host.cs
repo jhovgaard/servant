@@ -134,6 +134,7 @@ namespace Servant.Server.Selfhost
 
         public void StartWebSocket()
         {
+            SocketClient.SocketClient.IsStopped = false;
             SocketClient.SocketClient.Connect();
         }
 
