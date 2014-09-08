@@ -70,7 +70,13 @@ namespace Servant.Server.SocketClient
                         case CommandRequestType.UpdateSite:
                             var site = serializer.Deserialize<Site>(request.JsonObject);
 
-                            Site originalSite = SiteManager.GetSiteByName(request.Value);
+                            var originalSite = SiteManager.GetSiteByName(request.Value);
+
+                            if (originalSite == null)
+                            {
+                                ws.Send("not_found");
+                                return;
+                            }
 
                             originalSite.ApplicationPool = site.ApplicationPool;
                             originalSite.Name = site.Name;
