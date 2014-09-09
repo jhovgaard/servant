@@ -48,7 +48,7 @@ namespace Servant.Web.Helpers
                     if (site.Bindings.Select(x => x.Protocol).Any(x => x == "ftp")) // Servant doesn't support FTP sites
                         continue;
 
-                    var parsedSite = ParseSite(site, excludeAppPools, manager.ApplicationPools);
+                    var parsedSite = ParseSite(site, excludeAppPools, manager.ApplicationPools.ToList());
                     if (parsedSite != null)
                         yield return parsedSite;
                 }    
@@ -75,7 +75,7 @@ namespace Servant.Web.Helpers
             }
         }
 
-        private static Site ParseSite(Microsoft.Web.Administration.Site site, bool excludeAppPools = false, ApplicationPoolCollection applicationPools = null)
+        private static Site ParseSite(Microsoft.Web.Administration.Site site, bool excludeAppPools = false, List<ApplicationPool> applicationPools = null)
         {
             if (site == null)
                 return null;
@@ -101,12 +101,12 @@ namespace Servant.Web.Helpers
                 {
                     using (var manager = new ServerManager())
                     {
-                        applicationPools = manager.ApplicationPools;
+                        applicationPools = manager.ApplicationPools.ToList();
                     }
-
-                    ObjectState applicationPoolState = applicationPools[site.Applications[0].ApplicationPoolName].State;
-                    servantSite.ApplicationPoolState = (InstanceState)Enum.Parse(typeof(InstanceState),  applicationPoolState.ToString());
                 }
+
+                ObjectState applicationPoolState = applicationPools.Single(x => x.Name == site.Applications[0].ApplicationPoolName).State;
+                servantSite.ApplicationPoolState = (InstanceState)Enum.Parse(typeof(InstanceState), applicationPoolState.ToString());
             }
 
 
