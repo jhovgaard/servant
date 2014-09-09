@@ -135,7 +135,7 @@ namespace Servant.Server.Selfhost
         public void StartWebSocket()
         {
             SocketClient.SocketClient.IsStopped = false;
-            SocketClient.SocketClient.Connect();
+            new System.Threading.Thread(SocketClient.SocketClient.Connect).Start();
         }
 
         void SyncDatabaseJob(object sender, ElapsedEventArgs e)
