@@ -31,6 +31,8 @@ namespace Servant.Server.SocketClient
                 var client = GetClient(configuration);
                 client.Connect();
                 connected = client.IsAlive;
+                if(!connected)
+                    Thread.Sleep(2000);
             }
             _isRetrying = false;
         }
