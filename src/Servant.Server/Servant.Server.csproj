@@ -107,6 +107,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Selfhost\CertificateHandler.cs" />
     <Compile Include="Selfhost\ErrorWriter.cs" />
+    <Compile Include="SocketClient\CommandResponse.cs" />
     <Compile Include="SocketClient\SocketClient.cs" />
     <Compile Include="SocketClient\CommandRequest.cs" />
     <Compile Include="WindowsService\ProjectInstaller.cs">

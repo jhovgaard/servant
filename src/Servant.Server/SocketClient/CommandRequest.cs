@@ -1,4 +1,5 @@
-﻿using System.Security.Principal;
+﻿using System;
+using System.Security.Principal;
 
 namespace Servant.Server.SocketClient
 {
@@ -7,6 +8,7 @@ namespace Servant.Server.SocketClient
         public CommandRequestType Command { get; set; }
         public string JsonObject { get; set; }
         public string Value { get; set; }
+        public Guid Guid { get; set; }
     }
 
     public enum CommandRequestType

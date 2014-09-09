@@ -4,6 +4,7 @@ using System.Threading;
 using Nancy.Json;
 using Nancy.TinyIoc;
 using Servant.Business.Objects;
+using Servant.Business.Objects.Enums;
 using Servant.Web.Helpers;
 using WebSocketSharp;
 
@@ -94,20 +95,20 @@ namespace Servant.Server.SocketClient
                             break;
                         case CommandRequestType.GetApplicationPools:
                             var appPools = SiteManager.GetApplicationPools();
-                            ws.Send(serializer.Serialize(appPools));
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) {Message = serializer.Serialize(appPools)}));
                             break;
                         case CommandRequestType.GetCertificates:
                             ws.Send(serializer.Serialize(SiteManager.GetCertificates()));
                             break;
                         case CommandRequestType.StartSite:
                             var startSite = SiteManager.GetSiteByName(request.Value);
-                            SiteManager.StartSite(startSite);
-                            ws.Send("ok");
+                            var startResult = SiteManager.StartSite(startSite);
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Success = startResult == SiteStartResult.Started, Message = startResult.ToString() }));
                             break;
                         case CommandRequestType.StopSite:
                             var stopSite = SiteManager.GetSiteByName(request.Value);
                             SiteManager.StopSite(stopSite);
-                            ws.Send("ok");
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) {  Success = true }));
                             break;
                         case CommandRequestType.RecycleApplicationPool:
                             var recycleSite = SiteManager.GetSiteByName(request.Value);
