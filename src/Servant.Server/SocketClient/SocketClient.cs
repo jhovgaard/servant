@@ -68,7 +68,12 @@ namespace Servant.Server.SocketClient
                         case CommandRequestType.GetSites:
                             var sites = SiteManager.GetSites();
                             var result = serializer.Serialize(sites);
-                            ws.Send(result);
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid)
+                                                     {
+                                                         Guid = request.Guid,
+                                                         Message = result,
+                                                         Success = true
+                                                     }));
                             break;
                         case CommandRequestType.UpdateSite:
                             var site = serializer.Deserialize<Site>(request.JsonObject);
@@ -91,14 +96,14 @@ namespace Servant.Server.SocketClient
 
                             SiteManager.UpdateSite(originalSite);
 
-                            ws.Send("ok");
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message  = "ok", Success = true}));
                             break;
                         case CommandRequestType.GetApplicationPools:
                             var appPools = SiteManager.GetApplicationPools();
-                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) {Message = serializer.Serialize(appPools)}));
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) {Message = serializer.Serialize(appPools), Success = true}));
                             break;
                         case CommandRequestType.GetCertificates:
-                            ws.Send(serializer.Serialize(SiteManager.GetCertificates()));
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) {Message = serializer.Serialize(SiteManager.GetCertificates()), Success = true}));
                             break;
                         case CommandRequestType.StartSite:
                             var startSite = SiteManager.GetSiteByName(request.Value);
@@ -113,22 +118,22 @@ namespace Servant.Server.SocketClient
                         case CommandRequestType.RecycleApplicationPool:
                             var recycleSite = SiteManager.GetSiteByName(request.Value);
                             SiteManager.RecycleApplicationPoolBySite(recycleSite.IisId);
-                            ws.Send("ok");
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
                             break;
                         case CommandRequestType.RestartSite:
                             var restartSite = SiteManager.GetSiteByName(request.Value);
                             SiteManager.RestartSite(restartSite.IisId);
-                            ws.Send("ok");
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
                             break;
                         case CommandRequestType.DeleteSite:
                             var deleteSite = SiteManager.GetSiteByName(request.Value);
                             SiteManager.DeleteSite(deleteSite.IisId);
-                            ws.Send("ok");
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
                             break;
                         case CommandRequestType.CreateSite:
                             var createSite = serializer.Deserialize<Site>(request.JsonObject);
                             var id = SiteManager.CreateSite(createSite);
-                            ws.Send(id.ToString());
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = id.ToString(), Success = true }));
                             break;
                     }
                 };
