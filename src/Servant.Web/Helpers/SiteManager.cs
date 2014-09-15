@@ -212,6 +212,12 @@ namespace Servant.Web.Helpers
                 if(site.Name != iisSite.Name) 
                     iisSite.Name = site.Name;
 
+                // If the application pool does not exists on the server, create it
+                if (manager.ApplicationPools.SingleOrDefault(x => x.Name == site.ApplicationPool) == null)
+                {
+                    manager.ApplicationPools.Add(site.ApplicationPool);
+                }
+
                 mainApplication.ApplicationPoolName = site.ApplicationPool;
 
                 // Commits bindings
