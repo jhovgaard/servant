@@ -132,8 +132,8 @@ namespace Servant.Server.SocketClient
                             break;
                         case CommandRequestType.CreateSite:
                             var createSite = serializer.Deserialize<Site>(request.JsonObject);
-                            var id = SiteManager.CreateSite(createSite);
-                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = id.ToString(), Success = true }));
+                            var createResult = SiteManager.CreateSite(createSite);
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = serializer.Serialize(createResult), Success = true }));
                             break;
                     }
                 };
