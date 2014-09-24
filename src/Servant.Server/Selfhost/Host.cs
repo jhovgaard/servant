@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Timers;
 using Exceptionless;
@@ -88,6 +89,17 @@ namespace Servant.Server.Selfhost
             ServantHost = null;
             if(Debug)
                 Console.WriteLine("Host was killed.");
+        }
+
+        public void Update()
+        {
+            var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var update = new Process() { StartInfo = new ProcessStartInfo(System.IO.Path.Combine(path, "Servant.Updater.exe"), path) };
+            if (Environment.OSVersion.Version.Major >= 6)
+            {
+                update.StartInfo.Verb = "runas";
+            }
+            update.Start();
         }
 
         public void StartLogParsing()

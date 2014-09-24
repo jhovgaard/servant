@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Business", "Servant.Business\Servant.Business.csproj", "{91BA5146-45D2-4FCE-BF35-FA451BF7528D}"
 EndProject
@@ -17,6 +17,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Web", "Servant.Web\Servant.Web.csproj", "{ED24DEC4-4ADC-4745-96A3-DD770054C25E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Web.Tests", "Servant.Web.Tests\Servant.Web.Tests.csproj", "{63961692-9F65-4908-B976-FE5F21D1954E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Updater", "Servant.Updater\Servant.Updater.csproj", "{6B1ECFEB-333B-41A9-860D-BCC653B5DAE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +42,10 @@ Global
 		{63961692-9F65-4908-B976-FE5F21D1954E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63961692-9F65-4908-B976-FE5F21D1954E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63961692-9F65-4908-B976-FE5F21D1954E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B1ECFEB-333B-41A9-860D-BCC653B5DAE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B1ECFEB-333B-41A9-860D-BCC653B5DAE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B1ECFEB-333B-41A9-860D-BCC653B5DAE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B1ECFEB-333B-41A9-860D-BCC653B5DAE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

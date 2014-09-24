@@ -11,6 +11,7 @@ namespace Servant.Business
         void Start(ServantConfiguration configuration = null);
         void Stop();
         void Kill();
+        void Update();
         void StartLogParsing();
         void StopLogParsing();
         void RemoveCertificateBinding(int port);

@@ -21,6 +21,10 @@ namespace Servant.Web.Infrastructure
         {
         }
 
+        public void Update()
+        {
+        }
+
         public void StartLogParsing()
         {
         }
