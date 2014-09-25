@@ -23,6 +23,7 @@ namespace Servant.Server.SocketClient
         StartSite,
         RestartSite,
         RecycleApplicationPool,
-        Unauthorized
+        Unauthorized,
+        ForceUpdate
     }
 }

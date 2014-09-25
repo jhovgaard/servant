@@ -14,17 +14,16 @@ namespace Servant.Server.Selfhost
     public class Host : IHost
     {
         private NancyHost ServantHost { get; set; }
-        public bool LogParsingStarted { get; set; }
         public bool Debug { get; set; }
         public DateTime StartupTime { get; set; }
         private static Timer _timer;
 
         public Host()
         {
-            LogParsingStarted = false;
             StartupTime = DateTime.Now;
-            _timer = new Timer(60000);
-            _timer.Elapsed += SyncDatabaseJob;
+            _timer = new Timer(3600000);
+            _timer.Elapsed += (sender, args) => Update();
+            _timer.Start();
         }
 
         public void Start(ServantConfiguration configuration = null)
@@ -93,41 +92,18 @@ namespace Servant.Server.Selfhost
 
         public void Update()
         {
+            if (Debug)
+                Console.WriteLine("Checking for updates...");
+
             var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var update = new Process() { StartInfo = new ProcessStartInfo(System.IO.Path.Combine(path, "Servant.Updater.exe"), path) };
+            var update = new Process() { StartInfo = new ProcessStartInfo(System.IO.Path.Combine(path, "Servant.Updater.exe")) { UseShellExecute = false, CreateNoWindow = true } };
             if (Environment.OSVersion.Version.Major >= 6)
             {
                 update.StartInfo.Verb = "runas";
             }
             update.Start();
         }
-
-        public void StartLogParsing()
-        {
-            if(LogParsingStarted)
-                throw new Exception("Log parsing already started.");
-            
-            LogParsingStarted = true;
-            _timer.Start();
-            
-            if(Debug)
-                Console.WriteLine("Log parsing started.");
-        }
-
-        public void StopLogParsing()
-        {
-            var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
-
-            if (configuration.Debug)
-                Console.WriteLine("Stopping log parsing...");
-
-            LogParsingStarted = false;
-            _timer.Stop();
-
-            if (configuration.Debug)
-                Console.WriteLine("Log parsing stopped.");
-        }
-
+        
         public void RemoveCertificateBinding(int port)
         {
             CertificateHandler.RemoveCertificateBinding(port);
@@ -148,27 +124,6 @@ namespace Servant.Server.Selfhost
         {
             SocketClient.SocketClient.IsStopped = false;
             new System.Threading.Thread(SocketClient.SocketClient.Connect).Start();
-        }
-
-        void SyncDatabaseJob(object sender, ElapsedEventArgs e)
-        {
-            var configuration = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<ServantConfiguration>();
-            _timer.Stop();
-            if (configuration.Debug)
-                Console.WriteLine("Started SyncDatabaseJob (IsRunning: {0})", LogParsingStarted);
-           
-            try
-            {
-                //Manager.Helpers.EventLogHelper.SyncServer();
-                //Manager.Helpers.SynchronizationHelper.SyncServer();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error on SyncDatabaseJob ({0}: {1}", ex.GetType(), ex.Message);
-            }
-
-            if (LogParsingStarted)
-                _timer.Start();
         }
     }
 }
