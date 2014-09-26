@@ -3,6 +3,7 @@ using System.Security.Permissions;
 using System.Threading;
 using Nancy.Json;
 using Nancy.TinyIoc;
+using Servant.Business;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Servant.Web.Helpers;
@@ -134,6 +135,11 @@ namespace Servant.Server.SocketClient
                             var createSite = serializer.Deserialize<Site>(request.JsonObject);
                             var createResult = SiteManager.CreateSite(createSite);
                             ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = serializer.Serialize(createResult), Success = true }));
+                            break;
+                        case CommandRequestType.ForceUpdate:
+                             var host = TinyIoCContainer.Current.Resolve<IHost>();
+                            host.Update();
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = "Started", Success = true }));
                             break;
                     }
                 };

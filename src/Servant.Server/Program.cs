@@ -165,7 +165,7 @@ namespace Servant.Server
                     var startController = new ServiceController("Servant for IIS");
                     startController.Start();
                     StartBrowser();
-                    Console.WriteLine("Servant was successfully installed. Please complete the installation from your browser on " + Configuration.ServantUrl);
+                    Console.WriteLine("OK: Servant was successfully installed. Please complete the installation from your browser on " + Configuration.ServantUrl);
                     break;
 
                 case "uninstall":
@@ -181,6 +181,7 @@ namespace Servant.Server
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("An error occurred while trying to uninstall Servant.");
                         Console.ResetColor();
+                        Environment.Exit(1);
                     }
 
                     break;

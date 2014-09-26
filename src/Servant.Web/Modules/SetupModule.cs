@@ -74,9 +74,6 @@ namespace Servant.Web.Modules
                         formSettings.InstallationGuid = Guid.NewGuid();
                         Helpers.ConfigurationHelper.UpdateConfiguration(formSettings);
                         
-                        if (!configuration.EnableErrorMonitoring && formSettings.EnableErrorMonitoring) 
-                            host.StartLogParsing();
-
                         var isHttps = formSettings.ServantUrl.StartsWith("https://");
                         if (isHttps)
                         {

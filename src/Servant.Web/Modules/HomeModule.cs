@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Servant.Business;
 using Servant.Business.Objects;
 using Servant.Web.Helpers;
 
@@ -19,6 +20,13 @@ namespace Servant.Web.Modules
                 Model.UnhandledExceptions = latestErrors;
                 Model.HaveSeenNewsletter = configuration.HaveSeenNewsletter;
                 return View["Index", Model];
+            };
+
+            Get["/update"] = p =>
+            {
+                var host = Nancy.TinyIoc.TinyIoCContainer.Current.Resolve<IHost>();
+                host.Update();
+                return "Ok";
             };
 
             Post["/subscribetonewsletter"] = p => {

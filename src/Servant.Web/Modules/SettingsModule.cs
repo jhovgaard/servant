@@ -95,22 +95,6 @@ namespace Servant.Web.Modules
                 return View["Index", Model];
             };
 
-            Post["/startlogparsing/"] = _ => {
-                
-                var start = (bool) Request.Form.Start;
-                
-                if(!configuration.EnableErrorMonitoring && start)
-                    host.StartLogParsing();
-
-                if(configuration.EnableErrorMonitoring && !start)
-                    host.StopLogParsing();
-
-                configuration.EnableErrorMonitoring = start;
-                Helpers.ConfigurationHelper.UpdateConfiguration(configuration);
-                
-                return Response.AsRedirect("/settings/");
-            };
-
             Get["/api/"] = p =>
             {
                 Model.Settings = configuration;
