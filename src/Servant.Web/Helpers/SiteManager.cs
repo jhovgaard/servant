@@ -348,6 +348,12 @@ namespace Servant.Web.Helpers
 
             using (var manager = new ServerManager())
             {
+                if (manager.Sites.Any(x => x.Name == site.Name))
+                {
+                    result.Result = CreateSiteResult.NameAlreadyInUse;
+                    return result;
+                }
+
                 // Create site
                 manager.Sites.Add(site.Name, "http", bindingInformations.First(), site.SitePath);
                 var iisSite = manager.Sites.SingleOrDefault(x => x.Name == site.Name);
