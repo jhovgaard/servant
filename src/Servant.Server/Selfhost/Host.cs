@@ -39,7 +39,6 @@ namespace Servant.Server.Selfhost
                 var uri = new Uri(configuration.ServantUrl.Replace("*", "localhost"));
                 CreateHost(uri);
 
-                //StartLogParsing();
                 try
                 {
                     ServantHost.Start();
