@@ -16,7 +16,7 @@ namespace Servant.Updater
 
         static void Main(string[] args)
         {
-            //args = new[] {@"C:\Code\servant\src\Servant.Server\bin\Release\Servant.Server.exe"};
+            args = new[] {@"C:\Code\servant\src\Servant.Server\bin\Release\Servant.Server.exe"};
             string servantPath = Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetCallingAssembly().Location), "Servant.Server.exe");
             Console.WriteLine("Path: " + servantPath);
             if(args.Length > 0)
@@ -28,11 +28,12 @@ namespace Servant.Updater
             var downloadLocation = Path.Combine(servantDirectory, "servant-1.1.zip");
 
             var versionInfo = FileVersionInfo.GetVersionInfo(servantPath);
-            var currentVersion = float.Parse(versionInfo.ProductVersion);
+            var currentVersion = float.Parse(versionInfo.ProductVersion.Replace(".", ""));
             WriteLogEntry("Current version is " + currentVersion);
 
             var releases = GetReleases();
-            var latestVersion = float.Parse(releases.First().tag_name + "00");
+
+            var latestVersion = float.Parse(releases.First().tag_name.Replace(".", "").PadRight(4, '0'));
             WriteLogEntry("Most recent version is " + latestVersion);
 
             if (latestVersion > currentVersion)
