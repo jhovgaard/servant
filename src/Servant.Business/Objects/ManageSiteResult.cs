@@ -1,8 +1,8 @@
 ﻿namespace Servant.Business.Objects
 {
-    public class CreateSiteResult
+    public class ManageSiteResult
     {
         public int IisSiteId { get; set; }
-        public Enums.CreateSiteResult Result { get; set; }
+        public Enums.SiteResult Result { get; set; }
     }
 }

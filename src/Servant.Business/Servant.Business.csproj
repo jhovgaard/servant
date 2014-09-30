@@ -47,9 +47,9 @@
     <Compile Include="IHost.cs" />
     <Compile Include="Objects\Binding.cs" />
     <Compile Include="Objects\Certificate.cs" />
-    <Compile Include="Objects\CreateSiteResult.cs" />
+    <Compile Include="Objects\ManageSiteResult.cs" />
     <Compile Include="Objects\Entity.cs" />
-    <Compile Include="Objects\Enums\CreateSiteResult.cs" />
+    <Compile Include="Objects\Enums\ManageSiteResult.cs" />
     <Compile Include="Objects\Enums\Protocol.cs" />
     <Compile Include="Objects\Enums\SiteStartResult.cs" />
     <Compile Include="Objects\Enums\InstanceState.cs" />

@@ -1,10 +1,12 @@
 ﻿namespace Servant.Business.Objects.Enums
 {
-    public enum CreateSiteResult
+    public enum SiteResult
     {
         Success,
         Failed,
         BindingAlreadyInUse,
-        NameAlreadyInUse
+        NameAlreadyInUse,
+        UnknownSiteId,
+        SiteNameNotFound
     }
 }

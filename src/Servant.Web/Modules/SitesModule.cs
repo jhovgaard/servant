@@ -9,7 +9,6 @@ using Servant.Business.Objects.Enums;
 using Nancy.Responses;
 using Nancy.ModelBinding;
 using Servant.Web.Helpers;
-using CreateSiteResult = Servant.Business.Objects.Enums.CreateSiteResult;
 
 namespace Servant.Web.Modules
 {
@@ -41,16 +40,16 @@ namespace Servant.Web.Modules
 
                     switch (result.Result)
                     {
-                        case CreateSiteResult.NameAlreadyInUse:
+                        case SiteResult.NameAlreadyInUse:
                             AddPropertyError("name", "There's already a site with that name.");
                             break;
-                        case CreateSiteResult.BindingAlreadyInUse:
+                        case SiteResult.BindingAlreadyInUse:
                             AddPropertyError("httpbindings", "The binding is already in use.");
                             break;
-                        case CreateSiteResult.Failed:
+                        case SiteResult.Failed:
                             AddGlobalError("Something went completely wrong :-/");
                             break;
-                        case CreateSiteResult.Success:
+                        case SiteResult.Success:
                             System.Threading.Thread.Sleep(1000);
                             AddMessage("Site has successfully been created.", MessageType.Success);
                             return new RedirectResponse("/sites/" + result.IisSiteId + "/settings/");

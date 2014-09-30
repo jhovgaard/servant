@@ -10,7 +10,6 @@ using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Binding = Servant.Business.Objects.Binding;
-using CreateSiteResult = Servant.Business.Objects.Enums.CreateSiteResult;
 using Site = Servant.Business.Objects.Site;
 
 namespace Servant.Web.Helpers
@@ -182,7 +181,7 @@ namespace Servant.Web.Helpers
             }
         }
 
-        public static string GetSitename(Servant.Business.Objects.Site site) {
+        public static string GetSitename(Site site) {
             if(site == null)
                 return "Unknown";
             
@@ -198,11 +197,28 @@ namespace Servant.Web.Helpers
             return bindingsToAdd.Distinct();
         }
 
-        public static void UpdateSite(Servant.Business.Objects.Site site)
+        public static ManageSiteResult UpdateSite(Site site)
         {
+            var result = new ManageSiteResult { IisSiteId = site.IisId };
+
             using (var manager = new ServerManager())
             {
                 var iisSite = manager.Sites.SingleOrDefault(x => x.Id == site.IisId);
+
+                if (iisSite == null)
+                {
+                    result.Result = SiteResult.UnknownSiteId;
+                    return result;
+                }
+
+                var iisSiteWithSameName = manager.Sites.SingleOrDefault(x => x.Id != site.IisId && x.Name == site.Name);
+
+                if (iisSiteWithSameName != null)
+                {
+                    result.Result = SiteResult.NameAlreadyInUse;
+                    return result;
+                }
+
                 var mainApplication = iisSite.Applications.First();
 
                 mainApplication.VirtualDirectories[0].PhysicalPath = site.SitePath;
@@ -260,6 +276,8 @@ namespace Servant.Web.Helpers
                 
                 manager.CommitChanges();
             }
+
+            return result;
         }
 
         public static string[] GetApplicationPools()
@@ -331,9 +349,9 @@ namespace Servant.Web.Helpers
             return GetBindingInUse(iisSiteId, bindingInformations.ToList()) != null;
         }
 
-        public static Business.Objects.CreateSiteResult CreateSite(Site site)
+        public static Business.Objects.ManageSiteResult CreateSite(Site site)
         {
-            var result = new Business.Objects.CreateSiteResult();
+            var result = new Business.Objects.ManageSiteResult();
 
 
             var bindingInformations = site.Bindings.Select(x => x.ToIisBindingInformation()).ToList();
@@ -342,7 +360,7 @@ namespace Servant.Web.Helpers
             var bindingInUse = GetBindingInUse(0, bindingInformations); // 0 never exists
             if (bindingInUse != null)
             {
-                result.Result = CreateSiteResult.BindingAlreadyInUse;
+                result.Result = SiteResult.BindingAlreadyInUse;
                 return result;
             }
 
@@ -350,7 +368,7 @@ namespace Servant.Web.Helpers
             {
                 if (manager.Sites.Any(x => x.Name == site.Name))
                 {
-                    result.Result = CreateSiteResult.NameAlreadyInUse;
+                    result.Result = SiteResult.NameAlreadyInUse;
                     return result;
                 }
 
@@ -408,12 +426,12 @@ namespace Servant.Web.Helpers
 
                 if (created)
                 {
-                    result.Result = CreateSiteResult.Success;
+                    result.Result = SiteResult.Success;
                     result.IisSiteId = (int) iisSite.Id;
                 }
                 else
                 {
-                    result.Result = CreateSiteResult.Failed;
+                    result.Result = SiteResult.Failed;
                 }
 
                 return result;

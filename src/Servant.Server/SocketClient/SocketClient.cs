@@ -83,7 +83,7 @@ namespace Servant.Server.SocketClient
 
                             if (originalSite == null)
                             {
-                                ws.Send("not_found");
+                                ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = serializer.Serialize(new ManageSiteResult { Result = SiteResult.SiteNameNotFound }), Success = true }));
                                 return;
                             }
 
@@ -95,9 +95,9 @@ namespace Servant.Server.SocketClient
                             originalSite.SitePath = site.SitePath;
                             originalSite.Bindings = site.Bindings;
 
-                            SiteManager.UpdateSite(originalSite);
+                            var updateResult = SiteManager.UpdateSite(originalSite);
 
-                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message  = "ok", Success = true}));
+                            ws.Send(serializer.Serialize(new CommandResponse(request.Guid) { Message = serializer.Serialize(updateResult), Success = true }));
                             break;
                         case CommandRequestType.GetApplicationPools:
                             var appPools = SiteManager.GetApplicationPools();
