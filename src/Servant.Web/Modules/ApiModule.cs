@@ -9,6 +9,7 @@ using Nancy.Json;
 using Nancy.ModelBinding;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
+using Servant.Shared;
 using Servant.Web.Helpers;
 using Servant.Web.Infrastructure;
 using Servant.Web.Performance;
@@ -38,7 +39,7 @@ namespace Servant.Web.Modules
             {
                 var info = new ServantServerInfo();
                 info.ApplicationPools = SiteManager.GetApplicationPools();
-                info.Certificates = Helpers.SiteManager.GetCertificates().ToList();
+                info.Certificates = SiteManager.GetCertificates().ToList();
 
                 return Response.AsJson(info);
             };

@@ -107,7 +107,6 @@
     <Compile Include="Helpers\MailchimpHelper.cs" />
     <Compile Include="Helpers\ModelIncluders.cs" />
     <Compile Include="Helpers\ConfigurationHelper.cs" />
-    <Compile Include="Helpers\SiteManager.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Infrastructure\DummyHost.cs" />
     <Compile Include="Infrastructure\ServantServerInfo.cs" />
@@ -162,6 +161,10 @@
     <ProjectReference Include="..\Servant.Business\Servant.Business.csproj">
       <Project>{91ba5146-45d2-4fce-bf35-fa451bf7528d}</Project>
       <Name>Servant.Business</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Servant.Shared\Servant.Shared.csproj">
+      <Project>{e3a0e6d8-5341-4fd1-bbb1-c42d0574976d}</Project>
+      <Name>Servant.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

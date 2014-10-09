@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Linq;
+using Servant.Shared;
 using Servant.Web.Helpers;
 
 namespace Servant.Server.Selfhost

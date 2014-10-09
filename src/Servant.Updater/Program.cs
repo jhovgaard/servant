@@ -1,197 +1,147 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Text;
-using ICSharpCode.SharpZipLib.Zip;
+using Servant.Shared;
 
 namespace Servant.Updater
 {
     class Program
     {
-        static StringBuilder _log = new StringBuilder();
-
         static void Main(string[] args)
         {
-            args = new[] {@"C:\Code\servant\src\Servant.Server\bin\Release\Servant.Server.exe"};
-            string servantPath = Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetCallingAssembly().Location), "Servant.Server.exe");
-            Console.WriteLine("Path: " + servantPath);
+#if DEBUG
+            args = new[] { Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Servant.Client.exe") };
+#endif
+            
+            string servantFile = null;
+
             if(args.Length > 0)
-                servantPath = args[0];
+                servantFile = args[0];
+
+            if (servantFile == null)
+            {
+                return;
+            }
 
             var webClient = new WebClient();
-            var servantDirectory = Path.GetDirectoryName(servantPath);
-            
-            var downloadLocation = Path.Combine(servantDirectory, "servant-1.1.zip");
+            var servantDirectory = Path.GetDirectoryName(servantFile);
 
-            var versionInfo = FileVersionInfo.GetVersionInfo(servantPath);
+            if (servantDirectory == null)
+            {
+                return;
+            }
+
+            var release = GetLatestRelease();
+
+            if (release == null)
+            {
+                return;
+            }
+
+            var versionInfo = FileVersionInfo.GetVersionInfo(servantFile);
             var currentVersion = float.Parse(versionInfo.ProductVersion.Replace(".", ""));
-            WriteLogEntry("Current version is " + currentVersion);
+            var latestVersion = float.Parse(release.Version.Replace(".", "").PadRight(4, '0'));
 
-            var releases = GetReleases();
-
-            var latestVersion = float.Parse(releases.First().tag_name.Replace(".", "").PadRight(4, '0'));
             WriteLogEntry("Most recent version is " + latestVersion);
 
             if (latestVersion > currentVersion)
             {
-                var servantZipUrl = releases.First().assets.First().browser_download_url;
-                WriteLogEntry("Downloading " + servantZipUrl + "...");
-                webClient.DownloadFile(servantZipUrl, downloadLocation);
-                var fastZip = new FastZip();
-
-                WriteLogEntry("Uninstalling current version");
-                var uninstalled = Uninstall(servantPath);
-                
-                if (!uninstalled)
-                    WriteLogEntry("Unable to uninstall Servant. It may be caused by corrupt config.json.", true);
-
-                // Backup af nuværende installation
-                var backupDirectory = Path.Combine(servantDirectory, "_temp");
-                DirectoryCopy(servantDirectory, backupDirectory, true);
+                var downloadFileName = Path.Combine(servantDirectory, string.Format("update-{0}.msi", latestVersion));
+                WriteLogEntry("There's a new a version of Servant available. Downloading...");
+                var couldDownload = false;
 
                 try
                 {
-                    WriteLogEntry("Extracting new version");
-                    fastZip.ExtractZip(downloadLocation, servantDirectory, FastZip.Overwrite.Always, null, null, null,
-                        false);
-                    var installed = Install(servantPath);
-                    if (!installed)
+                    webClient.DownloadFile(release.Url, downloadFileName);
+                    couldDownload = true;
+                }
+                catch (Exception e)
+                {
+                    WriteLogEntry("Could not download Servant client update: " + e.Message, addToEventLog: true);
+                }
+
+                if (couldDownload)
+                {
+                    WriteLogEntry("File downloaded. Beginning update process...");
+
+                    var p = new Process
+                            {
+                                StartInfo = { FileName = "msiexec", Arguments = string.Format("/i \"{0}\" /quiet /qn /norestart /log \"msi_update_log.txt\"", downloadFileName) }
+                            };
+
+                    p.Start();
+                    p.WaitForExit();
+
+                    if (p.ExitCode == 0)
                     {
-                        WriteLogEntry("Unable to install new version of Servant. Rolling back...", true);
+                        WriteLogEntry("Update succeeded.");
+
+                        try
+                        {
+                            File.Delete(downloadFileName);
+                        }
+                        catch { }
                     }
-
-                    WriteLogEntry(string.Format("Successfully updated Servant from version {0} to version {1}.", currentVersion, latestVersion), true);
-                }
-                catch (Exception ex)
-                {
-                    EventLog.WriteEntry("Servant for IIS", "Failed updating Servant: " + System.Environment.NewLine + ex.Message + System.Environment.NewLine + ex.StackTrace, EventLogEntryType.Error);
-                    Uninstall(servantPath);
-                    CleanupServantDirectory(servantDirectory);
-                    DirectoryCopy(backupDirectory, servantPath, true);
-                    Install(servantPath);
-                    
-                    throw;
-                }
-                finally
-                {
-                    System.IO.Directory.Delete(backupDirectory, true);
+                    else
+                    {
+                        WriteLogEntry("Fatal error during update. Exit code: " + p.ExitCode + ". See msi-install-log.txt for more info.", addToEventLog: true);
+                    }
                 }
             }
-        }
-
-        private static void CleanupServantDirectory(string path)
-        {
-            string[] filePaths = Directory.GetFiles(path);
-            
-            foreach (var filePath in filePaths)
+            else
             {
-                if(System.IO.Path.GetFileName(filePath) != "Servant.Updater.exe")
-                    File.Delete(filePath);
-            }
-
-            var dir = new DirectoryInfo(path);
-            var dirs = dir.GetDirectories();
-
-            foreach (var subdir in dirs)
-            {
-                if (subdir.Name != "_temp")
-                {
-                    subdir.Delete(true);
-                }
-            }
-        }
-
-        /// Source: http://msdn.microsoft.com/en-us/library/bb762914(v=vs.110).aspx
-        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
-        {
-            // Get the subdirectories for the specified directory.
-            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
-            DirectoryInfo[] dirs = dir.GetDirectories();
-
-            if (!dir.Exists)
-            {
-                throw new DirectoryNotFoundException(
-                    "Source directory does not exist or could not be found: "
-                    + sourceDirName);
-            }
-
-            // If the destination directory doesn't exist, create it. 
-            if (!Directory.Exists(destDirName))
-            {
-                Directory.CreateDirectory(destDirName);
-            }
-
-            // Get the files in the directory and copy them to the new location.
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo file in files)
-            {
-                string temppath = Path.Combine(destDirName, file.Name);
-                file.CopyTo(temppath, true);
-            }
-
-            // If copying subdirectories, copy them and their contents to new location. 
-            if (copySubDirs)
-            {
-                foreach (DirectoryInfo subdir in dirs)
-                {
-                    string temppath = Path.Combine(destDirName, subdir.Name);
-                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
-                }
+                WriteLogEntry("No new update ready for you.");
             }
         }
 
         private static void WriteLogEntry(string value, bool addToEventLog = false)
         {
             Console.WriteLine(value);
-            _log.Append(value);
 
             if (addToEventLog)
-                EventLog.WriteEntry("Servant for IIS", value, EventLogEntryType.Information);
+                EventLog.WriteEntry("Servant Client Updater", value, EventLogEntryType.Error);
         }
 
-        private static List<GithubReleaseResult> GetReleases()
+        private static ReleaseResult GetLatestRelease()
         {
-            string url = "https://api.github.com/repos/jhovgaard/servant/releases";
+#if DEBUG
+            return new ReleaseResult { Url = "https://dl.dropboxusercontent.com/u/969563/Servant.Client.1.1.0.0.msi", Version = "1.1.0" };
+#endif
+
+            const string url = "http://www.servant.io/version.json";
             var request = (HttpWebRequest)WebRequest.Create(url);
 
-            request.UserAgent = "Servant for IIS Client";
+            request.UserAgent = "Servant Client Updater";
             request.KeepAlive = false;
 
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseStream =new StreamReader(response.GetResponseStream());
-            string result = responseStream.ReadToEnd();
-            response.Close();
-            responseStream.Close();
+            try
+            {
+                using (var response = (HttpWebResponse)request.GetResponse())
+                {
+                    var stream = response.GetResponseStream();
 
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<GithubReleaseResult>>(result);
+                    if (stream == null)
+                    {
+                        throw new NullReferenceException("Stream was null.");
+                    }
+
+                    using (var responseStream = new StreamReader(stream))
+                    {
+                        var result = responseStream.ReadToEnd();
+                        response.Close();
+                        responseStream.Close();
+                        return Json.DeserializeFromString<ReleaseResult>(result);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                WriteLogEntry("Unable to check for updates: " + e.Message, addToEventLog: true);
+            }
+
+            return null;
         } 
-
-        static bool Uninstall(string path)
-        {
-            var uninstall = new Process() { StartInfo = new ProcessStartInfo(path, "uninstall") { CreateNoWindow = false, UseShellExecute = false, RedirectStandardOutput = true } };
-            if (Environment.OSVersion.Version.Major >= 6)
-            {
-                uninstall.StartInfo.Verb = "runas";
-            }
-            uninstall.Start();
-            uninstall.WaitForExit();
-            return uninstall.ExitCode == 0;
-        }
-
-        static bool Install(string path)
-        {
-            var install = new Process() { StartInfo = new ProcessStartInfo(path, "install") { CreateNoWindow = false, UseShellExecute = false, RedirectStandardOutput = true } };
-            if (Environment.OSVersion.Version.Major >= 6)
-            {
-                install.StartInfo.Verb = "runas";
-            }
-            install.Start();
-            install.WaitForExit();
-            return install.ExitCode == 0;
-        }
     }
 }

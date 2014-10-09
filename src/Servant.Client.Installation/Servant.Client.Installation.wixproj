@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.8</ProductVersion>
+    <ProjectGuid>76114457-7d51-4f0e-ac93-a0b698a79b0d</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>Servant.Client</OutputName>
+    <OutputType>Package</OutputType>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <Cultures>
+    </Cultures>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="KeyDialog.wxs" />
+    <Compile Include="Product.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Servant.Client\Servant.Client.csproj">
+      <Name>Servant.Client</Name>
+      <Project>{90ab2320-a198-4275-bf27-fab83d6ce69c}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\Servant.Updater\Servant.Updater.csproj">
+      <Name>Servant.Updater</Name>
+      <Project>{6b1ecfeb-333b-41a9-860d-bcc653b5dae6}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>..\..\dependencies\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>..\..\dependencies\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="banner1.jpg" />
+    <Content Include="banner2.jpg" />
+    <Content Include="logo.ico" />
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+  <Target Name="BeforeBuild">
+    <GetAssemblyIdentity AssemblyFiles="$(SolutionDir)Servant.Client\bin\$(Configuration)\Servant.Client.exe">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyVersions" />
+    </GetAssemblyIdentity>
+    <CreateProperty Value="$(OutputName).%(AssemblyVersions.Version)">
+      <Output TaskParameter="Value" PropertyName="TargetName" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetName)$(TargetExt)">
+      <Output TaskParameter="Value" PropertyName="TargetFileName" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetDir)$(TargetFileName)">
+      <Output TaskParameter="Value" PropertyName="TargetPath" />
+    </CreateProperty>
+  </Target>
+</Project>

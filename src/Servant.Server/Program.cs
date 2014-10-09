@@ -14,6 +14,7 @@ using Pluralsight.Crypto;
 using Servant.Business;
 using Servant.Business.Objects;
 using Servant.Server.Selfhost;
+using Servant.Shared;
 using Servant.Web.Helpers;
 using Servant.Server.WindowsService;
 

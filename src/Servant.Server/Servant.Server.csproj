@@ -107,9 +107,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Selfhost\CertificateHandler.cs" />
     <Compile Include="Selfhost\ErrorWriter.cs" />
-    <Compile Include="SocketClient\CommandResponse.cs" />
     <Compile Include="SocketClient\SocketClient.cs" />
-    <Compile Include="SocketClient\CommandRequest.cs" />
     <Compile Include="WindowsService\ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -141,6 +139,10 @@
     <ProjectReference Include="..\Servant.Business\Servant.Business.csproj">
       <Project>{91ba5146-45d2-4fce-bf35-fa451bf7528d}</Project>
       <Name>Servant.Business</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Servant.Shared\Servant.Shared.csproj">
+      <Project>{e3a0e6d8-5341-4fd1-bbb1-c42d0574976d}</Project>
+      <Name>Servant.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\Servant.Web\Servant.Web.csproj">
       <Project>{ed24dec4-4adc-4745-96a3-dd770054c25e}</Project>

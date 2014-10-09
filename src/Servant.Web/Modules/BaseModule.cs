@@ -7,6 +7,7 @@ using Nancy.Security;
 using Nancy;
 using Nancy.Validation;
 using Servant.Business.Objects;
+using Servant.Shared;
 using Servant.Web.Helpers;
 using Servant.Web.Views.Shared.Models;
 

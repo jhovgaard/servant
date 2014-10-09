@@ -7,6 +7,7 @@ using Nancy;
 using Nancy.Testing;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
+using Servant.Shared;
 using Servant.Web.Helpers;
 using Servant.Web.Tests.Helpers;
 

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define ProductId = "*"?>
+  <?define UpgradeCode = "12ad19d8925e496783745058da49089b"?>
+  <?define ProductVersion = "!(bind.FileVersion.$(var.Servant.Client.TargetFileName))"?>
+  <?define RTMProductVersion = "0.0.0.0"?>
+    
+	<Product Id="$(var.ProductId)" Name="Servant Client" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Servant.io" UpgradeCode="$(var.UpgradeCode)">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+   
+    <Upgrade Id='$(var.UpgradeCode)'>
+      <UpgradeVersion Minimum='$(var.ProductVersion)'
+                      IncludeMinimum='no'
+                      OnlyDetect='yes'
+                      Property='NEWPRODUCTFOUND' />
+      <UpgradeVersion Minimum='$(var.RTMProductVersion)'
+                      IncludeMinimum='yes'
+                      Maximum='$(var.ProductVersion)'
+                      IncludeMaximum='no'
+                      Property='UPGRADEFOUND' />
+    </Upgrade>
+    
+    <MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="Servant Client" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+
+    <Icon Id="logo.ico" SourceFile="logo.ico"/>
+
+    <UIRef Id="WixUI_InstallDir" />
+    
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <Property Id="WIXUI_KEY" />
+    <Property Id="ARPPRODUCTICON" Value="logo.ico" />
+
+    <UI>
+      <Publish Dialog="WelcomeDlg"
+               Control="Next"
+               Event="NewDialog"
+               Value="KeyDialog"
+               Order="2">1</Publish>
+      <Publish Dialog="KeyDialog"
+               Control="Next"
+               Event="NewDialog"
+               Value="InstallDirDlg"
+               Order="2">1</Publish>
+      <Publish Dialog="KeyDialog"
+               Control="Back"
+               Event="NewDialog"
+               Value="WelcomeDlg"
+               Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg"
+               Control="Back"
+               Event="NewDialog"
+               Value="KeyDialog"
+               Order="2">1</Publish>
+    </UI>
+
+    <CustomAction Id="SetKey_set" Property='SetKey' Value='"[INSTALLDIR]Servant.Client.exe" -k [WIXUI_KEY]' Execute='immediate'/>
+    <CustomAction Id="SetKey" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
+    <CustomAction Id="RunStartServiceCommand_set" Property='RunStartServiceCommand' Value='"[SystemFolder]sc.exe" start ServantClient' Execute='immediate'/>
+    <CustomAction Id="RunStartServiceCommand" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
+    <CustomAction Id='PreventDowngrading' Error='Newer version already installed' />
+
+    <InstallExecuteSequence>
+      <Custom Action="SetKey_set" Before="InstallFinalize">NOT REMOVE</Custom>
+      <Custom Action="SetKey" After="SetKey_set">NOT REMOVE</Custom>
+      <Custom Action="RunStartServiceCommand_set" After="SetKey">NOT REMOVE</Custom>
+      <Custom Action="RunStartServiceCommand" After="RunStartServiceCommand_set">NOT REMOVE</Custom>
+    </InstallExecuteSequence>
+  
+    <InstallExecuteSequence>
+      <Custom Action='PreventDowngrading' After='FindRelatedProducts'>NEWPRODUCTFOUND</Custom>
+      <RemoveExistingProducts After='InstallFinalize' />
+    </InstallExecuteSequence>
+
+    <InstallUISequence>
+      <Custom Action='PreventDowngrading' After='FindRelatedProducts'>NEWPRODUCTFOUND</Custom>
+    </InstallUISequence>
+	</Product>
+  
+	<Fragment>
+    <WixVariable Id="WixUIBannerBmp" Value="banner1.jpg" />
+    <WixVariable Id="WixUIDialogBmp" Value="banner2.jpg" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLDIR" Name="Servant" />
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLDIR">
+      <Component Id="Servant.Client.exe" Guid="2636bf23363a41dfbf2cebf84674a24e">
+        <File Id="Servant.Client.exe" Source="$(var.Servant.Client.TargetDir)\Servant.Client.exe" KeyPath="yes" Vital="yes" />
+        <ServiceInstall Id="ServantClientService" Description="Servant Client is responsible for exchanging data with Servant.io" DisplayName="Servant Client" Name="ServantClient" Start="auto" Type="ownProcess" ErrorControl="normal"/> 
+        <ServiceControl Id="ServantClientServiceControl" Name="ServantClient" Stop="both" Remove="uninstall" Wait="yes" /> 
+      </Component>
+      <Component Id="Servant.Business.dll" Guid="b03243fbd54b4b46acfd3db4db40f0d1">
+        <File Id="Servant.Business.dll" Source="$(var.Servant.Client.TargetDir)\Servant.Business.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="websocket_sharp.dll" Guid="94221cc33698447789fc02a2ccf65b41">
+        <File Id="websocket_sharp.dll" Source="$(var.Servant.Client.TargetDir)\websocket-sharp.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="CommandLine.dll" Guid="3190095badda4fb89085d77f35fa153a">
+        <File Id="CommandLine.dll" Source="$(var.Servant.Client.TargetDir)\CommandLine.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="Servant.Shared.dll" Guid="63271e4a68f94c4481c5f95e219adcf1">
+        <File Id="Servant.Shared.dll" Source="$(var.Servant.Client.TargetDir)\Servant.Shared.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="ServiceStack.Text.dll" Guid="11256da2c0ae4750b188300cdbb6765f">
+        <File Id="ServiceStack.Text.dll" Source="$(var.Servant.Client.TargetDir)\ServiceStack.Text.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="Servant.Updater.exe" Guid="b502232edf5c458fb0d8eac606b76f7f">
+        <File Id="Servant.Updater.exe" Source="$(var.Servant.Updater.TargetDir)\Servant.Updater.exe" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+	</Fragment>
+</Wix>

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Security.Principal;
 
-namespace Servant.Server.SocketClient
+namespace Servant.Shared.SocketClient
 {
     public class CommandRequest
     {

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Servant.Shared;
 
 namespace Servant.Web.Helpers
 {

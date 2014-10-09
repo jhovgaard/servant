@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Servant.Server.SocketClient
+namespace Servant.Shared.SocketClient
 {
     public class CommandResponse
     {

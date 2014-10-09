@@ -8,6 +8,7 @@ using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Nancy.Responses;
 using Nancy.ModelBinding;
+using Servant.Shared;
 using Servant.Web.Helpers;
 
 namespace Servant.Web.Modules

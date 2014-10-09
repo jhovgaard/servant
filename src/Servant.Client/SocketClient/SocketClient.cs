@@ -1,16 +1,16 @@
 ﻿using System;
+using System.Net.Security;
 using System.Threading;
-using Nancy.TinyIoc;
 using Servant.Business;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
+using Servant.Client.Infrastructure;
 using Servant.Shared;
 using Servant.Shared.SocketClient;
-using Servant.Web.Helpers;
+using TinyIoC;
 using WebSocketSharp;
-using Json = Servant.Shared.Json;
 
-namespace Servant.Server.SocketClient
+namespace Servant.Client.SocketClient
 {
     public static class SocketClient
     {
@@ -19,7 +19,7 @@ namespace Servant.Server.SocketClient
 
         public static void Connect()
         {
-            var configuration = TinyIoCContainer.Current.Resolve<ServantConfiguration>();
+            var configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
 
             if (string.IsNullOrWhiteSpace(configuration.ServantIoKey))
             {
@@ -30,7 +30,7 @@ namespace Servant.Server.SocketClient
             _isRetrying = true;
             while (!connected && !IsStopped)
             {
-                configuration = TinyIoCContainer.Current.Resolve<ServantConfiguration>(); // Genindlæser så man kan ændre key.
+                configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>(); // Genindlæser så man kan ændre key.
                 var client = GetClient(configuration);
                 client.Connect();
                 connected = client.IsAlive;
@@ -40,11 +40,13 @@ namespace Servant.Server.SocketClient
             _isRetrying = false;
         }
 
-        private static WebSocket GetClient(ServantConfiguration configuration)
+        private static WebSocket GetClient(ServantClientConfiguration configuration)
         {
-            var url = "ws://" + configuration.ServantIoUrl + "/Client?installationGuid=" + configuration.InstallationGuid + "&organizationGuid=" + configuration.ServantIoKey + "&servername=" + System.Environment.MachineName;
+            var url = "wss://" + configuration.ServantIoHost + "/Client?installationGuid=" + configuration.InstallationGuid + "&organizationGuid=" + configuration.ServantIoKey + "&servername=" + System.Environment.MachineName;
             using (var ws = new WebSocket(url))
             {
+                ws.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => sslPolicyErrors == SslPolicyErrors.None;
+
                 var pingTimer = new System.Timers.Timer(2000);
                 pingTimer.Elapsed += (sender, args) =>
                                      {
@@ -161,7 +163,7 @@ namespace Servant.Server.SocketClient
 
                 ws.OnClose += (sender, args) =>
                 {
-                    Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Lost connection to Servant.io");
+                    Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Lost connection to wss://" + configuration.ServantIoHost);
                     pingTimer.Enabled = false;
 
                     if (!_isRetrying)
@@ -172,7 +174,7 @@ namespace Servant.Server.SocketClient
 
                 ws.OnOpen += (sender, args) =>
                     {
-                        Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Successfully connected to ws://" + configuration.ServantIoUrl);
+                        Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Successfully connected to wss://" + configuration.ServantIoHost);
                         pingTimer.Enabled = true;
                     };
                 ws.Log.Output = (data, s) => { };

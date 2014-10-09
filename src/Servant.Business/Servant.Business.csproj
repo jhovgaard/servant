@@ -57,6 +57,7 @@
     <Compile Include="Objects\Error.cs" />
     <Compile Include="Objects\LogEntry.cs" />
     <Compile Include="Objects\ServantConfiguration.cs" />
+    <Compile Include="Objects\ServantVersion.cs" />
     <Compile Include="Objects\Site.cs" />
     <Compile Include="Objects\ApplicationError.cs" />
     <Compile Include="Objects\SiteApplication.cs" />

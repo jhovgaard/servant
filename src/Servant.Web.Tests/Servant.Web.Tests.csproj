@@ -79,6 +79,10 @@
       <Project>{65975626-bb9a-4cf4-a81c-f7831d6da23a}</Project>
       <Name>Servant.Server</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Servant.Shared\Servant.Shared.csproj">
+      <Project>{E3A0E6D8-5341-4FD1-BBB1-C42D0574976D}</Project>
+      <Name>Servant.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Servant.Web\Servant.Web.csproj">
       <Project>{ED24DEC4-4ADC-4745-96A3-DD770054C25E}</Project>
       <Name>Servant.Web</Name>
