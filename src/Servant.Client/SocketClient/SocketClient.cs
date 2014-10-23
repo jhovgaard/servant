@@ -58,91 +58,97 @@ namespace Servant.Client.SocketClient
                 {
                     var request = Json.DeserializeFromString<CommandRequest>(e.Data);
 
-                    switch (request.Command)
+                    try
                     {
-                        case CommandRequestType.Unauthorized:
-                            IsStopped = true;
-                            Console.WriteLine();
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Servant.io key was not recognized.");
-                            Console.ResetColor();
-                            ws.Close();
-                            break;
-                        case CommandRequestType.GetSites:
-                            var sites = SiteManager.GetSites();
-                            var result = Json.SerializeToString(sites);
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid)
-                                                     {
-                                                         Guid = request.Guid,
-                                                         Message = result,
-                                                         Success = true
-                                                     }));
-                            break;
-                        case CommandRequestType.UpdateSite:
-                            var site = Json.DeserializeFromString<Site>(request.JsonObject);
+                        switch (request.Command)
+                        {
+                            case CommandRequestType.Unauthorized:
+                                IsStopped = true;
+                                Console.WriteLine();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Servant.io key was not recognized.");
+                                Console.ResetColor();
+                                ws.Close();
+                                break;
+                            case CommandRequestType.GetSites:
+                                var sites = SiteManager.GetSites();
+                                var result = Json.SerializeToString(sites);
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid)
+                                                         {
+                                                             Message = result,
+                                                             Success = true
+                                                         }));
+                                break;
+                            case CommandRequestType.UpdateSite:
+                                var site = Json.DeserializeFromString<Site>(request.JsonObject);
 
-                            var originalSite = SiteManager.GetSiteByName(request.Value);
+                                var originalSite = SiteManager.GetSiteByName(request.Value);
 
-                            if (originalSite == null)
-                            {
-                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(new ManageSiteResult { Result = SiteResult.SiteNameNotFound }), Success = true }));
-                                return;
-                            }
+                                if (originalSite == null)
+                                {
+                                    ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(new ManageSiteResult { Result = SiteResult.SiteNameNotFound }), Success = true }));
+                                    return;
+                                }
 
-                            originalSite.ApplicationPool = site.ApplicationPool;
-                            originalSite.Name = site.Name;
-                            originalSite.SiteState = site.SiteState;
-                            originalSite.Bindings = site.Bindings;
-                            originalSite.LogFileDirectory = site.LogFileDirectory;
-                            originalSite.SitePath = site.SitePath;
-                            originalSite.Bindings = site.Bindings;
+                                originalSite.ApplicationPool = site.ApplicationPool;
+                                originalSite.Name = site.Name;
+                                originalSite.SiteState = site.SiteState;
+                                originalSite.Bindings = site.Bindings;
+                                originalSite.LogFileDirectory = site.LogFileDirectory;
+                                originalSite.SitePath = site.SitePath;
+                                originalSite.Bindings = site.Bindings;
 
-                            var updateResult = SiteManager.UpdateSite(originalSite);
+                                var updateResult = SiteManager.UpdateSite(originalSite);
 
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(updateResult), Success = true }));
-                            break;
-                        case CommandRequestType.GetApplicationPools:
-                            var appPools = SiteManager.GetApplicationPools();
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) {Message = Json.SerializeToString(appPools), Success = true}));
-                            break;
-                        case CommandRequestType.GetCertificates:
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) {Message = Json.SerializeToString(SiteManager.GetCertificates()), Success = true}));
-                            break;
-                        case CommandRequestType.StartSite:
-                            var startSite = SiteManager.GetSiteByName(request.Value);
-                            var startResult = SiteManager.StartSite(startSite);
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Success = startResult == SiteStartResult.Started, Message = startResult.ToString() }));
-                            break;
-                        case CommandRequestType.StopSite:
-                            var stopSite = SiteManager.GetSiteByName(request.Value);
-                            SiteManager.StopSite(stopSite);
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) {  Success = true }));
-                            break;
-                        case CommandRequestType.RecycleApplicationPool:
-                            var recycleSite = SiteManager.GetSiteByName(request.Value);
-                            SiteManager.RecycleApplicationPoolBySite(recycleSite.IisId);
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
-                            break;
-                        case CommandRequestType.RestartSite:
-                            var restartSite = SiteManager.GetSiteByName(request.Value);
-                            SiteManager.RestartSite(restartSite.IisId);
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
-                            break;
-                        case CommandRequestType.DeleteSite:
-                            var deleteSite = SiteManager.GetSiteByName(request.Value);
-                            SiteManager.DeleteSite(deleteSite.IisId);
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
-                            break;
-                        case CommandRequestType.CreateSite:
-                            var createSite = Json.DeserializeFromString<Site>(request.JsonObject);
-                            var createResult = SiteManager.CreateSite(createSite);
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(createResult), Success = true }));
-                            break;
-                        case CommandRequestType.ForceUpdate:
-                             var host = TinyIoCContainer.Current.Resolve<IHost>();
-                            host.Update();
-                            ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "Started", Success = true }));
-                            break;
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(updateResult), Success = true }));
+                                break;
+                            case CommandRequestType.GetApplicationPools:
+                                var appPools = SiteManager.GetApplicationPools();
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) {Message = Json.SerializeToString(appPools), Success = true}));
+                                break;
+                            case CommandRequestType.GetCertificates:
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) {Message = Json.SerializeToString(SiteManager.GetCertificates()), Success = true}));
+                                break;
+                            case CommandRequestType.StartSite:
+                                var startSite = SiteManager.GetSiteByName(request.Value);
+                                var startResult = SiteManager.StartSite(startSite);
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Success = startResult == SiteStartResult.Started, Message = startResult.ToString() }));
+                                break;
+                            case CommandRequestType.StopSite:
+                                var stopSite = SiteManager.GetSiteByName(request.Value);
+                                SiteManager.StopSite(stopSite);
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) {  Success = true }));
+                                break;
+                            case CommandRequestType.RecycleApplicationPool:
+                                var recycleSite = SiteManager.GetSiteByName(request.Value);
+                                SiteManager.RecycleApplicationPoolBySite(recycleSite.IisId);
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
+                                break;
+                            case CommandRequestType.RestartSite:
+                                var restartSite = SiteManager.GetSiteByName(request.Value);
+                                SiteManager.RestartSite(restartSite.IisId);
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
+                                break;
+                            case CommandRequestType.DeleteSite:
+                                var deleteSite = SiteManager.GetSiteByName(request.Value);
+                                SiteManager.DeleteSite(deleteSite.IisId);
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
+                                break;
+                            case CommandRequestType.CreateSite:
+                                var createSite = Json.DeserializeFromString<Site>(request.JsonObject);
+                                var createResult = SiteManager.CreateSite(createSite);
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(createResult), Success = true }));
+                                break;
+                            case CommandRequestType.ForceUpdate:
+                                 var host = TinyIoCContainer.Current.Resolve<IHost>();
+                                host.Update();
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "Started", Success = true }));
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) {Success = false, Message = "ex:" + ex.Message + Environment.NewLine + ex.StackTrace }));
                     }
                 };
 
@@ -177,7 +183,12 @@ namespace Servant.Client.SocketClient
                         Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Successfully connected to wss://" + configuration.ServantIoHost);
                         pingTimer.Enabled = true;
                     };
-                ws.Log.Output = (data, s) => { };
+                ws.Log.Output = (data, s) =>
+                                {
+#if DEBUG
+                                    MessageHandler.Print(data.Message);
+#endif
+                                };
                 ws.Log.Level = LogLevel.Fatal;
 
                 return ws;
