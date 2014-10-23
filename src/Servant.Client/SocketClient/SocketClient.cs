@@ -64,10 +64,7 @@ namespace Servant.Client.SocketClient
                         {
                             case CommandRequestType.Unauthorized:
                                 IsStopped = true;
-                                Console.WriteLine();
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Servant.io key was not recognized.");
-                                Console.ResetColor();
+                                MessageHandler.LogException("Servant.io key was not recognized.");
                                 ws.Close();
                                 break;
                             case CommandRequestType.GetSites:
@@ -157,9 +154,8 @@ namespace Servant.Client.SocketClient
                     var isInternalError = args.Message == "An exception has occurred while receiving a message.";
 
                     var socket = (WebSocket)sender;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Error: " + args.Message);
-                    Console.ResetColor();
+
+                    MessageHandler.LogException("WS Error: " + args.Message);
 
                     if (socket.ReadyState == WebSocketState.Open && !isInternalError)
                     {
@@ -169,7 +165,7 @@ namespace Servant.Client.SocketClient
 
                 ws.OnClose += (sender, args) =>
                 {
-                    Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Lost connection to wss://" + configuration.ServantIoHost);
+                    MessageHandler.LogException("Lost connection to wss://" + configuration.ServantIoHost);
                     pingTimer.Enabled = false;
 
                     if (!_isRetrying)
@@ -180,13 +176,21 @@ namespace Servant.Client.SocketClient
 
                 ws.OnOpen += (sender, args) =>
                     {
-                        Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Successfully connected to wss://" + configuration.ServantIoHost);
+                        MessageHandler.LogException("Successfully connected to wss://" + configuration.ServantIoHost);
                         pingTimer.Enabled = true;
                     };
                 ws.Log.Output = (data, s) =>
                                 {
 #if DEBUG
                                     MessageHandler.Print(data.Message);
+#endif
+
+#if !DEBUG
+                                    if (data.Level == LogLevel.Error || data.Level == LogLevel.Fatal)
+                                    {
+                                        MessageHandler.LogException(data.Message);
+                                    }
+
 #endif
                                 };
                 ws.Log.Level = LogLevel.Fatal;
