@@ -107,6 +107,16 @@ namespace Servant.Shared
                 servantSite.ApplicationPoolState = (InstanceState)Enum.Parse(typeof(InstanceState), applicationPoolState.ToString());
             }
 
+            foreach (var directory in site.Applications[0].VirtualDirectories.Skip(1))
+            {
+                servantSite.Applications.Add(new SiteApplication
+                {
+                    ApplicationPool = "",
+                    Path = directory.Path,
+                    DiskPath = directory.PhysicalPath,
+                    IsApplication = false
+                });
+            }
 
             if (site.Applications.Count > 1)
             {
@@ -117,6 +127,7 @@ namespace Servant.Shared
                             ApplicationPool = application.ApplicationPoolName,
                             Path = application.Path,
                             DiskPath = application.VirtualDirectories[0].PhysicalPath,
+                            IsApplication = true
                         });
                 }
             }
@@ -219,8 +230,16 @@ namespace Servant.Shared
                 }
 
                 var mainApplication = iisSite.Applications.First();
+                var rootPathDirectory = mainApplication.VirtualDirectories.SingleOrDefault(x => x.Path == "/");
+                if (rootPathDirectory == null)
+                {
+                    mainApplication.VirtualDirectories.Add("/", site.SitePath);
 
-                mainApplication.VirtualDirectories[0].PhysicalPath = site.SitePath;
+                }
+                else
+                {
+                    rootPathDirectory.PhysicalPath = site.SitePath;    
+                }
 
                 // In some scenarios Microsoft.Web.Administation fails to save site if property-set is detected with same name. 
                 //I believe it deletes and insert sites on updates and this makes a name conflict. Fixed by the hack below:
@@ -248,29 +267,53 @@ namespace Servant.Shared
                         iisSite.Bindings.Add(binding.ToIisBindingInformation(), binding.Protocol.ToString());
                 }
 
-                //Intelligently updates virtual applications
-                foreach (var application in site.Applications)
-                {
-                    var iisApp = iisSite.Applications.SingleOrDefault(x => x.Path == application.Path);
-
-                    if (iisApp == null)
-                    {
-                        if (!application.Path.StartsWith("/"))
-                            application.Path = "/" + application.Path;
-
-                        iisSite.Applications.Add(application.Path, application.DiskPath);
-                        iisApp = iisSite.Applications.Single(x => x.Path == application.Path);
-
-                    }
-
-                    iisApp.VirtualDirectories[0].PhysicalPath = application.DiskPath;
-                    iisApp.ApplicationPoolName = application.ApplicationPool;
-                }
-
-                var applicationsToDelete = iisSite.Applications.Skip(1).Where(x => !site.Applications.Select(a => a.Path).Contains(x.Path));
+                // Deletes virtual applications
+                var applicationsToDelete = iisSite.Applications.Skip(1).Where(application => !site.Applications.Where(x => x.IsApplication).Select(a => a.Path).Contains(application.Path)).ToList();
                 foreach (var application in applicationsToDelete)
                 {
                     application.Delete();
+                     iisSite.Applications.Remove(application); // Bug in Microsoft.Web.Administration when changing from directory - application
+                }
+
+                // Deletes virtual directories
+                var directoriesToDelete = mainApplication.VirtualDirectories.Where(directory => directory.Path != "/" && !site.Applications.Where(x => !x.IsApplication).Select(a => a.Path).Contains(directory.Path)).ToList(); // Exclude "/" because it's the root application's directory.
+                foreach (var directory in directoriesToDelete)
+                {
+                    directory.Delete();
+                    mainApplication.VirtualDirectories.Remove(directory); // Bug in Microsoft.Web.Administration when changing from directory - application
+                }
+
+                //Intelligently updates virtual applications + directories
+                foreach (var application in site.Applications)
+                {
+                    if (!application.Path.StartsWith("/"))
+                        application.Path = "/" + application.Path;
+
+                    if (application.IsApplication)
+                    {
+                        var iisApp = iisSite.Applications.SingleOrDefault(x => x.Path == application.Path);
+
+                        if (iisApp == null)
+                        {
+                            iisSite.Applications.Add(application.Path, application.DiskPath);
+                            iisApp = iisSite.Applications.Single(x => x.Path == application.Path);
+                        }
+
+                        iisApp.VirtualDirectories[0].PhysicalPath = application.DiskPath;
+                        iisApp.ApplicationPoolName = application.ApplicationPool;
+                    } 
+                    else // Directory
+                    {
+                        var virtualDirectory = mainApplication.VirtualDirectories.SingleOrDefault(x => x.Path == application.Path);
+                        if (virtualDirectory == null)
+                        {
+                            mainApplication.VirtualDirectories.Add(application.Path, application.DiskPath);
+                        }
+                        else
+                        {
+                            virtualDirectory.PhysicalPath = application.DiskPath;
+                        }
+                    }
                 }
                 
                 manager.CommitChanges();

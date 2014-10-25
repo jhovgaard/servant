@@ -18,6 +18,9 @@ namespace Servant.Client.Infrastructure
             if (!File.Exists(configFile))
             {
                 configuration = new ServantClientConfiguration { ServantIoHost = "www.servant.io:2650", InstallationGuid = Guid.NewGuid() };
+#if(DEBUG)
+                configuration = new ServantClientConfiguration { ServantIoHost = "localhost:2650", InstallationGuid = Guid.NewGuid() };
+#endif
                 UpdateConfiguration(configuration);
             }
             else
