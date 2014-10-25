@@ -16,7 +16,6 @@ namespace Servant.Client.SocketClient
 {
     public static class SocketClient
     {
-        private static string _webSocketHost;
         static bool _isRetrying;
         public static bool IsStopped;
 
@@ -45,15 +44,8 @@ namespace Servant.Client.SocketClient
 
         private static WebSocket GetClient(ServantClientConfiguration configuration)
         {
-            _webSocketHost = configuration.ServantIoHost;
+            var url = "wss://" + configuration.ServantIoHost + "/Client?installationGuid=" + configuration.InstallationGuid + "&organizationGuid=" + configuration.ServantIoKey + "&servername=" + System.Environment.MachineName;		
 
-            if (!Regex.IsMatch(configuration.ServantIoHost, @"wss?://.*"))
-            {
-                _webSocketHost = string.Format("{0}://{1}", (configuration.ServantIoHost.StartsWith("www.servant.io") ? "wss" : "ws"), configuration.ServantIoHost);
-            }
-
-            var url = _webSocketHost + "/Client?installationGuid=" + configuration.InstallationGuid + "&organizationGuid=" + configuration.ServantIoKey + "&servername=" + Environment.MachineName;
-            
             using (var ws = new WebSocket(url))
             {
 #if(!DEBUG)
@@ -151,9 +143,12 @@ namespace Servant.Client.SocketClient
                                 ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(createResult), Success = true }));
                                 break;
                             case CommandRequestType.ForceUpdate:
-                                 var host = TinyIoCContainer.Current.Resolve<IHost>();
-                                host.Update();
+                                Servant.Update();
                                 ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "Started", Success = true }));
+                                break;
+                            case CommandRequestType.DeploySite:
+                                Deployer.Deploy(request.Value, Json.DeserializeFromString<string>(request.JsonObject));
+                                ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
                                 break;
                         }
                     }
@@ -179,7 +174,7 @@ namespace Servant.Client.SocketClient
 
                 ws.OnClose += (sender, args) =>
                 {
-                    MessageHandler.LogException("Lost connection to " + _webSocketHost);
+                    MessageHandler.LogException("Lost connection to " + configuration.ServantIoHost);
                     pingTimer.Enabled = false;
 
                     if (!_isRetrying)
@@ -190,7 +185,7 @@ namespace Servant.Client.SocketClient
 
                 ws.OnOpen += (sender, args) =>
                     {
-                        MessageHandler.Print("Successfully connected to " + _webSocketHost);
+                        MessageHandler.Print("Successfully connected to " + configuration.ServantIoHost);
                         pingTimer.Enabled = true;
                     };
                 ws.Log.Output = (data, s) =>

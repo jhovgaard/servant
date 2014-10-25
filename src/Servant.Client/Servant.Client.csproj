@@ -52,6 +52,9 @@
     <Reference Include="CommandLine">
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Administration, Version=7.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\dependencies\Microsoft.Web.Administration.dll</HintPath>
@@ -73,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Infrastructure\CommandLineOptions.cs" />
     <Compile Include="Infrastructure\ConfigManager.cs" />
+    <Compile Include="Infrastructure\Deployer.cs" />
     <Compile Include="Infrastructure\MessageHandler.cs" />
     <Compile Include="Infrastructure\ServantClientConfiguration.cs" />
     <Compile Include="Service\ServantClientServiceInstaller.cs">
