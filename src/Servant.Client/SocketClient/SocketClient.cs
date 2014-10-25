@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Security;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Servant.Business;
 using Servant.Business.Objects;
@@ -14,6 +15,7 @@ namespace Servant.Client.SocketClient
 {
     public static class SocketClient
     {
+        private static string _webSocketHost;
         static bool _isRetrying;
         public static bool IsStopped;
 
@@ -42,7 +44,15 @@ namespace Servant.Client.SocketClient
 
         private static WebSocket GetClient(ServantClientConfiguration configuration)
         {
-            var url = "wss://" + configuration.ServantIoHost + "/Client?installationGuid=" + configuration.InstallationGuid + "&organizationGuid=" + configuration.ServantIoKey + "&servername=" + System.Environment.MachineName;
+            _webSocketHost = configuration.ServantIoHost;
+
+            if (!Regex.IsMatch(configuration.ServantIoHost, @"wss?://.*"))
+            {
+                _webSocketHost = string.Format("{0}://{1}", (configuration.ServantIoHost.StartsWith("www.servant.io") ? "wss" : "ws"), configuration.ServantIoHost);
+            }
+
+            var url = _webSocketHost + "/Client?installationGuid=" + configuration.InstallationGuid + "&organizationGuid=" + configuration.ServantIoKey + "&servername=" + Environment.MachineName;
+            
             using (var ws = new WebSocket(url))
             {
                 ws.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => sslPolicyErrors == SslPolicyErrors.None;
@@ -165,7 +175,7 @@ namespace Servant.Client.SocketClient
 
                 ws.OnClose += (sender, args) =>
                 {
-                    MessageHandler.LogException("Lost connection to wss://" + configuration.ServantIoHost);
+                    MessageHandler.LogException("Lost connection to " + _webSocketHost);
                     pingTimer.Enabled = false;
 
                     if (!_isRetrying)
@@ -176,21 +186,18 @@ namespace Servant.Client.SocketClient
 
                 ws.OnOpen += (sender, args) =>
                     {
-                        MessageHandler.LogException("Successfully connected to wss://" + configuration.ServantIoHost);
+                        MessageHandler.Print("Successfully connected to " + _webSocketHost);
                         pingTimer.Enabled = true;
                     };
                 ws.Log.Output = (data, s) =>
                                 {
 #if DEBUG
                                     MessageHandler.Print(data.Message);
-#endif
-
-#if !DEBUG
+#else
                                     if (data.Level == LogLevel.Error || data.Level == LogLevel.Fatal)
                                     {
                                         MessageHandler.LogException(data.Message);
                                     }
-
 #endif
                                 };
                 ws.Log.Level = LogLevel.Fatal;
