@@ -7,6 +7,7 @@
         BindingAlreadyInUse,
         NameAlreadyInUse,
         UnknownSiteId,
-        SiteNameNotFound
+        SiteNameNotFound,
+        ValidationError
     }
 }

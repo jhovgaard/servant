@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Security;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -55,7 +56,9 @@ namespace Servant.Client.SocketClient
             
             using (var ws = new WebSocket(url))
             {
+#if(!DEBUG)
                 ws.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => sslPolicyErrors == SslPolicyErrors.None;
+#endif
 
                 var pingTimer = new System.Timers.Timer(2000);
                 pingTimer.Elapsed += (sender, args) =>
@@ -93,19 +96,20 @@ namespace Servant.Client.SocketClient
 
                                 if (originalSite == null)
                                 {
-                                    ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(new ManageSiteResult { Result = SiteResult.SiteNameNotFound }), Success = true }));
+                                    ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(new ManageSiteResult { Result = SiteResult.SiteNameNotFound }), Success = false }));
                                     return;
                                 }
 
-                                originalSite.ApplicationPool = site.ApplicationPool;
-                                originalSite.Name = site.Name;
-                                originalSite.SiteState = site.SiteState;
-                                originalSite.Bindings = site.Bindings;
-                                originalSite.LogFileDirectory = site.LogFileDirectory;
-                                originalSite.SitePath = site.SitePath;
-                                originalSite.Bindings = site.Bindings;
+                                var validationResult = Validators.ValidateSite(site, originalSite);
+                                if (validationResult.Errors.Any())
+                                {
+                                    ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(validationResult) }));
+                                    return;
+                                }
 
-                                var updateResult = SiteManager.UpdateSite(originalSite);
+                                site.IisId = originalSite.IisId;
+
+                                var updateResult = SiteManager.UpdateSite(site);
 
                                 ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = Json.SerializeToString(updateResult), Success = true }));
                                 break;
