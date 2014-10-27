@@ -116,6 +116,9 @@
       <Component Id="Servant.Updater.exe" Guid="b502232edf5c458fb0d8eac606b76f7f">
         <File Id="Servant.Updater.exe" Source="$(var.Servant.Updater.TargetDir)\Servant.Updater.exe" KeyPath="yes" />
       </Component>
+      <Component Id="ICSharpCode.SharpZipLib.dll" Guid="49f654c46b2d4ec8945c9969b26e69a0">
+        <File Id="ICSharpCode.SharpZipLib.dll" Source="$(var.Servant.Updater.TargetDir)\ICSharpCode.SharpZipLib.dll" KeyPath="yes" />
+      </Component>
     </ComponentGroup>
 	</Fragment>
 </Wix>
