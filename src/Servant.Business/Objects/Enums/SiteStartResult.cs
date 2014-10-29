@@ -4,6 +4,7 @@
     {
         Started,
         BindingIsAlreadyInUse,
-        CannotAccessSitePath
+        CannotAccessSitePath,
+        PortInUseByAnotherService
     }
 }

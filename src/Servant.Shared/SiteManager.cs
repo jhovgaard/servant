@@ -347,8 +347,13 @@ namespace Servant.Shared
                 {
                     return SiteStartResult.BindingIsAlreadyInUse;
                 }
-                catch (FileLoadException)
+                catch (FileLoadException e)
                 {
+                    if (e.Message.Contains("being used by another"))
+                    {
+                        return SiteStartResult.PortInUseByAnotherService;
+                    }
+
                     return SiteStartResult.CannotAccessSitePath;
                 }
             }
