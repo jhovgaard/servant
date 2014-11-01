@@ -44,7 +44,8 @@ namespace Servant.Client.SocketClient
 
         private static WebSocket GetClient(ServantClientConfiguration configuration)
         {
-            var url = "wss://" + configuration.ServantIoHost + "/Client?installationGuid=" + configuration.InstallationGuid + "&organizationGuid=" + configuration.ServantIoKey + "&servername=" + System.Environment.MachineName;		
+            var url = string.Format("wss://{0}/Client?installationGuid={1}&organizationGuid={2}&servername={3}&version={4}",
+                configuration.ServantIoHost, configuration.InstallationGuid, configuration.ServantIoKey, Environment.MachineName, configuration.Version);
 
             using (var ws = new WebSocket(url))
             {
