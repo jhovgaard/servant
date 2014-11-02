@@ -148,8 +148,8 @@ namespace Servant.Client.SocketClient
                                 ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "Started", Success = true }));
                                 break;
                             case CommandRequestType.DeploySite:
-                                Deployer.Deploy(request.Value, Json.DeserializeFromString<string>(request.JsonObject));
                                 ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
+                                Deployer.Deploy(request.Value, Json.DeserializeFromString<string>(request.JsonObject));
                                 break;
                         }
                     }
