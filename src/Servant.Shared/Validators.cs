@@ -25,8 +25,8 @@ namespace Servant.Shared
             if (string.IsNullOrWhiteSpace(site.Name))
                 result.Errors.Add("Name is required.");
 
-            var existingSite = SiteManager.GetSiteByName(originalSite.Name);
-            if (site.Name != null && existingSite != null && existingSite.Name != site.Name)
+            var existingSite = SiteManager.GetSiteByName(site.Name);
+            if (site.Name != null && existingSite != null && site.Name.ToLower() == existingSite.Name.ToLower() && existingSite.IisId != originalSite.IisId)
                 result.Errors.Add("There's already a site with this name.");
 
             if (string.IsNullOrWhiteSpace(site.SitePath))
