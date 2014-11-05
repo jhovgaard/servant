@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Linq;
-using System.Net.Security;
-using System.Text.RegularExpressions;
+using System.Net;
 using System.Threading;
-using Servant.Business;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Servant.Client.Infrastructure;
@@ -155,7 +154,19 @@ namespace Servant.Client.SocketClient
                     }
                     catch (Exception ex)
                     {
-                        ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) {Success = false, Message = "ex:" + ex.Message + Environment.NewLine + ex.StackTrace }));
+                        var wc = new WebClient();
+                        var hostname = configuration.ServantIoHost.Substring(0, configuration.ServantIoHost.IndexOf(":"));
+
+                        var exceptionUrl = "https://" + hostname + "/exceptions/log";
+#if(DEBUG)
+                        exceptionUrl = "http://localhost:51652/exceptions/log";
+#endif
+                        wc.UploadValues(exceptionUrl, new NameValueCollection()
+                        {
+                            {"InstallationGuid", configuration.InstallationGuid.ToString()},
+                            {"Message", ex.Message},
+                            {"Stacktrace", ex.StackTrace}
+                        });
                     }
                 };
 
