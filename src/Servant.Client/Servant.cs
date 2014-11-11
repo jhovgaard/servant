@@ -23,7 +23,7 @@ namespace Servant.Client
             Timer.Start();
 
             SocketClient.SocketClient.IsStopped = false;
-            new System.Threading.Thread(SocketClient.SocketClient.Connect).Start();
+            new System.Threading.Thread(SocketClient.SocketClient.Initialize).Start();
         }
 
         public static void Update()

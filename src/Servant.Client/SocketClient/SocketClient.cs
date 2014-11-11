@@ -5,70 +5,92 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using Microsoft.AspNet.SignalR.Client;
+using Microsoft.AspNet.SignalR.Client.Transports;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Servant.Client.Infrastructure;
 using Servant.Shared;
 using Servant.Shared.SocketClient;
 using TinyIoC;
-using WebSocketSharp;
 
 namespace Servant.Client.SocketClient
 {
     public static class SocketClient
     {
         public static bool IsStopped;
+        static ServantClientConfiguration configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
 
-        public static void Connect()
-        {
-            var configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
-
-            if (string.IsNullOrWhiteSpace(configuration.ServantIoKey))
-            {
-                return;
-            }
-
-            var connection = new HubConnection("http://localhost:51652/",
+        static HubConnection connection = new HubConnection("http://localhost:51652/",
                 new Dictionary<string, string>() {  
                     {"installationGuid", configuration.InstallationGuid.ToString()},
                     {"organizationGuid", configuration.ServantIoKey},
                     {"servername", Environment.MachineName},
                     {"version", configuration.Version.ToString()},
-                });
+                }) { TransportConnectTimeout = TimeSpan.FromSeconds(10)};
 
-            var myHub = connection.CreateHubProxy("ServantClientHub");
-            //Start connection
-
-            connection.Start().ContinueWith(task =>
+        private static void Connect()
+        {
+            if (string.IsNullOrWhiteSpace(configuration.ServantIoKey))
             {
-                if (task.IsFaulted)
-                {
-                    Console.WriteLine("There was an error opening the connection:{0}",
-                                      task.Exception.GetBaseException());
-                }
-                else
-                {
-                    Console.WriteLine("Connected");
-                }
+                Console.WriteLine("Cannot connect without a key.");
+                return;
+            }
 
-            }).Wait();
+            connection.Start(new WebSocketTransport()).Wait(new TimeSpan(0, 0, 5));
+
+            if (connection.State != ConnectionState.Connected)
+            {
+                System.Threading.Thread.Sleep(2000);
+                connection.Stop(TimeSpan.FromSeconds(0)); // Trigger nyt kald til Connect()
+            }
+            else
+            {
+                Console.WriteLine("Successfully connected to Servant.io.");    
+            }
+        }
+
+        public static void Initialize()
+        {
+            var myHub = connection.CreateHubProxy("ServantClientHub");
+
+            Connect();
+
+            connection.Closed += () => {
+                Console.WriteLine("Connection Closed...");
+                Connect();
+            };
+            
+            connection.Reconnecting += () =>
+            {
+                Console.WriteLine("Reconnecting...");
+                //connection.Stop();
+            };
+
             connection.Error += exception =>
                                 {
-                                    var wc = new WebClient();
-                                    var hostname = configuration.ServantIoHost.Substring(0,configuration.ServantIoHost.IndexOf(":"));
+                                    try
+                                    {
+                                        var wc = new WebClient();
+                                        var hostname = configuration.ServantIoHost.Substring(0, configuration.ServantIoHost.IndexOf(":"));
 
-                                    var exceptionUrl = "https://" + hostname + "/exceptions/log";
+                                        var exceptionUrl = "https://" + hostname + "/exceptions/log";
 #if(DEBUG)
-                                    exceptionUrl = "http://localhost:51652/exceptions/log";
+                                        exceptionUrl = "http://localhost:51652/exceptions/log";
 #endif
-                                    wc.UploadValues(exceptionUrl, new NameValueCollection() {
+                                        wc.UploadValues(exceptionUrl, new NameValueCollection() {
                                                                       {"InstallationGuid", configuration.InstallationGuid.ToString() },
                                                                       {"Message", exception.Message},
                                                                       {"Stacktrace", exception.StackTrace}
                                                                   });
+
+                                    }
+                                    catch (Exception)
+                                    {
+                                    }
                                 };
 
-            myHub.On<CommandRequest>("Command", request =>
+            
+            myHub.On<CommandRequest>("Request", request =>
             {
                 switch (request.Command)
                 {
