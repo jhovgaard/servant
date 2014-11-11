@@ -27,8 +27,8 @@ namespace Servant.Client.SocketClient
             {
                 return;
             }
-            
-            var connection = new HubConnection("http://localhost:58289/",
+
+            var connection = new HubConnection("http://localhost:51652/",
                 new Dictionary<string, string>() {  
                     {"installationGuid", configuration.InstallationGuid.ToString()},
                     {"organizationGuid", configuration.ServantIoKey},
@@ -36,7 +36,7 @@ namespace Servant.Client.SocketClient
                     {"version", configuration.Version.ToString()},
                 });
 
-            var myHub = connection.CreateHubProxy("ServantHub");
+            var myHub = connection.CreateHubProxy("ServantClientHub");
             //Start connection
 
             connection.Start().ContinueWith(task =>
