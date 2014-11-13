@@ -31,7 +31,7 @@ namespace Servant.Client.Infrastructure
                 }
             }
 
-            Console.WriteLine(text);
+            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + ": " + text);
             WriteLine(text);
         }
 
