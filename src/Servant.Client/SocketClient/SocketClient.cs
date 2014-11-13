@@ -26,20 +26,16 @@ namespace Servant.Client.SocketClient
 
         public static void Initialize()
         {
-            #if(DEBUG)
-                _servantUrl = "http://localhost:51652";
-            #else
-                servantUrl = "https://" + configuration.ServantIoHost;
-            #endif
+            _servantUrl = "https://" + Configuration.ServantIoHost;
 
             Connect();
 
             _connection.Closed += () => {
-                MessageHandler.Print("Connection to Servant.io closed.");
+                MessageHandler.Print(string.Format("Connection to {0} closed.", _servantUrl));
                 Connect();
             };
             
-            _connection.Reconnecting += () => MessageHandler.Print("Lost connection to Servant.io. Reconnecting...");
+            _connection.Reconnecting += () => MessageHandler.Print(string.Format("Lost connection to {0}. Reconnecting...", _servantUrl));
 
             _connection.Error += exception =>
                                 {
@@ -52,6 +48,7 @@ namespace Servant.Client.SocketClient
                                                                       {"Stacktrace", exception.StackTrace}
                                                                   });
 
+                                        MessageHandler.LogException(exception.Message + Environment.NewLine + exception.StackTrace);
                                     }
                                     catch (Exception)
                                     {
@@ -173,7 +170,7 @@ namespace Servant.Client.SocketClient
 
             while (_connection.State != ConnectionState.Connected)
             {
-                MessageHandler.Print("Trying to connect to Servant.io...");
+                MessageHandler.Print(string.Format("Trying to connect to {0}...", _servantUrl));
                 try
                 {
                     _connection.Start(new WebSocketTransport()).Wait(new TimeSpan(0, 0, 5));
