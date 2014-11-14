@@ -294,6 +294,11 @@ namespace Servant.Shared
 
                     if (application.IsApplication)
                     {
+                        if (application.Path.EndsWith("/"))
+                        {
+                            application.Path = application.Path.Substring(0, application.Path.Length - 1);
+                        }
+
                         var iisApp = iisSite.Applications.SingleOrDefault(x => x.Path == application.Path);
 
                         if (iisApp == null)
@@ -451,6 +456,27 @@ namespace Servant.Shared
                 else
                 {
                     iisSite.ApplicationDefaults.ApplicationPoolName = site.ApplicationPool;
+                }
+
+                //Add Virtual apps/directories
+                foreach (var application in site.Applications)
+                {
+                    if (!application.Path.StartsWith("/"))
+                        application.Path = "/" + application.Path;
+
+                    if (application.IsApplication)
+                    {
+                        if (application.Path.EndsWith("/"))
+                        {
+                            application.Path.Remove(application.Path.Length - 1, 1);
+                        }
+
+                        iisSite.Applications.Add(application.Path, application.DiskPath);
+                    }
+                    else // Directory
+                    {
+                        iisSite.Applications.First().VirtualDirectories.Add(application.Path, application.DiskPath);
+                    }
                 }
 
                 manager.CommitChanges();

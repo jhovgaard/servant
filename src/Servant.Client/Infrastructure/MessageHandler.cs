@@ -51,13 +51,20 @@ namespace Servant.Client.Infrastructure
                 logFile.Close();
             }
 
-            File.AppendAllText(filePath, string.Format("{0}: {1}", DateTime.Now, line + Environment.NewLine));
-
-            var txtfile = new FileInfo(filePath);
-            if (txtfile.Length > (5 * 1024 * 1024))
+            try
             {
-                var lines = File.ReadAllLines(filePath).Skip(30).ToArray();
-                File.WriteAllLines(filePath, lines);
+                File.AppendAllText(filePath, string.Format("{0}: {1}", DateTime.Now, line + Environment.NewLine));
+
+                var txtfile = new FileInfo(filePath);
+                if (txtfile.Length > (5 * 1024 * 1024))
+                {
+                    var lines = File.ReadAllLines(filePath).Skip(30).ToArray();
+                    File.WriteAllLines(filePath, lines);
+                }
+            }
+            catch (System.IO.IOException)
+            {
+                throw;
             }
         }
     }

@@ -63,41 +63,5 @@ namespace Servant.Shared
 
             return result;
         }
-
-        //public void ValidateSiteApplications(Site site)
-        //{
-        //    for (int i = 0; i < site.Applications.Count; i++)
-        //    {
-        //        var application = site.Applications[i];
-
-        //        if (!application.Path.StartsWith("/"))
-        //            application.Path = "/" + application.Path;
-
-        //        if (string.IsNullOrWhiteSpace(application.DiskPath))
-        //        {
-        //            AddPropertyError("diskpath[" + i + "]", "Disk Path is required.");
-        //        }
-        //        else
-        //        {
-        //            if (!FileSystemHelper.DirectoryExists(application.DiskPath))
-        //            {
-        //                FileSystemHelper.CreateDirectory(application.DiskPath);
-        //            }
-        //        }
-
-        //        if (string.IsNullOrWhiteSpace(application.Path))
-        //            AddPropertyError("path[" + i + "]", "Path is required.");
-
-        //        if (!FileSystemHelper.IsPathValid(application.Path))
-        //            AddPropertyError("path[" + i + "]", "Path cannot contain the following characters: ?, ;, :, @, &, =, +, $, ,, |, \", <, >, *.");
-
-        //        var existingApplicationByPath = site.Applications.SingleOrDefault(x => x != site.Applications[i] && x.Path == site.Applications[i].Path);
-        //        if (site.SitePath != null && existingApplicationByPath != null)
-        //            AddPropertyError("path[" + i + "]", "There's already an application with this path.");
-
-        //        if (!FileSystemHelper.IsPathValid(application.DiskPath))
-        //            AddPropertyError("diskpath[" + i + "]", "Path cannot contain the following characters: ?, ;, :, @, &, =, +, $, ,, |, \", <, >, *.");
-        //    }
-        //}
     }
 }

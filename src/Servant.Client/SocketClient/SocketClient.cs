@@ -228,7 +228,7 @@ namespace Servant.Client.SocketClient
                 {
                 }
 
-                //Connect();
+                Connect();
             };
 
             MessageHandler.Print(string.Format("Successfully connected to {0}", Configuration.ServantIoHost));

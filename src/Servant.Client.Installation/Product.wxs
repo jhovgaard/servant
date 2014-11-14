@@ -101,9 +101,6 @@
       <Component Id="Servant.Business.dll" Guid="b03243fbd54b4b46acfd3db4db40f0d1">
         <File Id="Servant.Business.dll" Source="$(var.Servant.Client.TargetDir)\Servant.Business.dll" KeyPath="yes" />
       </Component>
-      <Component Id="websocket_sharp.dll" Guid="94221cc33698447789fc02a2ccf65b41">
-        <File Id="websocket_sharp.dll" Source="$(var.Servant.Client.TargetDir)\websocket-sharp.dll" KeyPath="yes" />
-      </Component>
       <Component Id="CommandLine.dll" Guid="3190095badda4fb89085d77f35fa153a">
         <File Id="CommandLine.dll" Source="$(var.Servant.Client.TargetDir)\CommandLine.dll" KeyPath="yes" />
       </Component>
@@ -118,6 +115,12 @@
       </Component>
       <Component Id="ICSharpCode.SharpZipLib.dll" Guid="49f654c46b2d4ec8945c9969b26e69a0">
         <File Id="ICSharpCode.SharpZipLib.dll" Source="$(var.Servant.Client.TargetDir)\ICSharpCode.SharpZipLib.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="Microsoft.AspNet.SignalR.Client.dll" Guid="5699d718cdea407488e738c5c7760acc">
+        <File Id="Microsoft.AspNet.SignalR.Client.dll" Source="$(var.Servant.Client.TargetDir)\Microsoft.AspNet.SignalR.Client.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="Newtonsoft.Json.dll" Guid="5a443d73f4ca452fbf779d18cc9adb5f">
+        <File Id="Newtonsoft.Json.dll" Source="$(var.Servant.Client.TargetDir)\Newtonsoft.Json.dll" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 	</Fragment>
