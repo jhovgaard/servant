@@ -253,6 +253,9 @@ namespace Servant.Shared
                 }
 
                 mainApplication.ApplicationPoolName = site.ApplicationPool;
+                
+                // Update log file path
+                iisSite.LogFile.Directory = site.LogFileDirectory;
 
                 // Commits bindings
                 iisSite.Bindings.Clear();
@@ -315,6 +318,7 @@ namespace Servant.Shared
                         }
                     }
                 }
+
                 
                 manager.CommitChanges();
             }

@@ -44,6 +44,19 @@ namespace Servant.Shared
                         FileSystemHelper.CreateDirectory(site.SitePath);
                     }
                 }
+
+                if (!FileSystemHelper.IsPathValid(site.LogFileDirectory))
+                {
+                    result.Errors.Add("Log File Directory cannot contain the following characters: ?, ;, :, @, &, =, +, $, ,, |, \", <, >, *.");
+                }
+                else
+                {
+                    if (!FileSystemHelper.DirectoryExists(site.LogFileDirectory))
+                    {
+                        FileSystemHelper.CreateDirectory(site.LogFileDirectory);
+                    }
+                }
+
             }
 
             result.Result = result.Errors.Any() ? SiteResult.ValidationError : SiteResult.Success;
