@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Timers;
 using Servant.Client.Infrastructure;
+using TinyIoC;
 
 namespace Servant.Client
 {
@@ -20,6 +21,16 @@ namespace Servant.Client
 
         public static void Start()
         {
+            #region Version 1.0.7 specific
+            var configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
+            var newHost = "https://www.servant.io";
+            if (configuration.ServantIoHost != newHost)
+            {
+                configuration.ServantIoHost = newHost;
+                ConfigManager.UpdateConfiguration(configuration);
+            } 
+            #endregion
+
             Timer.Start();
 
             SocketClient.SocketClient.IsStopped = false;
