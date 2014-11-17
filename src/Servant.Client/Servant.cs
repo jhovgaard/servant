@@ -57,7 +57,7 @@ namespace Servant.Client
             var path1 = Path.Combine(path, "Servant.Updater.exe");
             var path2 = assembly.Location;
 
-            var update = new Process { StartInfo = new ProcessStartInfo("cmd.exe", string.Format("/K \"\"{0}\" \"{1}\"\"", path1, path2)) { UseShellExecute = false, CreateNoWindow = true } };
+            var update = new Process { StartInfo = new ProcessStartInfo("cmd.exe", string.Format("/C \"\"{0}\" \"{1}\"\"", path1, path2)) { UseShellExecute = false, CreateNoWindow = true } };
 
             if (Environment.OSVersion.Version.Major >= 6)
             {
