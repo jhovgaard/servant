@@ -9,6 +9,7 @@ using Microsoft.AspNet.SignalR.Client.Transports;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Servant.Client.Infrastructure;
+using Servant.Client.Service;
 using Servant.Shared;
 using Servant.Shared.SocketClient;
 using TinyIoC;
@@ -29,18 +30,8 @@ namespace Servant.Client.SocketClient
             Connect();
         }
 
-        private static void Connect()
+        private static void InitializeConnection()
         {
-            if (_connection != null)
-            {
-                _connection.Dispose();
-            }
-
-            if (string.IsNullOrWhiteSpace(Configuration.ServantIoKey))
-            {
-                MessageHandler.Print("Cannot connect without a key.");
-                return;
-            }
             _connection = new HubConnection(Configuration.ServantIoHost,
                 new Dictionary<string, string>()
                 {
@@ -48,28 +39,9 @@ namespace Servant.Client.SocketClient
                     {"organizationGuid", Configuration.ServantIoKey},
                     {"servername", Environment.MachineName},
                     {"version", Configuration.Version.ToString()},
-                }) {TransportConnectTimeout = TimeSpan.FromSeconds(10)};
+                });
+            
             _myHub = _connection.CreateHubProxy("ServantClientHub");
-
-            while (_connection.State != ConnectionState.Connected)
-            {
-                if (_connection.State == ConnectionState.Connecting)
-                {
-                    Thread.Sleep(2000);
-                }
-                else
-                {
-                    MessageHandler.Print(string.Format("Trying to connect to {0}...", Configuration.ServantIoHost));
-                    try
-                    {
-                        _connection.Start().Wait();
-                    }
-                    catch (Exception)
-                    {
-                        Thread.Sleep(2000);
-                    }
-                }
-            }
 
             _myHub.On<CommandRequest>("Request", request =>
             {
@@ -202,13 +174,14 @@ namespace Servant.Client.SocketClient
                 }
             });
 
-            _connection.Closed += () =>
+            _connection.StateChanged += change =>
             {
-                MessageHandler.Print(string.Format("Connection to {0} closed.", Configuration.ServantIoHost));
-                Connect();
+                MessageHandler.Print("State changed to: " + change.NewState);
+                if (change.NewState == ConnectionState.Disconnected)
+                {
+                    Connect();
+                }
             };
-
-            _connection.Reconnecting += () => MessageHandler.Print(string.Format("Lost connection to {0}. Reconnecting...", Configuration.ServantIoHost));
 
             _connection.Error += exception =>
             {
@@ -216,22 +189,31 @@ namespace Servant.Client.SocketClient
 
                 try
                 {
-                    var exceptionUrl = Configuration.ServantIoHost + "/exceptions/log";
-                    new WebClient().UploadValues(exceptionUrl, new NameValueCollection()
-                    {
-                        {"InstallationGuid", Configuration.InstallationGuid.ToString()},
-                        {"Message", exception.Message},
-                        {"Stacktrace", exception.StackTrace}
-                    });
+                    var exceptionUrl = new System.Uri(Configuration.ServantIoHost + "/exceptions/log");
+                    new WebClient().UploadValuesAsync(exceptionUrl, new NameValueCollection()
+                                                                                         {
+                                                                                             { "InstallationGuid", Configuration.InstallationGuid.ToString() },
+                                                                                             { "Message", exception.Message},
+                                                                                             { "Stacktrace", exception.StackTrace }
+                                                                                         });
                 }
                 catch (Exception)
                 {
                 }
-
-                Connect();
             };
+        }
 
-            MessageHandler.Print(string.Format("Successfully connected to {0}", Configuration.ServantIoHost));
+        private static void Connect()
+        {
+            if (string.IsNullOrWhiteSpace(Configuration.ServantIoKey))
+            {
+                MessageHandler.Print("Cannot connect without a key.");
+                return;
+            }
+
+            MessageHandler.Print("Connecting...");
+            InitializeConnection();
+            _connection.Start().Wait(TimeSpan.FromSeconds(5));
         }
     }
 }
