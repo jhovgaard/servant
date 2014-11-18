@@ -30,6 +30,19 @@ namespace Servant.Client.SocketClient
             Connect();
         }
 
+        private static void ReplyOverHttp(CommandResponse response)
+        {
+            var url = Configuration.ServantIoHost + "/client/response?installationGuid=" + Configuration.InstallationGuid + "&organizationId=" + Configuration.ServantIoKey;
+            var wc = new WebClient();
+
+            var result = wc.UploadValues(url, new NameValueCollection()
+            {
+                {"Message", response.Message},
+                {"Guid", response.Guid.ToString()},
+                {"Success", response.Success.ToString()}
+            });
+        }
+
         private static void InitializeConnection()
         {
             _connection = new HubConnection(Configuration.ServantIoHost,
@@ -55,7 +68,7 @@ namespace Servant.Client.SocketClient
                     case CommandRequestType.GetSites:
                         var sites = SiteManager.GetSites();
                         var result = Json.SerializeToString(sites);
-                        _myHub.Invoke<CommandResponse>("CommandResponse", new CommandResponse(request.Guid)
+                        ReplyOverHttp(new CommandResponse(request.Guid)
                         {
                             Message = result,
                             Success = true
@@ -68,8 +81,7 @@ namespace Servant.Client.SocketClient
 
                         if (originalSite == null)
                         {
-                            _myHub.Invoke<CommandResponse>("CommandResponse",
-                                new CommandResponse(request.Guid)
+                            ReplyOverHttp(new CommandResponse(request.Guid)
                                 {
                                     Message =
                                         Json.SerializeToString(new ManageSiteResult
@@ -84,8 +96,7 @@ namespace Servant.Client.SocketClient
                         var validationResult = Validators.ValidateSite(site, originalSite);
                         if (validationResult.Errors.Any())
                         {
-                            _myHub.Invoke<CommandResponse>("CommandResponse",
-                                new CommandResponse(request.Guid) { Message = Json.SerializeToString(validationResult) });
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Message = Json.SerializeToString(validationResult) });
                             return;
                         }
 
@@ -93,8 +104,7 @@ namespace Servant.Client.SocketClient
 
                         var updateResult = SiteManager.UpdateSite(site);
 
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid)
+                        ReplyOverHttp(new CommandResponse(request.Guid)
                             {
                                 Message = Json.SerializeToString(updateResult),
                                 Success = true
@@ -102,16 +112,14 @@ namespace Servant.Client.SocketClient
                         break;
                     case CommandRequestType.GetApplicationPools:
                         var appPools = SiteManager.GetApplicationPools();
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid)
+                        ReplyOverHttp(new CommandResponse(request.Guid)
                             {
                                 Message = Json.SerializeToString(appPools),
                                 Success = true
                             });
                         break;
                     case CommandRequestType.GetCertificates:
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid)
+                        ReplyOverHttp(new CommandResponse(request.Guid)
                             {
                                 Message = Json.SerializeToString(SiteManager.GetCertificates()),
                                 Success = true
@@ -120,8 +128,8 @@ namespace Servant.Client.SocketClient
                     case CommandRequestType.StartSite:
                         var startSite = SiteManager.GetSiteByName(request.Value);
                         var startResult = SiteManager.StartSite(startSite);
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid)
+
+                        ReplyOverHttp(new CommandResponse(request.Guid)
                             {
                                 Success = startResult == SiteStartResult.Started,
                                 Message = startResult.ToString()
@@ -130,32 +138,27 @@ namespace Servant.Client.SocketClient
                     case CommandRequestType.StopSite:
                         var stopSite = SiteManager.GetSiteByName(request.Value);
                         SiteManager.StopSite(stopSite);
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid) { Success = true });
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
                         break;
                     case CommandRequestType.RecycleApplicationPool:
                         var recycleSite = SiteManager.GetSiteByName(request.Value);
                         SiteManager.RecycleApplicationPoolBySite(recycleSite.IisId);
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
                         break;
                     case CommandRequestType.RestartSite:
                         var restartSite = SiteManager.GetSiteByName(request.Value);
                         SiteManager.RestartSite(restartSite.IisId);
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
                         break;
                     case CommandRequestType.DeleteSite:
                         var deleteSite = SiteManager.GetSiteByName(request.Value);
                         SiteManager.DeleteSite(deleteSite.IisId);
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
                         break;
                     case CommandRequestType.CreateSite:
                         var createSite = Json.DeserializeFromString<Site>(request.JsonObject);
                         var createResult = SiteManager.CreateSite(createSite);
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid)
+                        ReplyOverHttp(new CommandResponse(request.Guid)
                             {
                                 Message = Json.SerializeToString(createResult),
                                 Success = true
@@ -163,12 +166,10 @@ namespace Servant.Client.SocketClient
                         break;
                     case CommandRequestType.ForceUpdate:
                         Servant.Update();
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid) { Message = "Started", Success = true });
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "Started", Success = true });
                         break;
                     case CommandRequestType.DeploySite:
-                        _myHub.Invoke<CommandResponse>("CommandResponse",
-                            new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
                         Deployer.Deploy(request.Value, Json.DeserializeFromString<string>(request.JsonObject));
                         break;
                 }
