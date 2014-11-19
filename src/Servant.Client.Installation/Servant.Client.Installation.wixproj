@@ -45,6 +45,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>..\..\dependencies\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
     <WixExtension Include="WixUtilExtension">
       <HintPath>..\..\dependencies\WixUtilExtension.dll</HintPath>
       <Name>WixUtilExtension</Name>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
   <?define ProductId = "*"?>
   <?define UpgradeCode = "12ad19d8925e496783745058da49089b"?>
   <?define ProductVersion = "!(bind.FileVersion.$(var.Servant.Client.TargetFileName))"?>
@@ -83,7 +83,12 @@
 	<Fragment>
     <WixVariable Id="WixUIBannerBmp" Value="banner1.jpg" />
     <WixVariable Id="WixUIDialogBmp" Value="banner2.jpg" />
+    <PropertyRef Id="NETFRAMEWORK40FULL"/>
 
+    <Condition Message=".NET Framework 4.0 must be installed prior to installation of this product.">
+      <![CDATA[Installed OR NETFRAMEWORK40FULL]]>
+    </Condition>
+    
     <Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="INSTALLDIR" Name="Servant" />
