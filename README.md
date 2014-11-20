@@ -7,6 +7,12 @@ It's designed to fit your daily routines, optimized to track down your worst pro
 ## Two Versions
 Servant is available in two versions. The regular version with a simple self-hosted interface or a thin client communicating directly with Servant.io using a secured WebSocket connection. Both versions are open source, however, the thin client is only to use with Servant.io.
 
+### Requirements
+There are a few minimum requirements for Servant:
+
+* ASP.NET 4.0
+* Works only with IIS7 and up
+
 ### Servant.Server
 You simply download Servant and extract it to a folder of your choice. This version is also possible to use with Servant.io, but also provides a hosted interface, but not the same features that Servant.io offers.
 As of now, this version is *not automatically updated*.
