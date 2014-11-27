@@ -58,7 +58,14 @@ namespace Servant.Client
 
             var service = new ServantClientService();
             service.ServiceStart(args);
-            Console.ReadLine();
+
+            var commander = new ConsoleManager();
+            while (true)
+            {
+                var line = Console.ReadLine();
+                commander.SendCommand(line);
+            }
+            
 #else
             var servicesToRun = new ServiceBase[] 
             { 
