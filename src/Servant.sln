@@ -1,15 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Business", "Servant.Business\Servant.Business.csproj", "{91BA5146-45D2-4FCE-BF35-FA451BF7528D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9C34EF0D-BCF4-491C-BC6D-8C5FD22BFD6D}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Server", "Servant.Server\Servant.Server.csproj", "{65975626-BB9A-4CF4-A81C-F7831D6DA23A}"
 EndProject
@@ -24,6 +18,11 @@ EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Servant.Client.Installation", "Servant.Client.Installation\Servant.Client.Installation.wixproj", "{76114457-7D51-4F0E-AC93-A0B698A79B0D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Shared", "Servant.Shared\Servant.Shared.csproj", "{E3A0E6D8-5341-4FD1-BBB1-C42D0574976D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9322E697-882F-4486-ABA4-3B1A0BE21A9D}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

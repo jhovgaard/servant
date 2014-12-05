@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR.Client.Http;
+using Servant.Shared.SocketClient;
 
 namespace Servant.Client
 {
@@ -26,7 +20,7 @@ namespace Servant.Client
             };
 
             startInfo.FileName = System.Environment.ExpandEnvironmentVariables(@"%windir%\System32\cmd.exe");
-            //startInfo.Arguments = "/Q";
+            startInfo.Arguments = "/Q";
 
             // add '>' to distinguish PROMPT from other output
             //startInfo.EnvironmentVariables["PROMPT"] = "$P$G";
@@ -44,10 +38,18 @@ namespace Servant.Client
             Process.OutputDataReceived += (sender, args) =>
             {
                 Console.WriteLine(args.Data);
+                SocketClient.SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.CmdExe) { Message = args.Data, Success = true });
+            };
+
+            Process.ErrorDataReceived += (sender, args) =>
+            {
+                Console.WriteLine(args.Data);
+                SocketClient.SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.CmdExe) { Message = args.Data, Success = true });
             };
 
             Process.Start();
             Process.BeginOutputReadLine();
+            Process.BeginErrorReadLine();
         }
 
         public void SendCommand(string data)

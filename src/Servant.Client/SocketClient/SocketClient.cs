@@ -30,7 +30,7 @@ namespace Servant.Client.SocketClient
             Connect();
         }
 
-        private static void ReplyOverHttp(CommandResponse response)
+        public static void ReplyOverHttp(CommandResponse response)
         {
             var url = Configuration.ServantIoHost + "/client/response?installationGuid=" + Configuration.InstallationGuid + "&organizationId=" + Configuration.ServantIoKey;
             var wc = new WebClient();
@@ -39,7 +39,8 @@ namespace Servant.Client.SocketClient
             {
                 {"Message", response.Message},
                 {"Guid", response.Guid.ToString()},
-                {"Success", response.Success.ToString()}
+                {"Success", response.Success.ToString()},
+                {"Type", response.Type.ToString()}
             });
         }
 
@@ -171,6 +172,10 @@ namespace Servant.Client.SocketClient
                     case CommandRequestType.DeploySite:
                         ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
                         Deployer.Deploy(request.Value, Json.DeserializeFromString<string>(request.JsonObject));
+                        break;
+                    case CommandRequestType.CmdExeCommand:
+                        var manager = TinyIoCContainer.Current.Resolve<ConsoleManager>();
+                        manager.SendCommand(request.Value);
                         break;
                 }
             });
