@@ -28,13 +28,6 @@ namespace Servant.Client
                 Arguments = "/K"
             };
 
-            // add '>' to distinguish PROMPT from other output
-            //startInfo.EnvironmentVariables["PROMPT"] = "$P$G";
-
-            // dir cmd would list folders then files alpabetically
-            // consistent with FileBrowser ui.
-            startInfo.EnvironmentVariables["DIRCMD"] = "/OG /ON";
-
             Process = new Process
             {
                 StartInfo = startInfo,
@@ -42,7 +35,6 @@ namespace Servant.Client
             
             Process.OutputDataReceived += (sender, args) =>
             {
-                Console.WriteLine("Output:" + args.Data);
                 if (!string.IsNullOrEmpty(args.Data))
                 {
                     ResponseLines.Add(new CmdExeLine(args.Data, false));    
@@ -51,7 +43,6 @@ namespace Servant.Client
 
             Process.ErrorDataReceived += (sender, args) =>
             {
-                Console.WriteLine("Error:" + args.Data);
                 if (!string.IsNullOrEmpty(args.Data))
                     ResponseLines.Add(new CmdExeLine(args.Data, true));
             };
