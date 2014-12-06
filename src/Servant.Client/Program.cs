@@ -11,6 +11,7 @@ namespace Servant.Client
         static void Main(string[] args)
         {
             TinyIoCContainer.Current.Register(ConfigManager.GetConfigurationFromDisk());
+            TinyIoCContainer.Current.Register(typeof(ConsoleManager)).AsSingleton();
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
 
             var config = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
