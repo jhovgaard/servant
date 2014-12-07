@@ -11,6 +11,7 @@ namespace Servant.Client
         static void Main(string[] args)
         {
             TinyIoCContainer.Current.Register(ConfigManager.GetConfigurationFromDisk());
+            TinyIoCContainer.Current.Register(typeof(ConsoleManager)).AsSingleton();
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
 
             var config = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
@@ -58,7 +59,14 @@ namespace Servant.Client
 
             var service = new ServantClientService();
             service.ServiceStart(args);
-            Console.ReadLine();
+
+            var commander = new ConsoleManager();
+            while (true)
+            {
+                var line = Console.ReadLine();
+                commander.SendCommand(line);
+            }
+            
 #else
             var servicesToRun = new ServiceBase[] 
             { 

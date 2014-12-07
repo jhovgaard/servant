@@ -82,6 +82,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleManager.cs" />
     <Compile Include="Infrastructure\CommandLineOptions.cs" />
     <Compile Include="Infrastructure\ConfigManager.cs" />
     <Compile Include="Infrastructure\Deployer.cs" />

@@ -24,6 +24,7 @@ namespace Servant.Shared.SocketClient
         RecycleApplicationPool,
         Unauthorized,
         ForceUpdate,
-        DeploySite
+        DeploySite,
+        CmdExeCommand
     }
 }
