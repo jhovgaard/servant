@@ -57,16 +57,8 @@ namespace Servant.Client
                 ConfigManager.UpdateConfiguration(config);
             }
 
-            var service = new ServantClientService();
-            service.ServiceStart(args);
-
-            var commander = new ConsoleManager();
-            while (true)
-            {
-                var line = Console.ReadLine();
-                commander.SendCommand(line);
-            }
-            
+            Servant.Start();
+            Console.ReadLine();
 #else
             var servicesToRun = new ServiceBase[] 
             { 
