@@ -171,7 +171,7 @@ namespace Servant.Client.SocketClient
                         Deployer.Deploy(request.Value, Json.DeserializeFromString<string>(request.JsonObject));
                         break;
                     case CommandRequestType.CmdExeCommand:
-                        if (Configuration.DisableConsoleAccess)
+                        if (!Configuration.DisableConsoleAccess)
                         {
                             var manager = TinyIoCContainer.Current.Resolve<ConsoleManager>();
                             manager.SendCommand(request.Value);
