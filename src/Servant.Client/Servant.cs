@@ -23,17 +23,17 @@ namespace Servant.Client
         {
 #if(!DEBUG)
 
-            #region Version 1.0.7 specific
             var configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
+            #region Version 1.0.7 specific
             var newHost = "https://www.servant.io";
             if (configuration.ServantIoHost != newHost)
             {
                 configuration.ServantIoHost = newHost;
-                ConfigManager.UpdateConfiguration(configuration);
             } 
+
+            ConfigManager.UpdateConfiguration(configuration);
             #endregion
 #endif
-
             Timer.Start();
 
             SocketClient.SocketClient.IsStopped = false;

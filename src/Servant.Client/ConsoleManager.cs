@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
+using Servant.Client.Infrastructure;
 using Servant.Shared;
 using Servant.Shared.SocketClient;
+using TinyIoC;
 
 namespace Servant.Client
 {
@@ -16,6 +18,15 @@ namespace Servant.Client
         protected List<CmdExeLine> ResponseLines = new List<CmdExeLine>();
 
         public ConsoleManager()
+        {
+            var configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
+            if (!configuration.DisableConsoleAccess)
+            {
+                LoadProcess();
+            }
+        }
+
+        private void LoadProcess()
         {
             var startInfo = new ProcessStartInfo
             {
@@ -32,12 +43,12 @@ namespace Servant.Client
             {
                 StartInfo = startInfo,
             };
-            
+
             Process.OutputDataReceived += (sender, args) =>
             {
                 if (!string.IsNullOrEmpty(args.Data))
                 {
-                    ResponseLines.Add(new CmdExeLine(args.Data, false));    
+                    ResponseLines.Add(new CmdExeLine(args.Data, false));
                 }
             };
 

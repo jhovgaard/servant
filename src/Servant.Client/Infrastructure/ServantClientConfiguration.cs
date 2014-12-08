@@ -17,5 +17,6 @@ namespace Servant.Client.Infrastructure
         public Guid InstallationGuid { get; set; }
         public string ServantIoKey { get; set; }
         public string ServantIoHost { get; set; }
+        public bool DisableConsoleAccess { get; set; }
     }
 }
