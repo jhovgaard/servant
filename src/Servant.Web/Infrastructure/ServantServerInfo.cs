@@ -5,7 +5,7 @@ namespace Servant.Web.Infrastructure
 {
     public class ServantServerInfo
     {
-        public string[] ApplicationPools { get; set; }
+        public List<ApplicationPool> ApplicationPools { get; set; }
         public List<Certificate> Certificates { get; set; } 
     }
 }

@@ -45,6 +45,7 @@
     <Compile Include="Helpers\SecurityHelper.cs" />
     <Compile Include="Helpers\BindingHelper.cs" />
     <Compile Include="IHost.cs" />
+    <Compile Include="Objects\ApplicationPool.cs" />
     <Compile Include="Objects\Binding.cs" />
     <Compile Include="Objects\Certificate.cs" />
     <Compile Include="Objects\ManageSiteResult.cs" />

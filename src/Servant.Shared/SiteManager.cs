@@ -61,7 +61,7 @@ namespace Servant.Shared
             }
         }
 
-        public static global::Servant.Business.Objects.Site GetSiteById(int iisId) 
+        public static Site GetSiteById(int iisId) 
         {
             using (var manager = new ServerManager())
             {
@@ -73,7 +73,7 @@ namespace Servant.Shared
             }
         }
 
-        private static Site ParseSite(Microsoft.Web.Administration.Site site, bool excludeAppPools = false, List<ApplicationPool> applicationPools = null)
+        private static Site ParseSite(Microsoft.Web.Administration.Site site, bool excludeAppPools = false, List<Microsoft.Web.Administration.ApplicationPool> applicationPools = null)
         {
             if (site == null)
                 return null;
@@ -331,15 +331,20 @@ namespace Servant.Shared
             return result;
         }
 
-        public static string[] GetApplicationPools()
+        public static List<Business.Objects.ApplicationPool> GetApplicationPools()
         {
             using (var manager = new ServerManager())
             {
-                return manager.ApplicationPools.Select(x => x.Name).OrderBy(x => x).ToArray();    
+                return manager.ApplicationPools.Select(x => new Business.Objects.ApplicationPool
+                            {
+                                Name = x.Name,
+                                State = (InstanceState) Enum.Parse(typeof (InstanceState), x.State.ToString()),
+                                
+                            }).OrderBy(x => x.Name).ToList();
             }
         }
 
-        public static global::Servant.Business.Objects.Enums.SiteStartResult StartSite(global::Servant.Business.Objects.Site site)
+        public static SiteStartResult StartSite(Site site)
         {
             using (var manager = new ServerManager())
             {
@@ -352,7 +357,7 @@ namespace Servant.Shared
                     iisSite.Start();
                     return SiteStartResult.Started;
                 }
-                catch (Microsoft.Web.Administration.ServerManagerException)
+                catch (ServerManagerException)
                 {
                     return SiteStartResult.BindingIsAlreadyInUse;
                 }
@@ -368,7 +373,7 @@ namespace Servant.Shared
             }
         }
 
-        public static void StopSite(global::Servant.Business.Objects.Site site)
+        public static void StopSite(Site site)
         {
             using (var manager = new ServerManager())
             {

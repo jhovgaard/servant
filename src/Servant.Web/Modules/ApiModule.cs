@@ -37,9 +37,11 @@ namespace Servant.Web.Modules
 
             Get["/info/"] = p =>
             {
-                var info = new ServantServerInfo();
-                info.ApplicationPools = SiteManager.GetApplicationPools();
-                info.Certificates = SiteManager.GetCertificates().ToList();
+                var info = new ServantServerInfo
+                           {
+                               ApplicationPools = SiteManager.GetApplicationPools().ToList(),
+                               Certificates = SiteManager.GetCertificates().ToList()
+                           };
 
                 return Response.AsJson(info);
             };
