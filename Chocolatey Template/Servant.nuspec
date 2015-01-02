@@ -3,15 +3,15 @@
   <metadata>
     <id>Servant</id>
     <title>Servant</title>
-    <version>1.1</version>
+    <version>1.0.14.0</version>
     <authors>Jonas Hovgaard</authors>
     <owners>Servant</owners>
-    <summary>Servant is a piece of software that transforms your regular Internet Information Services (IIS) Manager to a beautiful, fast and web-based management tool.</summary>
-    <description>Servant is a piece of software that transforms your regular Internet Information Services (IIS) Manager to a beautiful, fast and web-based management tool. It's designed to fit your daily routines, optimized to track down your worst problems and created to stop you from wasting time on administration.</description>
-    <projectUrl>http://www.servant.io</projectUrl>
+    <summary>Servant.io is a hosted web based manager for IIS web servers, enabling deployment, web farm support and much more.</summary>
+    <description>Servant offers effortless and browser-based access to all your web servers through a cohesive system. Be it creating sites, adding new bindings, changing disk paths, or restarting the application pool, all these tasks can be performed directly from your browser.</description>
+    <projectUrl>https://www.servant.io</projectUrl>
     <tags>servant servantforiis iis</tags>
-    <copyright>Copyright 2013 8seven</copyright>
-    <licenseUrl>http://www.servant.io/license.txt</licenseUrl>
+    <copyright>Copyright 2014 8seven</copyright>
+    <licenseUrl>https://www.servant.io/license.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <!--<iconUrl>https://github.com/__CHOCO_PKG_OWNER_REPO__/raw/master/Servant/Servant.gif</iconUrl>-->
     <!--<dependencies>

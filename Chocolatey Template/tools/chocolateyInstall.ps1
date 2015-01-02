@@ -1,5 +1,12 @@
-﻿$packageName = 'Servant' # arbitrary name for the package, used in messages
-$url = 'http://storage.servant.io/files/servant-1.1.zip' # download url
-Install-ChocolateyZipPackage "$packageName" "$url" "$(Split-Path -parent $MyInvocation.MyCommand.Definition)" "$url"
-$servantExe = Join-Path "$(Split-Path -parent $MyInvocation.MyCommand.Definition)" 'servant.server.exe'
-Start-ChocolateyProcessAsAdmin "install" $servantExe -minimized
+﻿$packageName = "servant"
+$installerType = "msi" 
+$url = "https://github.com/jhovgaard/servant/releases/download/1.0.14-client/Servant.Client.1.0.14.0.msi"
+$validExitCodes = @(0,3010)
+$packageParameters = $env:chocolateyPackageParameters;
+if(!$packageParameters) {
+  Write-ChocolateyFailure "servant" "Missing key"
+  return;
+}
+
+$silentArgs = "key=" + $packageParameters + " /qn";
+Install-ChocolateyPackage "$packageName" "$installerType" "$silentArgs" "$url" -validExitCodes $validExitCodes
