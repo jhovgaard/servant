@@ -19,18 +19,20 @@ namespace Servant.Client.Infrastructure
             Site site = SiteManager.GetSiteByName(sitename);
             var rootPath = site.SitePath;
             var directoryName = new DirectoryInfo(rootPath).Name;
+            
             if (directoryName.StartsWith("servant-"))
             {
-                rootPath = Directory.GetParent(rootPath).FullName;
+                rootPath = rootPath.Substring(0, rootPath.LastIndexOf(@"\", System.StringComparison.Ordinal));
             }
 
             var newPath = Path.Combine(rootPath, "servant-" + DateTime.Now.ToString("ddMMMyyyy-HHmmss"));
-            Directory.CreateDirectory(newPath);
+            var fullPath = Environment.ExpandEnvironmentVariables(newPath);
+            Directory.CreateDirectory(fullPath);
 
             var zipFile = DownloadUrl(url);
             var fastZip = new FastZip();
             var stream = new MemoryStream(zipFile);
-            fastZip.ExtractZip(stream, newPath, FastZip.Overwrite.Always, null, null, null, true, true);
+            fastZip.ExtractZip(stream, fullPath, FastZip.Overwrite.Always, null, null, null, true, true);
 
             site.SitePath = newPath;
             SiteManager.UpdateSite(site);
