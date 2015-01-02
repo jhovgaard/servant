@@ -72,7 +72,7 @@
   
     <InstallExecuteSequence>
       <Custom Action='PreventDowngrading' After='FindRelatedProducts'>NEWPRODUCTFOUND</Custom>
-      <RemoveExistingProducts After='InstallInitialize' />
+      <RemoveExistingProducts Before="InstallInitialize" />
     </InstallExecuteSequence>
 
     <InstallUISequence>
