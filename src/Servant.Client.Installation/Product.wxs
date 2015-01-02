@@ -31,7 +31,7 @@
     <UIRef Id="WixUI_InstallDir" />
     
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-    <Property Id="WIXUI_KEY" />
+    <Property Id="KEY" />
     <Property Id="ARPPRODUCTICON" Value="logo.ico" />
 
     <UI>
@@ -57,7 +57,7 @@
                Order="2">1</Publish>
     </UI>
 
-    <CustomAction Id="SetKey_set" Property='SetKey' Value='"[INSTALLDIR]Servant.Client.exe" -k [WIXUI_KEY]' Execute='immediate'/>
+    <CustomAction Id="SetKey_set" Property='SetKey' Value='"[INSTALLDIR]Servant.Client.exe" -k [KEY]' Execute='immediate'/>
     <CustomAction Id="SetKey" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
     <CustomAction Id="RunStartServiceCommand_set" Property='RunStartServiceCommand' Value='"[SystemFolder]sc.exe" start ServantClient' Execute='immediate'/>
     <CustomAction Id="RunStartServiceCommand" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
