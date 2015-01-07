@@ -25,6 +25,9 @@ namespace Servant.Shared.SocketClient
         Unauthorized,
         ForceUpdate,
         DeploySite,
-        CmdExeCommand
+        CmdExeCommand,
+        StopApplicationPool,
+        StartApplicationPool,
+        UpdateApplicationPool
     }
 }

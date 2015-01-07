@@ -177,6 +177,20 @@ namespace Servant.Client.SocketClient
                             manager.SendCommand(request.Value);
                         }
                         break;
+                    case CommandRequestType.UpdateApplicationPool:
+                        var applicationPool = Json.DeserializeFromString<ApplicationPool>(request.JsonObject);
+                        var originalName = request.Value;
+                        SiteManager.UpdateApplicationPool(originalName, applicationPool);
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
+                        break;
+                    case CommandRequestType.StartApplicationPool:
+                        SiteManager.StartApplicationPool(request.Value);
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
+                        break;
+                    case CommandRequestType.StopApplicationPool:
+                        SiteManager.StopApplicationPool(request.Value);
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
+                        break;
                 }
             });
 

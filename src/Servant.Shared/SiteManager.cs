@@ -9,6 +9,7 @@ using Microsoft.Web.Administration;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
+using ApplicationPool = Servant.Business.Objects.ApplicationPool;
 using Binding = Servant.Business.Objects.Binding;
 using Site = Servant.Business.Objects.Site;
 
@@ -587,6 +588,41 @@ namespace Servant.Shared
             }
 
             System.Threading.Thread.Sleep(500);
+        }
+
+        public static void UpdateApplicationPool(string originalPoolName, ApplicationPool applicationPool)
+        {
+            using (var manager = new ServerManager())
+            {
+                var pool = manager.ApplicationPools.Single(x => x.Name == originalPoolName);
+
+                var apps = manager.Sites.SelectMany(x => x.Applications);
+                foreach (var app in apps.Where(x => x.ApplicationPoolName == pool.Name))
+                {
+                    app.ApplicationPoolName = applicationPool.Name;
+                }
+                
+                pool.Name = applicationPool.Name;
+                manager.CommitChanges();
+            }
+        }
+
+        public static void StartApplicationPool(string poolName)
+        {
+            using (var manager = new ServerManager())
+            {
+                var pool = manager.ApplicationPools.Single(x => x.Name == poolName);
+                pool.Start();
+            }
+        }
+
+        public static void StopApplicationPool(string poolName)
+        {
+            using (var manager = new ServerManager())
+            {
+                var pool = manager.ApplicationPools.Single(x => x.Name == poolName);
+                pool.Stop();
+            }
         }
     }
 }
