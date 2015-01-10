@@ -4,10 +4,12 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNet.SignalR.Client;
+using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using Servant.Client.Infrastructure;
 using Servant.Shared;
+using Servant.Shared.Helpers;
 using Servant.Shared.SocketClient;
 using TinyIoC;
 
@@ -108,6 +110,19 @@ namespace Servant.Client.SocketClient
                                 Success = true
                             });
                         break;
+                    case CommandRequestType.GetAll:
+                        ReplyOverHttp(new CommandResponse(request.Guid)
+                            {
+                                Message = Json.SerializeToString(new AllResponse
+                                {
+                                    Sites = SiteManager.GetSites().ToList(),
+                                    FrameworkVersions = NetFrameworkHelper.GetAllVersions().ToList(),
+                                    ApplicationPools = SiteManager.GetApplicationPools(),
+                                    Certificates = SiteManager.GetCertificates().ToList()
+                                }),
+                                Success = true
+                            });
+                        break;
                     case CommandRequestType.GetApplicationPools:
                         var appPools = SiteManager.GetApplicationPools();
                         ReplyOverHttp(new CommandResponse(request.Guid)
@@ -137,11 +152,6 @@ namespace Servant.Client.SocketClient
                         var stopSite = SiteManager.GetSiteByName(request.Value);
                         SiteManager.StopSite(stopSite);
                         ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
-                        break;
-                    case CommandRequestType.RecycleApplicationPool:
-                        var recycleSite = SiteManager.GetSiteByName(request.Value);
-                        SiteManager.RecycleApplicationPoolBySite(recycleSite.IisId);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
                         break;
                     case CommandRequestType.RestartSite:
                         var restartSite = SiteManager.GetSiteByName(request.Value);
@@ -190,6 +200,14 @@ namespace Servant.Client.SocketClient
                     case CommandRequestType.StopApplicationPool:
                         SiteManager.StopApplicationPool(request.Value);
                         ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
+                        break;
+                    case CommandRequestType.RecycleApplicationPool:
+                        SiteManager.RecycleApplicationPool(request.Value);
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                        break;
+                    case CommandRequestType.DeleteApplicationPool:
+                        SiteManager.DeleteApplicationPool(request.Value);
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
                         break;
                 }
             });

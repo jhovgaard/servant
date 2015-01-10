@@ -79,8 +79,6 @@ namespace Servant.Shared
             if (site == null)
                 return null;
 
-
-
             var servantSite = new Site {
                     IisId = (int)site.Id,
                     Name = site.Name,
@@ -91,9 +89,6 @@ namespace Servant.Shared
                     Bindings = GetBindings(site).ToList(),
                 };
 
-
-
-            
             if (!excludeAppPools)
             {
                 if (applicationPools == null)
@@ -336,11 +331,20 @@ namespace Servant.Shared
         {
             using (var manager = new ServerManager())
             {
+                
                 return manager.ApplicationPools.Select(x => new Business.Objects.ApplicationPool
                             {
                                 Name = x.Name,
                                 State = (InstanceState) Enum.Parse(typeof (InstanceState), x.State.ToString()),
-                                
+                                ClrVersion = x.ManagedRuntimeVersion,
+                                PipelineMode = x.ManagedPipelineMode.ToString(),
+                                AutoStart = x.AutoStart,
+                                DisallowOverlappingRotation = x.Recycling.DisallowOverlappingRotation,
+                                DisallowRotationOnConfigChange = x.Recycling.DisallowRotationOnConfigChange,
+                                RecycleInterval = x.Recycling.PeriodicRestart.Time,
+                                RecyclePrivateMemoryLimit = x.Recycling.PeriodicRestart.PrivateMemory,
+                                RecycleVirtualMemoryLimit = x.Recycling.PeriodicRestart.Memory,
+                                RecycleRequestsLimit = x.Recycling.PeriodicRestart.Requests,
                             }).OrderBy(x => x.Name).ToList();
             }
         }
@@ -557,15 +561,6 @@ namespace Servant.Shared
             StartSite(site);
         }
 
-        public static void RecycleApplicationPoolBySite(int iisSiteId)
-        {
-            var site = GetIisSiteById(iisSiteId);
-            using (var manager = new ServerManager())
-            {
-                manager.ApplicationPools[site.Applications[0].ApplicationPoolName].Recycle();    
-            }
-        }
-
         public static void DeleteSite(int iisId)
         {
             using (var manager = new ServerManager())
@@ -622,6 +617,25 @@ namespace Servant.Shared
             {
                 var pool = manager.ApplicationPools.Single(x => x.Name == poolName);
                 pool.Stop();
+            }
+        }
+
+        public static void RecycleApplicationPool(string poolName)
+        {
+            using (var manager = new ServerManager())
+            {
+                var pool = manager.ApplicationPools.Single(x => x.Name == poolName);
+                pool.Recycle();
+            }
+        }
+
+        public static void DeleteApplicationPool(string poolName)
+        {
+            using (var manager = new ServerManager())
+            {
+                var pool = manager.ApplicationPools.Single(x => x.Name == poolName);
+                pool.Delete();
+                manager.CommitChanges();
             }
         }
     }

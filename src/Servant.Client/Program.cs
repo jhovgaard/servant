@@ -2,6 +2,8 @@
 using System.ServiceProcess;
 using Servant.Client.Infrastructure;
 using Servant.Client.Service;
+using Servant.Shared;
+using Servant.Shared.Helpers;
 using TinyIoC;
 
 namespace Servant.Client

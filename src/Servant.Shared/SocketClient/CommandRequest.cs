@@ -28,6 +28,8 @@ namespace Servant.Shared.SocketClient
         CmdExeCommand,
         StopApplicationPool,
         StartApplicationPool,
-        UpdateApplicationPool
+        UpdateApplicationPool,
+        DeleteApplicationPool,
+        GetAll
     }
 }
