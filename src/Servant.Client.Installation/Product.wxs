@@ -5,7 +5,7 @@
   <?define ProductVersion = "!(bind.FileVersion.$(var.Servant.Client.TargetFileName))"?>
   <?define RTMProductVersion = "0.0.0.0"?>
     
-	<Product Id="4cc767f1-7837-45a3-882b-5beda6f6e641" Name="Servant Client" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Servant.io" UpgradeCode="$(var.UpgradeCode)">
+	<Product Id="$(var.ProductId)" Name="Servant Client" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Servant.io" UpgradeCode="$(var.UpgradeCode)">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
    
     <Upgrade Id='$(var.UpgradeCode)'>
