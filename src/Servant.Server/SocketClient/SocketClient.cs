@@ -117,8 +117,7 @@ namespace Servant.Server.SocketClient
                             ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) {  Success = true }));
                             break;
                         case CommandRequestType.RecycleApplicationPool:
-                            var recycleSite = SiteManager.GetSiteByName(request.Value);
-                            SiteManager.RecycleApplicationPoolBySite(recycleSite.IisId);
+                            SiteManager.RecycleApplicationPool(request.Value);
                             ws.Send(Json.SerializeToString(new CommandResponse(request.Guid) { Message = "ok", Success = true }));
                             break;
                         case CommandRequestType.RestartSite:

@@ -137,7 +137,7 @@ namespace Servant.Web.Modules
                 }
 
                 Site site = SiteManager.GetSiteById(p.Id);
-                SiteManager.RecycleApplicationPoolBySite(site.IisId);
+                SiteManager.RecycleApplicationPool(site.ApplicationPool);
                 return Response.AsJson(site);
             };
 

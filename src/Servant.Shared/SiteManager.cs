@@ -337,7 +337,7 @@ namespace Servant.Shared
                                 Name = x.Name,
                                 State = (InstanceState) Enum.Parse(typeof (InstanceState), x.State.ToString()),
                                 ClrVersion = x.ManagedRuntimeVersion,
-                                PipelineMode = x.ManagedPipelineMode.ToString(),
+                                PipelineMode = x.ManagedPipelineMode.ToString().ToLower(),
                                 AutoStart = x.AutoStart,
                                 DisallowOverlappingRotation = x.Recycling.DisallowOverlappingRotation,
                                 DisallowRotationOnConfigChange = x.Recycling.DisallowRotationOnConfigChange,
@@ -345,6 +345,15 @@ namespace Servant.Shared
                                 RecyclePrivateMemoryLimit = x.Recycling.PeriodicRestart.PrivateMemory,
                                 RecycleVirtualMemoryLimit = x.Recycling.PeriodicRestart.Memory,
                                 RecycleRequestsLimit = x.Recycling.PeriodicRestart.Requests,
+                                IdleTimeout = x.ProcessModel.IdleTimeout,
+                                MaximumWorkerProcesses = x.ProcessModel.MaxProcesses,
+                                PingingEnabled = x.ProcessModel.PingingEnabled,
+                                PingInterval = x.ProcessModel.PingInterval,
+                                PingMaximumResponseTime = x.ProcessModel.PingResponseTime,
+                                ServiceUnavailableResponseType = x.Failure.LoadBalancerCapabilities.ToString().ToLower(),
+                                RapidFailProtectionEnabled = x.Failure.RapidFailProtection,
+                                RapidFailProtectionInterval = x.Failure.RapidFailProtectionInterval,
+                                RapidFailProtectionMaxCrashes = x.Failure.RapidFailProtectionMaxCrashes,
                             }).OrderBy(x => x.Name).ToList();
             }
         }
@@ -596,8 +605,31 @@ namespace Servant.Shared
                 {
                     app.ApplicationPoolName = applicationPool.Name;
                 }
-                
+
+                ManagedPipelineMode pipelineMode;
+                Enum.TryParse(applicationPool.PipelineMode, true, out pipelineMode);
+                LoadBalancerCapabilities loadBalancerCapabilities;
+                Enum.TryParse(applicationPool.ServiceUnavailableResponseType, true, out loadBalancerCapabilities);
+
                 pool.Name = applicationPool.Name;
+                pool.AutoStart = applicationPool.AutoStart;
+                pool.ManagedRuntimeVersion = applicationPool.ClrVersion;
+                pool.ManagedPipelineMode =  pipelineMode;
+                pool.Recycling.DisallowOverlappingRotation = applicationPool.DisallowOverlappingRotation;
+                pool.Recycling.DisallowRotationOnConfigChange = applicationPool.DisallowRotationOnConfigChange;
+                pool.Recycling.PeriodicRestart.Time = applicationPool.RecycleInterval;
+                pool.Recycling.PeriodicRestart.PrivateMemory = applicationPool.RecyclePrivateMemoryLimit;
+                pool.Recycling.PeriodicRestart.Memory = applicationPool.RecycleVirtualMemoryLimit;
+                pool.Recycling.PeriodicRestart.Requests = applicationPool.RecycleRequestsLimit;
+                pool.ProcessModel.IdleTimeout = applicationPool.IdleTimeout;
+                pool.ProcessModel.MaxProcesses = applicationPool.MaximumWorkerProcesses;
+                pool.ProcessModel.PingingEnabled = applicationPool.PingingEnabled;
+                pool.ProcessModel.PingResponseTime = applicationPool.PingMaximumResponseTime;
+                pool.Failure.LoadBalancerCapabilities = loadBalancerCapabilities;
+                pool.Failure.RapidFailProtection = applicationPool.RapidFailProtectionEnabled;
+                pool.Failure.RapidFailProtectionInterval = applicationPool.RapidFailProtectionInterval;
+                pool.Failure.RapidFailProtectionMaxCrashes = applicationPool.RapidFailProtectionMaxCrashes;
+
                 manager.CommitChanges();
             }
         }

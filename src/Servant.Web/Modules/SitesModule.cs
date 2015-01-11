@@ -142,7 +142,7 @@ namespace Servant.Web.Modules
             Post[@"/(?<Id>[\d]{1,4})/recycle/"] = p =>
             {
                 Site site = SiteManager.GetSiteById(p.Id);
-                SiteManager.RecycleApplicationPoolBySite(site.IisId);
+                SiteManager.RecycleApplicationPool(site.ApplicationPool);
                 AddMessage("Application pool has been recycled.");
                 return new RedirectResponse("/sites/" + site.IisId + "/settings/");
             };
