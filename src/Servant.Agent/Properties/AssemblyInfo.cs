@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Servant Client")]
-[assembly: AssemblyDescription("Servant Client is responsible for exchanging data with Servant.oi")]
+[assembly: AssemblyTitle("Servant Agent")]
+[assembly: AssemblyDescription("Servant Agent is responsible for exchanging data with Servant.oi")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Servant")]
-[assembly: AssemblyProduct("Servant Client")]
+[assembly: AssemblyProduct("Servant Agent")]
 [assembly: AssemblyCopyright("Copyright © 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.16.0")]
-[assembly: AssemblyFileVersion("1.0.16.0")]
+[assembly: AssemblyVersion("1.0.17.0")]
+[assembly: AssemblyFileVersion("1.0.17.0")]

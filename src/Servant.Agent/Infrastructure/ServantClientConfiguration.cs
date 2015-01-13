@@ -2,13 +2,13 @@
 using System.Reflection;
 using Servant.Business.Objects;
 
-namespace Servant.Client.Infrastructure
+namespace Servant.Agent.Infrastructure
 {
-    public class ServantClientConfiguration
+    public class ServantAgentConfiguration
     {
         public ServantVersion Version;
 
-        public ServantClientConfiguration()
+        public ServantAgentConfiguration()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             Version = new ServantVersion(version.Major, version.Minor, version.Build);

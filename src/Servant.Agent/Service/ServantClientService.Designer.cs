@@ -1,6 +1,6 @@
-﻿namespace Servant.Client.Service
+﻿namespace Servant.Agent.Service
 {
-    partial class ServantClientService
+    partial class ServantAgentService
     {
         /// <summary> 
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            this.ServiceName = "ServantClient";
+            this.ServiceName = "ServantAgent";
         }
 
         #endregion

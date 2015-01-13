@@ -3,15 +3,15 @@ using System.Configuration.Install;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
-using Servant.Client.Infrastructure;
+using Servant.Agent.Infrastructure;
 
-namespace Servant.Client.Service
+namespace Servant.Agent.Service
 {
     internal static class ServiceHelper
     {
         public static void Uninstall(string directory = null)
         {
-            MessageHandler.Print("Trying to uninstall the Servant Client service...");
+            MessageHandler.Print("Trying to uninstall the Servant Agent service...");
             try
             {
                 ManagedInstallerClass.InstallHelper(new[] { "/u", "/LogToConsole=false", directory ?? Assembly.GetExecutingAssembly().Location });
@@ -45,11 +45,11 @@ namespace Servant.Client.Service
 
             if (installPossible)
             {
-                MessageHandler.Print("Trying to install Servant Client as Windows service...");
+                MessageHandler.Print("Trying to install Servant Agent as Windows service...");
                 try
                 {
                     ManagedInstallerClass.InstallHelper(new[] { "/LogToConsole=false", Assembly.GetExecutingAssembly().Location });
-                    MessageHandler.Print("The Servant Client service was installed.");
+                    MessageHandler.Print("The Servant Agent service was installed.");
                 }
                 catch (UnauthorizedAccessException)
                 {

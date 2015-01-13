@@ -3,15 +3,15 @@ using System.ComponentModel;
 using System.Configuration.Install;
 using System.ServiceProcess;
 
-namespace Servant.Client.Service
+namespace Servant.Agent.Service
 {
     [RunInstaller(true)]
-    public class ServantClientServiceInstaller : Installer
+    public class ServantAgentServiceInstaller : Installer
     {
         readonly ServiceProcessInstaller _processInstaller = new ServiceProcessInstaller();
         readonly ServiceInstaller _serviceInstaller = new ServiceInstaller();
 
-        public ServantClientServiceInstaller()
+        public ServantAgentServiceInstaller()
         {
             _processInstaller.Account = ServiceConfig.AccountType;
             _processInstaller.Username = null;

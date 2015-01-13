@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using System.Timers;
-using Servant.Client.Infrastructure;
+using Servant.Agent.Infrastructure;
 using TinyIoC;
 
-namespace Servant.Client
+namespace Servant.Agent
 {
     public static class Servant
     {
@@ -23,7 +23,7 @@ namespace Servant.Client
         {
 #if(!DEBUG)
 
-            var configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
+            var configuration = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();
             #region Version 1.0.7 specific
             var newHost = "https://www.servant.io";
             if (configuration.ServantIoHost != newHost)

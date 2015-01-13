@@ -1,12 +1,12 @@
 ﻿using System;
 using System.ServiceProcess;
-using Servant.Client.Infrastructure;
-using Servant.Client.Service;
+using Servant.Agent.Infrastructure;
+using Servant.Agent.Service;
 using Servant.Shared;
 using Servant.Shared.Helpers;
 using TinyIoC;
 
-namespace Servant.Client
+namespace Servant.Agent
 {
     class Program
     {
@@ -16,7 +16,7 @@ namespace Servant.Client
             TinyIoCContainer.Current.Register(typeof(ConsoleManager)).AsSingleton();
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
 
-            var config = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
+            var config = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();
 #if !DEBUG
             if (Environment.UserInteractive)
             {
@@ -64,7 +64,7 @@ namespace Servant.Client
 #else
             var servicesToRun = new ServiceBase[] 
             { 
-                new ServantClientService() 
+                new ServantAgentService() 
             };
 
             ServiceBase.Run(servicesToRun);

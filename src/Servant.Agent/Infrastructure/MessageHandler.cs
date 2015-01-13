@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Servant.Client.Infrastructure
+namespace Servant.Agent.Infrastructure
 {
     public static class MessageHandler
     {
@@ -25,7 +25,7 @@ namespace Servant.Client.Infrastructure
         {
             if (logType == LogType.Exception)
             {
-                using (var eventLog = new EventLog { Source = "Servant Client" })
+                using (var eventLog = new EventLog { Source = "Servant Agent" })
                 {
                     eventLog.WriteEntry(text, EventLogEntryType.Error);
                 }

@@ -12,7 +12,7 @@ namespace Servant.Updater
         static void Main(string[] args)
         {
 #if DEBUG
-            args = new[] { Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Servant.Client.exe") };
+            args = new[] { Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Servant.Agent.exe") };
 #endif
             
             string servantFile = null;
@@ -59,7 +59,7 @@ namespace Servant.Updater
                 }
                 catch (Exception e)
                 {
-                    WriteLogEntry("Could not download Servant client update: " + e.Message, addToEventLog: true);
+                    WriteLogEntry("Could not download Servant agent update: " + e.Message, addToEventLog: true);
                 }
 
                 if (couldDownload)
@@ -101,19 +101,19 @@ namespace Servant.Updater
             Console.WriteLine(value);
 
             if (addToEventLog)
-                EventLog.WriteEntry("Servant Client Updater", value, EventLogEntryType.Error);
+                EventLog.WriteEntry("Servant Agent Updater", value, EventLogEntryType.Error);
         }
 
         private static ReleaseResult GetLatestRelease()
         {
 #if DEBUG
-            return new ReleaseResult { Url = "https://dl.dropboxusercontent.com/u/969563/Servant.Client.1.1.0.0.msi", Version = "1.1.0" };
+            return new ReleaseResult { Url = "https://dl.dropboxusercontent.com/u/969563/Servant.Agent.1.1.0.0.msi", Version = "1.1.0" };
 #endif
 
             const string url = "http://www.servant.io/version.json";
             var request = (HttpWebRequest)WebRequest.Create(url);
 
-            request.UserAgent = "Servant Client Updater";
+            request.UserAgent = "Servant Agent Updater";
             request.KeepAlive = false;
 
             try

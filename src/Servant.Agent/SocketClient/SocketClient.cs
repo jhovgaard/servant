@@ -7,19 +7,19 @@ using Microsoft.AspNet.SignalR.Client;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
-using Servant.Client.Infrastructure;
+using Servant.Agent.Infrastructure;
 using Servant.Shared;
 using Servant.Shared.Helpers;
 using Servant.Shared.SocketClient;
 using TinyIoC;
 
-namespace Servant.Client.SocketClient
+namespace Servant.Agent.SocketClient
 {
     public static class SocketClient
     {
         public static bool IsStopped;
 
-        private static readonly ServantClientConfiguration Configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
+        private static readonly ServantAgentConfiguration Configuration = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();
 
         private static HubConnection _connection;
         private static IHubProxy _myHub;
@@ -54,7 +54,7 @@ namespace Servant.Client.SocketClient
                     {"version", Configuration.Version.ToString()},
                 });
             
-            _myHub = _connection.CreateHubProxy("ServantClientHub");
+            _myHub = _connection.CreateHubProxy("ServantAgentHub");
 
             _myHub.On<CommandRequest>("Request", request =>
             {

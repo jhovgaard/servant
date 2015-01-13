@@ -7,8 +7,8 @@
     <ProjectGuid>{90AB2320-A198-4275-BF27-FAB83D6CE69C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Servant.Client</RootNamespace>
-    <AssemblyName>Servant.Client</AssemblyName>
+    <RootNamespace>Servant.Agent</RootNamespace>
+    <AssemblyName>Servant.Agent</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

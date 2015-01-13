@@ -19,9 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Web.Tests", "Servan
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Updater", "Servant.Updater\Servant.Updater.csproj", "{6B1ECFEB-333B-41A9-860D-BCC653B5DAE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Client", "Servant.Client\Servant.Client.csproj", "{90AB2320-A198-4275-BF27-FAB83D6CE69C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Agent", "Servant.Agent\Servant.Agent.csproj", "{90AB2320-A198-4275-BF27-FAB83D6CE69C}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Servant.Client.Installation", "Servant.Client.Installation\Servant.Client.Installation.wixproj", "{76114457-7D51-4F0E-AC93-A0B698A79B0D}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Servant.Agent.Installation", "Servant.Agent.Installation\Servant.Agent.Installation.wixproj", "{76114457-7D51-4F0E-AC93-A0B698A79B0D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Servant.Shared", "Servant.Shared\Servant.Shared.csproj", "{E3A0E6D8-5341-4FD1-BBB1-C42D0574976D}"
 EndProject

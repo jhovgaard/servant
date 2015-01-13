@@ -2,10 +2,10 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
   <?define ProductId = "*"?>
   <?define UpgradeCode = "12ad19d8925e496783745058da49089b"?>
-  <?define ProductVersion = "!(bind.FileVersion.$(var.Servant.Client.TargetFileName))"?>
+  <?define ProductVersion = "!(bind.FileVersion.$(var.Servant.Agent.TargetFileName))"?>
   <?define RTMProductVersion = "0.0.0.0"?>
     
-	<Product Id="$(var.ProductId)" Name="Servant Client" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Servant.io" UpgradeCode="$(var.UpgradeCode)">
+	<Product Id="$(var.ProductId)" Name="Servant Agent" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Servant.io" UpgradeCode="$(var.UpgradeCode)">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
    
     <Upgrade Id='$(var.UpgradeCode)'>
@@ -22,7 +22,7 @@
     
     <MediaTemplate EmbedCab="yes" />
 
-		<Feature Id="ProductFeature" Title="Servant Client" Level="1">
+		<Feature Id="ProductFeature" Title="Servant Agent" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
 		</Feature>
 
@@ -57,9 +57,9 @@
                Order="2">1</Publish>
     </UI>
 
-    <CustomAction Id="SetKey_set" Property='SetKey' Value='"[INSTALLDIR]Servant.Client.exe" -k [KEY]' Execute='immediate'/>
+    <CustomAction Id="SetKey_set" Property='SetKey' Value='"[INSTALLDIR]Servant.Agent.exe" -k [KEY]' Execute='immediate'/>
     <CustomAction Id="SetKey" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
-    <CustomAction Id="RunStartServiceCommand_set" Property='RunStartServiceCommand' Value='"[SystemFolder]sc.exe" start ServantClient' Execute='immediate'/>
+    <CustomAction Id="RunStartServiceCommand_set" Property='RunStartServiceCommand' Value='"[SystemFolder]sc.exe" start ServantAgent' Execute='immediate'/>
     <CustomAction Id="RunStartServiceCommand" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="check" Impersonate="no"/>
     <CustomAction Id='PreventDowngrading' Error='Newer version already installed' />
 
@@ -98,34 +98,34 @@
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLDIR">
-      <Component Id="Servant.Client.exe" Guid="2636bf23363a41dfbf2cebf84674a24e">
-        <File Id="Servant.Client.exe" Source="$(var.Servant.Client.TargetDir)\Servant.Client.exe" KeyPath="yes" Vital="yes" />
-        <ServiceInstall Id="ServantClientService" Description="Servant Client is responsible for exchanging data with Servant.io" DisplayName="Servant Client" Name="ServantClient" Start="auto" Type="ownProcess" ErrorControl="normal"/> 
-        <ServiceControl Id="ServantClientServiceControl" Name="ServantClient" Stop="both" Remove="uninstall" Wait="yes" /> 
+      <Component Id="Servant.Agent.exe" Guid="2636bf23363a41dfbf2cebf84674a24e">
+        <File Id="Servant.Agent.exe" Source="$(var.Servant.Agent.TargetDir)\Servant.Agent.exe" KeyPath="yes" Vital="yes" />
+        <ServiceInstall Id="ServantAgentService" Description="Servant Agent is responsible for exchanging data with Servant.io" DisplayName="Servant Agent" Name="ServantAgent" Start="auto" Type="ownProcess" ErrorControl="normal"/> 
+        <ServiceControl Id="ServantAgentServiceControl" Name="ServantAgent" Stop="both" Remove="uninstall" Wait="yes" /> 
       </Component>
       <Component Id="Servant.Business.dll" Guid="b03243fbd54b4b46acfd3db4db40f0d1">
-        <File Id="Servant.Business.dll" Source="$(var.Servant.Client.TargetDir)\Servant.Business.dll" KeyPath="yes" />
+        <File Id="Servant.Business.dll" Source="$(var.Servant.Agent.TargetDir)\Servant.Business.dll" KeyPath="yes" />
       </Component>
       <Component Id="CommandLine.dll" Guid="3190095badda4fb89085d77f35fa153a">
-        <File Id="CommandLine.dll" Source="$(var.Servant.Client.TargetDir)\CommandLine.dll" KeyPath="yes" />
+        <File Id="CommandLine.dll" Source="$(var.Servant.Agent.TargetDir)\CommandLine.dll" KeyPath="yes" />
       </Component>
       <Component Id="Servant.Shared.dll" Guid="63271e4a68f94c4481c5f95e219adcf1">
-        <File Id="Servant.Shared.dll" Source="$(var.Servant.Client.TargetDir)\Servant.Shared.dll" KeyPath="yes" />
+        <File Id="Servant.Shared.dll" Source="$(var.Servant.Agent.TargetDir)\Servant.Shared.dll" KeyPath="yes" />
       </Component>
       <Component Id="ServiceStack.Text.dll" Guid="11256da2c0ae4750b188300cdbb6765f">
-        <File Id="ServiceStack.Text.dll" Source="$(var.Servant.Client.TargetDir)\ServiceStack.Text.dll" KeyPath="yes" />
+        <File Id="ServiceStack.Text.dll" Source="$(var.Servant.Agent.TargetDir)\ServiceStack.Text.dll" KeyPath="yes" />
       </Component>
       <Component Id="Servant.Updater.exe" Guid="b502232edf5c458fb0d8eac606b76f7f">
         <File Id="Servant.Updater.exe" Source="$(var.Servant.Updater.TargetDir)\Servant.Updater.exe" KeyPath="yes" />
       </Component>
       <Component Id="ICSharpCode.SharpZipLib.dll" Guid="49f654c46b2d4ec8945c9969b26e69a0">
-        <File Id="ICSharpCode.SharpZipLib.dll" Source="$(var.Servant.Client.TargetDir)\ICSharpCode.SharpZipLib.dll" KeyPath="yes" />
+        <File Id="ICSharpCode.SharpZipLib.dll" Source="$(var.Servant.Agent.TargetDir)\ICSharpCode.SharpZipLib.dll" KeyPath="yes" />
       </Component>
       <Component Id="Microsoft.AspNet.SignalR.Client.dll" Guid="5699d718cdea407488e738c5c7760acc">
-        <File Id="Microsoft.AspNet.SignalR.Client.dll" Source="$(var.Servant.Client.TargetDir)\Microsoft.AspNet.SignalR.Client.dll" KeyPath="yes" />
+        <File Id="Microsoft.AspNet.SignalR.Client.dll" Source="$(var.Servant.Agent.TargetDir)\Microsoft.AspNet.SignalR.Client.dll" KeyPath="yes" />
       </Component>
       <Component Id="Newtonsoft.Json.dll" Guid="5a443d73f4ca452fbf779d18cc9adb5f">
-        <File Id="Newtonsoft.Json.dll" Source="$(var.Servant.Client.TargetDir)\Newtonsoft.Json.dll" KeyPath="yes" />
+        <File Id="Newtonsoft.Json.dll" Source="$(var.Servant.Agent.TargetDir)\Newtonsoft.Json.dll" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 	</Fragment>

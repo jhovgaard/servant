@@ -6,7 +6,7 @@
     <ProductVersion>3.8</ProductVersion>
     <ProjectGuid>76114457-7d51-4f0e-ac93-a0b698a79b0d</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>Servant.Client</OutputName>
+    <OutputName>Servant.Agent</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -27,8 +27,8 @@
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Servant.Client\Servant.Client.csproj">
-      <Name>Servant.Client</Name>
+    <ProjectReference Include="..\Servant.Agent\Servant.Agent.csproj">
+      <Name>Servant.Agent</Name>
       <Project>{90ab2320-a198-4275-bf27-fab83d6ce69c}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
@@ -65,7 +65,7 @@
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <Target Name="BeforeBuild">
-    <GetAssemblyIdentity AssemblyFiles="$(SolutionDir)Servant.Client\bin\$(Configuration)\Servant.Client.exe">
+    <GetAssemblyIdentity AssemblyFiles="$(SolutionDir)Servant.Agent\bin\$(Configuration)\Servant.Agent.exe">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersions" />
     </GetAssemblyIdentity>
     <CreateProperty Value="$(OutputName).%(AssemblyVersions.Version)">

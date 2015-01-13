@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
-using Servant.Client.Infrastructure;
+using Servant.Agent.Infrastructure;
 using Servant.Shared;
 using Servant.Shared.SocketClient;
 using TinyIoC;
 
-namespace Servant.Client
+namespace Servant.Agent
 {
     public class ConsoleManager
     {
@@ -19,7 +19,7 @@ namespace Servant.Client
 
         public ConsoleManager()
         {
-            var configuration = TinyIoCContainer.Current.Resolve<ServantClientConfiguration>();
+            var configuration = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();
             if (!configuration.DisableConsoleAccess)
             {
                 LoadProcess();

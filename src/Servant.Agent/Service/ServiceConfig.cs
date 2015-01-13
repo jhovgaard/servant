@@ -1,17 +1,17 @@
 ﻿using System.ServiceProcess;
 
-namespace Servant.Client.Service
+namespace Servant.Agent.Service
 {
     class ServiceConfig
     {
         public static string DisplayName
         {
-            get { return "Servant Client"; }
+            get { return "Servant Agent"; }
         }
 
         public static string ServiceName
         {
-            get { return "ServantClient"; }
+            get { return "ServantAgent"; }
         }
 
         public static string Description

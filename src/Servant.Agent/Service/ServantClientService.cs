@@ -2,13 +2,13 @@
 using System.Diagnostics;
 using System.Security.Principal;
 using System.ServiceProcess;
-using Servant.Client.Infrastructure;
+using Servant.Agent.Infrastructure;
 
-namespace Servant.Client.Service
+namespace Servant.Agent.Service
 {
-    partial class ServantClientService : ServiceBase
+    partial class ServantAgentService : ServiceBase
     {
-        public ServantClientService()
+        public ServantAgentService()
         {
             InitializeComponent();
         }
