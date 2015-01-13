@@ -145,7 +145,7 @@ namespace Servant.Agent.SocketClient
                         ReplyOverHttp(new CommandResponse(request.Guid)
                             {
                                 Success = startResult == SiteStartResult.Started,
-                                Message = startResult.ToString()
+                                Message = Json.SerializeToString(startResult)
                             });
                         break;
                     case CommandRequestType.StopSite:
