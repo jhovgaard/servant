@@ -54,7 +54,7 @@ namespace Servant.Agent.SocketClient
                     {"version", Configuration.Version.ToString()},
                 });
             
-            _myHub = _connection.CreateHubProxy("ServantAgentHub");
+            _myHub = _connection.CreateHubProxy("ServantClientHub");
 
             _myHub.On<CommandRequest>("Request", request =>
             {
