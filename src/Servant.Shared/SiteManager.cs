@@ -131,6 +131,36 @@ namespace Servant.Shared
             return servantSite;
         }
 
+        private static Microsoft.Web.Administration.ApplicationPool UpdateIisApplicationPoolFromServant(this Microsoft.Web.Administration.ApplicationPool iisApplicationPool, ApplicationPool servantApplicationPool)
+        {
+            ManagedPipelineMode pipelineMode;
+            Enum.TryParse(servantApplicationPool.PipelineMode, true, out pipelineMode);
+            LoadBalancerCapabilities loadBalancerCapabilities;
+            Enum.TryParse(servantApplicationPool.ServiceUnavailableResponseType, true, out loadBalancerCapabilities);
+
+            iisApplicationPool.Name = servantApplicationPool.Name;
+            iisApplicationPool.AutoStart = servantApplicationPool.AutoStart;
+            iisApplicationPool.ManagedRuntimeVersion = servantApplicationPool.ClrVersion;
+            iisApplicationPool.ManagedPipelineMode = pipelineMode;
+            iisApplicationPool.Recycling.DisallowOverlappingRotation = servantApplicationPool.DisallowOverlappingRotation;
+            iisApplicationPool.Recycling.DisallowRotationOnConfigChange = servantApplicationPool.DisallowRotationOnConfigChange;
+            iisApplicationPool.Recycling.PeriodicRestart.Time = servantApplicationPool.RecycleInterval;
+            iisApplicationPool.Recycling.PeriodicRestart.PrivateMemory = servantApplicationPool.RecyclePrivateMemoryLimit;
+            iisApplicationPool.Recycling.PeriodicRestart.Memory = servantApplicationPool.RecycleVirtualMemoryLimit;
+            iisApplicationPool.Recycling.PeriodicRestart.Requests = servantApplicationPool.RecycleRequestsLimit;
+            iisApplicationPool.ProcessModel.IdleTimeout = servantApplicationPool.IdleTimeout;
+            iisApplicationPool.ProcessModel.MaxProcesses = servantApplicationPool.MaximumWorkerProcesses;
+            iisApplicationPool.ProcessModel.PingingEnabled = servantApplicationPool.PingingEnabled;
+            iisApplicationPool.ProcessModel.PingResponseTime = servantApplicationPool.PingMaximumResponseTime;
+            iisApplicationPool.Failure.LoadBalancerCapabilities = loadBalancerCapabilities;
+            iisApplicationPool.Failure.RapidFailProtection = servantApplicationPool.RapidFailProtectionEnabled;
+            iisApplicationPool.Failure.RapidFailProtectionInterval = servantApplicationPool.RapidFailProtectionInterval;
+            iisApplicationPool.Failure.RapidFailProtectionMaxCrashes = servantApplicationPool.RapidFailProtectionMaxCrashes;
+            // Husk at opdatere GetDefaultApplicationPool
+
+            return iisApplicationPool;
+        }
+
         private static IEnumerable<Binding> GetBindings(Microsoft.Web.Administration.Site iisSite)
         {
             var allowedProtocols = new[] { "http", "https" };
@@ -606,34 +636,40 @@ namespace Servant.Shared
                     app.ApplicationPoolName = applicationPool.Name;
                 }
 
-                ManagedPipelineMode pipelineMode;
-                Enum.TryParse(applicationPool.PipelineMode, true, out pipelineMode);
-                LoadBalancerCapabilities loadBalancerCapabilities;
-                Enum.TryParse(applicationPool.ServiceUnavailableResponseType, true, out loadBalancerCapabilities);
-
-                pool.Name = applicationPool.Name;
-                pool.AutoStart = applicationPool.AutoStart;
-                pool.ManagedRuntimeVersion = applicationPool.ClrVersion;
-                pool.ManagedPipelineMode =  pipelineMode;
-                pool.Recycling.DisallowOverlappingRotation = applicationPool.DisallowOverlappingRotation;
-                pool.Recycling.DisallowRotationOnConfigChange = applicationPool.DisallowRotationOnConfigChange;
-                pool.Recycling.PeriodicRestart.Time = applicationPool.RecycleInterval;
-                pool.Recycling.PeriodicRestart.PrivateMemory = applicationPool.RecyclePrivateMemoryLimit;
-                pool.Recycling.PeriodicRestart.Memory = applicationPool.RecycleVirtualMemoryLimit;
-                pool.Recycling.PeriodicRestart.Requests = applicationPool.RecycleRequestsLimit;
-                pool.ProcessModel.IdleTimeout = applicationPool.IdleTimeout;
-                pool.ProcessModel.MaxProcesses = applicationPool.MaximumWorkerProcesses;
-                pool.ProcessModel.PingingEnabled = applicationPool.PingingEnabled;
-                pool.ProcessModel.PingResponseTime = applicationPool.PingMaximumResponseTime;
-                pool.Failure.LoadBalancerCapabilities = loadBalancerCapabilities;
-                pool.Failure.RapidFailProtection = applicationPool.RapidFailProtectionEnabled;
-                pool.Failure.RapidFailProtectionInterval = applicationPool.RapidFailProtectionInterval;
-                pool.Failure.RapidFailProtectionMaxCrashes = applicationPool.RapidFailProtectionMaxCrashes;
+                pool = pool.UpdateIisApplicationPoolFromServant(applicationPool);
 
                 manager.CommitChanges();
             }
         }
 
+        public static ApplicationPool GetDefaultApplicationPool()
+        {
+            using (var manager = new ServerManager())
+            {
+                return new Business.Objects.ApplicationPool
+                {
+                    ClrVersion = manager.ApplicationPoolDefaults.ManagedRuntimeVersion,
+                    PipelineMode = manager.ApplicationPoolDefaults.ManagedPipelineMode.ToString().ToLower(),
+                    AutoStart = manager.ApplicationPoolDefaults.AutoStart,
+                    DisallowOverlappingRotation = manager.ApplicationPoolDefaults.Recycling.DisallowOverlappingRotation,
+                    DisallowRotationOnConfigChange = manager.ApplicationPoolDefaults.Recycling.DisallowRotationOnConfigChange,
+                    RecycleInterval = manager.ApplicationPoolDefaults.Recycling.PeriodicRestart.Time,
+                    RecyclePrivateMemoryLimit = manager.ApplicationPoolDefaults.Recycling.PeriodicRestart.PrivateMemory,
+                    RecycleVirtualMemoryLimit = manager.ApplicationPoolDefaults.Recycling.PeriodicRestart.Memory,
+                    RecycleRequestsLimit = manager.ApplicationPoolDefaults.Recycling.PeriodicRestart.Requests,
+                    IdleTimeout = manager.ApplicationPoolDefaults.ProcessModel.IdleTimeout,
+                    MaximumWorkerProcesses = manager.ApplicationPoolDefaults.ProcessModel.MaxProcesses,
+                    PingingEnabled = manager.ApplicationPoolDefaults.ProcessModel.PingingEnabled,
+                    PingInterval = manager.ApplicationPoolDefaults.ProcessModel.PingInterval,
+                    PingMaximumResponseTime = manager.ApplicationPoolDefaults.ProcessModel.PingResponseTime,
+                    ServiceUnavailableResponseType = manager.ApplicationPoolDefaults.Failure.LoadBalancerCapabilities.ToString().ToLower(),
+                    RapidFailProtectionEnabled = manager.ApplicationPoolDefaults.Failure.RapidFailProtection,
+                    RapidFailProtectionInterval = manager.ApplicationPoolDefaults.Failure.RapidFailProtectionInterval,
+                    RapidFailProtectionMaxCrashes = manager.ApplicationPoolDefaults.Failure.RapidFailProtectionMaxCrashes
+                };
+            }
+        }
+        
         public static void StartApplicationPool(string poolName)
         {
             using (var manager = new ServerManager())
@@ -667,6 +703,16 @@ namespace Servant.Shared
             {
                 var pool = manager.ApplicationPools.Single(x => x.Name == poolName);
                 pool.Delete();
+                manager.CommitChanges();
+            }
+        }
+
+        public static void CreateApplicationPool(ApplicationPool applicationPool)
+        {
+            using (var manager = new ServerManager())
+            {
+                Microsoft.Web.Administration.ApplicationPool newAppPool = manager.ApplicationPools.Add(applicationPool.Name);
+                newAppPool.UpdateIisApplicationPoolFromServant(applicationPool);
                 manager.CommitChanges();
             }
         }

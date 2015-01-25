@@ -118,7 +118,8 @@ namespace Servant.Agent.SocketClient
                                     Sites = SiteManager.GetSites().ToList(),
                                     FrameworkVersions = NetFrameworkHelper.GetAllVersions().ToList(),
                                     ApplicationPools = SiteManager.GetApplicationPools(),
-                                    Certificates = SiteManager.GetCertificates().ToList()
+                                    Certificates = SiteManager.GetCertificates().ToList(),
+                                    DefaultApplicationPool = SiteManager.GetDefaultApplicationPool()
                                 }),
                                 Success = true
                             });
@@ -207,6 +208,11 @@ namespace Servant.Agent.SocketClient
                         break;
                     case CommandRequestType.DeleteApplicationPool:
                         SiteManager.DeleteApplicationPool(request.Value);
+                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                        break;
+                    case CommandRequestType.CreateApplicationPool:
+                        var applicationPoolToCreate = Json.DeserializeFromString<ApplicationPool>(request.JsonObject);
+                        SiteManager.CreateApplicationPool(applicationPoolToCreate);
                         ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
                         break;
                 }

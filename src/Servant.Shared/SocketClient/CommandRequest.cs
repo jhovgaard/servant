@@ -30,6 +30,7 @@ namespace Servant.Shared.SocketClient
         StartApplicationPool,
         UpdateApplicationPool,
         DeleteApplicationPool,
-        GetAll
+        GetAll,
+        CreateApplicationPool
     }
 }
