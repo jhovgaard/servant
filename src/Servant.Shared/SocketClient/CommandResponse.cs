@@ -28,7 +28,8 @@ namespace Servant.Shared.SocketClient
         public enum ResponseType
         {
             Iis,
-            CmdExe
+            CmdExe,
+            Deployment
         }
     }
 }

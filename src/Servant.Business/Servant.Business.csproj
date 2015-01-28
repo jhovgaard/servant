@@ -49,6 +49,7 @@
     <Compile Include="Objects\ApplicationPool.cs" />
     <Compile Include="Objects\Binding.cs" />
     <Compile Include="Objects\Certificate.cs" />
+    <Compile Include="Objects\Deployment.cs" />
     <Compile Include="Objects\ManageSiteResult.cs" />
     <Compile Include="Objects\Entity.cs" />
     <Compile Include="Objects\Enums\ManageSiteResult.cs" />

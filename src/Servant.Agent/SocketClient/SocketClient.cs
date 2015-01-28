@@ -177,9 +177,8 @@ namespace Servant.Agent.SocketClient
                         Servant.Update();
                         ReplyOverHttp(new CommandResponse(request.Guid) { Message = "Started", Success = true });
                         break;
-                    case CommandRequestType.DeploySite:
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
-                        Deployer.Deploy(request.Value, Json.DeserializeFromString<string>(request.JsonObject));
+                    case CommandRequestType.DeploySite:                      
+                        Deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject));
                         break;
                     case CommandRequestType.CmdExeCommand:
                         if (!Configuration.DisableConsoleAccess)
