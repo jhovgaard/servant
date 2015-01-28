@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ServiceProcess;
 using Servant.Agent.Infrastructure;
 using Servant.Agent.Service;
