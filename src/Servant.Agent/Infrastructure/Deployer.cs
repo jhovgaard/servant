@@ -6,11 +6,14 @@ using ICSharpCode.SharpZipLib.Zip;
 using Servant.Business.Objects;
 using Servant.Shared;
 using Servant.Shared.SocketClient;
+using TinyIoC;
 
 namespace Servant.Agent.Infrastructure
 {
     public static class Deployer
     {
+        private static readonly ServantAgentConfiguration Configuration = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();
+
         private static byte[] DownloadUrl(string url)
         {
             return new WebClient().DownloadData(url);
@@ -18,7 +21,7 @@ namespace Servant.Agent.Infrastructure
 
         private static void SendResponse(int deploymentId, string message, bool success = true)
         {
-            SocketClient.SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.Deployment) { Message = Json.SerializeToString(new { DeploymentId = deploymentId, Message = message }), Success = success });
+            SocketClient.SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.Deployment) { Message = Json.SerializeToString(new { DeploymentId = deploymentId, Message = message, Configuration.InstallationGuid }), Success = success });
         }
 
         public static void Deploy(Deployment deployment)
