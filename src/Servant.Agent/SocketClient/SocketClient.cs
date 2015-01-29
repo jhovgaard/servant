@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
@@ -177,8 +178,9 @@ namespace Servant.Agent.SocketClient
                         Servant.Update();
                         ReplyOverHttp(new CommandResponse(request.Guid) { Message = "Started", Success = true });
                         break;
-                    case CommandRequestType.DeploySite:                      
-                        Deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject));
+                    case CommandRequestType.DeploySite:
+                        Task.Factory.StartNew(() => Deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject)));
+                        
                         break;
                     case CommandRequestType.CmdExeCommand:
                         if (!Configuration.DisableConsoleAccess)
