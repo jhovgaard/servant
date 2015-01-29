@@ -180,7 +180,6 @@ namespace Servant.Agent.SocketClient
                         break;
                     case CommandRequestType.DeploySite:
                         Task.Factory.StartNew(() => Deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject)));
-                        
                         break;
                     case CommandRequestType.CmdExeCommand:
                         if (!Configuration.DisableConsoleAccess)

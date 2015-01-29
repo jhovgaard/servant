@@ -65,36 +65,41 @@ namespace Servant.Agent.Infrastructure
             {
                 SiteManager.RecycleApplicationPool(site.ApplicationPool);    
             }
-            
             fullSw.Stop();
             SendResponse(deployment.Id, string.Format("Changed site path to {0}. Deployment completed in {1} seconds.", fullPath, sw.Elapsed.TotalSeconds));
-            var statusCode = GetReturnedStatusCode(site);
-            SendResponse(deployment.Id, string.Format("Site locally returned HTTP {0} {1}.", (int)statusCode, statusCode));
 
-            // Roll-back if not 200 OK
-            if (statusCode != HttpStatusCode.OK)
+            if (deployment.WarmupAfterDeploy)
             {
-                site.SitePath = originalPath;
-                SiteManager.UpdateSite(site);
-                if (site.ApplicationPoolState == InstanceState.Started)
+                var statusCode = GetReturnedStatusCode(site, deployment.WarmupUrl);
+                SendResponse(deployment.Id, string.Format("Site locally returned HTTP {0} {1}.", (int)statusCode, statusCode));
+
+                if (deployment.RollbackOnError)
                 {
-                    SiteManager.RecycleApplicationPool(site.ApplicationPool);
+                    // Roll-back if not 200 OK
+                    if (statusCode != HttpStatusCode.OK)
+                    {
+                        site.SitePath = originalPath;
+                        SiteManager.UpdateSite(site);
+                        if (site.ApplicationPoolState == InstanceState.Started)
+                        {
+                            SiteManager.RecycleApplicationPool(site.ApplicationPool);
+                        }
+
+                        GetReturnedStatusCode(site, deployment.WarmupUrl);
+                        SendResponse(deployment.Id, string.Format("Rollback completed. Site path is now: {0}.", originalPath));
+                    }
                 }
-
-                SendResponse(deployment.Id, string.Format("Rollback completed. Site path is now: {0}.", originalPath));
             }
-
-            
         }
 
-        public static HttpStatusCode GetReturnedStatusCode(Site site)
+        public static HttpStatusCode GetReturnedStatusCode(Site site, string warmupUrl)
         {
             var binding = site.Bindings.First();
             var host = binding.Hostname;
             if (string.IsNullOrEmpty(host))
                 host = "localhost";
 
-            var request = WebRequest.Create("http://127.0.0.1:" + binding.Port) as HttpWebRequest;
+            var request = WebRequest.Create("http://127.0.0.1:" + binding.Port + "/" + warmupUrl) as HttpWebRequest;
             request.Host = host;
             HttpWebResponse response;
             try

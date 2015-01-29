@@ -11,5 +11,8 @@ namespace Servant.Business.Objects
         public int SiteIisId { get; set; }
         public string SiteName { get; set; }
         public string Url { get; set; }
+        public bool RollbackOnError { get; set; }
+        public bool WarmupAfterDeploy { get; set; }
+        public string WarmupUrl { get; set; }
     }
 }
