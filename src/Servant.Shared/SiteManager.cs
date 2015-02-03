@@ -456,6 +456,12 @@ namespace Servant.Shared
 
         public static Business.Objects.ManageSiteResult CreateSite(Site site)
         {
+            var validationResult = Validators.ValidateSite(site, null);
+            if (validationResult.Errors.Any())
+            {
+                return validationResult;
+            }
+
             var result = new Business.Objects.ManageSiteResult();
 
 

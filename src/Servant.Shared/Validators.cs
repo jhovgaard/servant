@@ -11,12 +11,12 @@ namespace Servant.Shared
 {
     public static class Validators
     {
-       public static ManageSiteResult ValidateSite(Site site, Site originalSite)
+        public static ManageSiteResult ValidateSite(Site site, Site originalSite)
         {
             var certificates = SiteManager.GetCertificates();
 
             var result = new ManageSiteResult();
-            
+
             if (!site.Bindings.Any())
             {
                 result.Errors.Add("Minimum one binding is required.");
@@ -26,6 +26,11 @@ namespace Servant.Shared
                 result.Errors.Add("Name is required.");
 
             var existingSite = SiteManager.GetSiteByName(site.Name);
+            if (originalSite == null)
+            {
+                originalSite = new Site() {IisId = 0};
+            }
+
             if (site.Name != null && existingSite != null && site.Name.ToLower() == existingSite.Name.ToLower() && existingSite.IisId != originalSite.IisId)
                 result.Errors.Add("There's already a site with this name.");
 
