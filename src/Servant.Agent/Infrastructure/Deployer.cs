@@ -21,9 +21,9 @@ namespace Servant.Agent.Infrastructure
             return new WebClient().DownloadData(url);
         }
 
-        private static void SendResponse(int deploymentId, string message, bool success = true)
+        private static void SendResponse(int deploymentId, DeploymentResponseType type, string message, bool success = true)
         {
-            SocketClient.SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.Deployment) { Message = Json.SerializeToString(new { DeploymentId = deploymentId, Message = message, Configuration.InstallationGuid }), Success = success });
+            SocketClient.SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.Deployment) { Message = Json.SerializeToString(new DeploymentResponse() { DeploymentId = deploymentId, Message = message, InstallationGuid = Configuration.InstallationGuid, Success = success, Type = type }), Success = success });
         }
 
         public static void Deploy(Deployment deployment)
@@ -32,7 +32,7 @@ namespace Servant.Agent.Infrastructure
             var fullSw = new Stopwatch();
 
             fullSw.Start();
-            SendResponse(deployment.Id, "Received deployment request.");
+            SendResponse(deployment.Id, DeploymentResponseType.DeploymentRequestReceived,  "Received deployment request.");
             Site site = SiteManager.GetSiteByName(deployment.SiteName);
             var originalPath = site.SitePath;
 
@@ -47,17 +47,17 @@ namespace Servant.Agent.Infrastructure
 
             var fullPath = Environment.ExpandEnvironmentVariables(newPath);
             Directory.CreateDirectory(fullPath);
-            SendResponse(deployment.Id, "Created directory: " + fullPath);
+            SendResponse(deployment.Id, DeploymentResponseType.CreateDirectory, "Created directory: " + fullPath);
 
             sw.Start();
             var zipFile = DownloadUrl(deployment.Url);
             sw.Stop();
-            SendResponse(deployment.Id, string.Format("Completed package download in {0} seconds.", sw.Elapsed.TotalSeconds));
+            SendResponse(deployment.Id, DeploymentResponseType.PackageDownload, string.Format("Completed package download in {0} seconds.", sw.Elapsed.TotalSeconds));
 
             var fastZip = new FastZip();
             var stream = new MemoryStream(zipFile);
             fastZip.ExtractZip(stream, fullPath, FastZip.Overwrite.Always, null, null, null, true, true);
-            SendResponse(deployment.Id, "Completed package unzipping.");
+            SendResponse(deployment.Id, DeploymentResponseType.PackageUnzipping, "Completed package unzipping.");
 
             site.SitePath = newPath;
             SiteManager.UpdateSite(site);
@@ -66,12 +66,12 @@ namespace Servant.Agent.Infrastructure
                 SiteManager.RecycleApplicationPool(site.ApplicationPool);    
             }
             fullSw.Stop();
-            SendResponse(deployment.Id, string.Format("Changed site path to {0}. Deployment completed in {1} seconds.", fullPath, sw.Elapsed.TotalSeconds));
+            SendResponse(deployment.Id, DeploymentResponseType.Deployment, string.Format("Changed site path to {0}. Deployment completed in {1} seconds.", fullPath, sw.Elapsed.TotalSeconds));
 
             if (deployment.WarmupAfterDeploy)
             {
                 var statusCode = GetReturnedStatusCode(site, deployment.WarmupUrl);
-                SendResponse(deployment.Id, string.Format("Site locally returned HTTP {0} {1}.", (int)statusCode, statusCode));
+                SendResponse(deployment.Id, DeploymentResponseType.Warmup, string.Format("Site locally returned HTTP {0} {1}.", (int)statusCode, statusCode));
 
                 if (deployment.RollbackOnError)
                 {
@@ -86,7 +86,7 @@ namespace Servant.Agent.Infrastructure
                         }
 
                         GetReturnedStatusCode(site, deployment.WarmupUrl);
-                        SendResponse(deployment.Id, string.Format("Rollback completed. Site path is now: {0}.", originalPath));
+                        SendResponse(deployment.Id, DeploymentResponseType.Rollback, string.Format("Rollback completed. Site path is now: {0}.", originalPath));
                     }
                 }
             }
