@@ -57,7 +57,7 @@ namespace Servant.Agent.Infrastructure
             var fastZip = new FastZip();
             var stream = new MemoryStream(zipFile);
             fastZip.ExtractZip(stream, fullPath, FastZip.Overwrite.Always, null, null, null, true, true);
-            SendResponse(deployment.Id, DeploymentResponseType.PackageUnzipping, "Completed package unzipping.");
+            SendResponse(deployment.Id, DeploymentResponseType.PackageUnzipping, "Completed package extracting.");
 
             site.SitePath = newPath;
             SiteManager.UpdateSite(site);
@@ -66,12 +66,15 @@ namespace Servant.Agent.Infrastructure
                 SiteManager.RecycleApplicationPool(site.ApplicationPool);    
             }
             fullSw.Stop();
-            SendResponse(deployment.Id, DeploymentResponseType.Deployment, string.Format("Changed site path to {0}. Deployment completed in {1} seconds.", fullPath, sw.Elapsed.TotalSeconds));
+
+            SendResponse(deployment.Id, DeploymentResponseType.ChangeSitePath, string.Format("Changed site path to {0}. Deployment completed in {1} seconds.", fullPath, fullSw.Elapsed.TotalSeconds));
 
             if (deployment.WarmupAfterDeploy)
             {
                 var statusCode = GetReturnedStatusCode(site, deployment.WarmupUrl);
-                SendResponse(deployment.Id, DeploymentResponseType.Warmup, string.Format("Site locally returned HTTP {0} {1}.", (int)statusCode, statusCode));
+                var msg = statusCode == null ? "Could not contact IIS site" : string.Format("Site locally returned HTTP {0} {1}.", (int) statusCode, statusCode);
+
+                SendResponse(deployment.Id, DeploymentResponseType.Warmup, msg, statusCode.HasValue && statusCode.Value == HttpStatusCode.OK);
 
                 if (deployment.RollbackOnError)
                 {
@@ -92,7 +95,7 @@ namespace Servant.Agent.Infrastructure
             }
         }
 
-        public static HttpStatusCode GetReturnedStatusCode(Site site, string warmupUrl)
+        public static HttpStatusCode? GetReturnedStatusCode(Site site, string warmupUrl)
         {
             var binding = site.Bindings.First();
             var host = binding.Hostname;
@@ -110,6 +113,12 @@ namespace Servant.Agent.Infrastructure
             catch (WebException ex)
             {
                 var exceptionResponse = (HttpWebResponse) ex.Response;
+
+                if (exceptionResponse == null)
+                {
+                    return null;
+                }
+
                 return exceptionResponse.StatusCode;
             }
             return response.StatusCode;

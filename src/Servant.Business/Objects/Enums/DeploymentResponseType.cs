@@ -8,6 +8,6 @@
         PackageUnzipping = 3,
         Warmup = 4,
         Rollback = 5,
-        Deployment = 6
+        ChangeSitePath = 6
     }
 }
