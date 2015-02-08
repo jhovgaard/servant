@@ -30,6 +30,17 @@ namespace Servant.Agent.Infrastructure
 
         public void Deploy(Deployment deployment)
         {
+            var existingDeployment = _deploymentInstances.SingleOrDefault(x => x.DeploymentGuid == deployment.Guid);
+            if (existingDeployment != null)
+            {
+                if (existingDeployment.RollbackCompleted) // Deployment have been rolled back by other server  already.
+                {
+                    return;
+                }
+
+                _deploymentInstances.RemoveAll(x => x.DeploymentGuid == deployment.Guid);
+            }
+
             var sw = new Stopwatch();
             var fullSw = new Stopwatch();
 
@@ -98,15 +109,17 @@ namespace Servant.Agent.Infrastructure
                 }
             }
 
-            _deploymentInstances.RemoveAll(x => x.DeploymentGuid == deployment.Guid);
-            _deploymentInstances.Add(new DeploymentInstance() { DeploymentId = deployment.Id, DeploymentGuid = deployment.Guid, NewPath = newPath, OriginalPath = originalPath, RollbackCompleted = rollbackCompleted, IisSiteId = site.IisId});
+            _deploymentInstances.Add(new DeploymentInstance() { DeploymentId = deployment.Id, DeploymentGuid = deployment.Guid, NewPath = newPath, OriginalPath = originalPath, RollbackCompleted = rollbackCompleted, IisSiteId = site.IisId });
         }
 
         public void Rollback(Guid deploymentGuid)
         {
             var instance = _deploymentInstances.SingleOrDefault(x => x.DeploymentGuid == deploymentGuid && !x.RollbackCompleted);
             if (instance == null)
+            {
+                _deploymentInstances.Add(new DeploymentInstance() { DeploymentGuid = deploymentGuid, RollbackCompleted = true });
                 return;
+            }
 
             Site site = SiteManager.GetSiteById(instance.IisSiteId);
             site.SitePath = instance.OriginalPath;
