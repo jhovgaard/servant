@@ -30,7 +30,7 @@ namespace Servant.Agent.Infrastructure
 
         public void Deploy(Deployment deployment)
         {
-            var existingDeployment = _deploymentInstances.SingleOrDefault(x => x.DeploymentGuid == deployment.Guid);
+            var existingDeployment = _deploymentInstances.SingleOrDefault(x => x.DeploymentId == deployment.Id);
             if (existingDeployment != null)
             {
                 if (existingDeployment.RollbackCompleted) // Deployment have been rolled back by other server  already.
@@ -38,7 +38,7 @@ namespace Servant.Agent.Infrastructure
                     return;
                 }
 
-                _deploymentInstances.RemoveAll(x => x.DeploymentGuid == deployment.Guid);
+                _deploymentInstances.RemoveAll(x => x.DeploymentId == deployment.Id);
             }
 
             var sw = new Stopwatch();
@@ -112,12 +112,13 @@ namespace Servant.Agent.Infrastructure
             _deploymentInstances.Add(new DeploymentInstance() { DeploymentId = deployment.Id, DeploymentGuid = deployment.Guid, NewPath = newPath, OriginalPath = originalPath, RollbackCompleted = rollbackCompleted, IisSiteId = site.IisId });
         }
 
-        public void Rollback(Guid deploymentGuid)
+        public void Rollback(int deploymentId)
         {
-            var instance = _deploymentInstances.SingleOrDefault(x => x.DeploymentGuid == deploymentGuid && !x.RollbackCompleted);
+            SendResponse(deploymentId, DeploymentResponseType.Rollback, string.Format("Remote rollback requested received."));
+            var instance = _deploymentInstances.SingleOrDefault(x => x.DeploymentId == deploymentId && !x.RollbackCompleted);
             if (instance == null)
             {
-                _deploymentInstances.Add(new DeploymentInstance() { DeploymentGuid = deploymentGuid, RollbackCompleted = true });
+                _deploymentInstances.Add(new DeploymentInstance() { DeploymentId = deploymentId, RollbackCompleted = true });
                 return;
             }
 
@@ -130,7 +131,6 @@ namespace Servant.Agent.Infrastructure
             }
 
             instance.RollbackCompleted = true;
-            SendResponse(instance.DeploymentId, DeploymentResponseType.Rollback, string.Format("Rollback requested received. Site path is now: {0}.", instance.OriginalPath));
         }
 
         public static HttpStatusCode? GetReturnedStatusCode(Site site, string warmupUrl)

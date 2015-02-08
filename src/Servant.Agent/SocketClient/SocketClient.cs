@@ -184,7 +184,7 @@ namespace Servant.Agent.SocketClient
                         Task.Factory.StartNew(() => deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject)));
                         break;
                     case CommandRequestType.RollbackDeployment:
-                        Task.Factory.StartNew(() => deployer.Rollback(Guid.Parse(request.Value)));
+                        Task.Factory.StartNew(() => deployer.Rollback(int.Parse(request.Value)));
                         break;
                     case CommandRequestType.CmdExeCommand:
                         if (!Configuration.DisableConsoleAccess)
