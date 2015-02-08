@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client;
 using Servant.Business.Helpers;
 using Servant.Business.Objects;
@@ -58,6 +59,8 @@ namespace Servant.Agent.SocketClient
 
             _myHub.On<CommandRequest>("Request", request =>
             {
+                var deployer = TinyIoCContainer.Current.Resolve<Deployer>();
+
                 switch (request.Command)
                 {
                     case CommandRequestType.Unauthorized:
@@ -178,8 +181,10 @@ namespace Servant.Agent.SocketClient
                         ReplyOverHttp(new CommandResponse(request.Guid) { Message = "Started", Success = true });
                         break;
                     case CommandRequestType.DeploySite:
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
-                        Deployer.Deploy(request.Value, Json.DeserializeFromString<string>(request.JsonObject));
+                        Task.Factory.StartNew(() => deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject)));
+                        break;
+                    case CommandRequestType.RollbackDeployment:
+                        Task.Factory.StartNew(() => deployer.Rollback(int.Parse(request.Value)));
                         break;
                     case CommandRequestType.CmdExeCommand:
                         if (!Configuration.DisableConsoleAccess)
