@@ -99,7 +99,7 @@ namespace Servant.Agent.Infrastructure
             }
 
             _deploymentInstances.RemoveAll(x => x.DeploymentGuid == deployment.Guid);
-            _deploymentInstances.Add(new DeploymentInstance() { DeploymentGuid = deployment.Guid, NewPath = newPath, OriginalPath = originalPath, RollbackCompleted = rollbackCompleted, IisSiteId = site.IisId});
+            _deploymentInstances.Add(new DeploymentInstance() { DeploymentId = deployment.Id, DeploymentGuid = deployment.Guid, NewPath = newPath, OriginalPath = originalPath, RollbackCompleted = rollbackCompleted, IisSiteId = site.IisId});
         }
 
         public void Rollback(Guid deploymentGuid)
@@ -117,6 +117,7 @@ namespace Servant.Agent.Infrastructure
             }
 
             instance.RollbackCompleted = true;
+            SendResponse(instance.DeploymentId, DeploymentResponseType.Rollback, string.Format("Rollback completed. Site path is now: {0}.", instance.OriginalPath));
         }
 
         public static HttpStatusCode? GetReturnedStatusCode(Site site, string warmupUrl)
@@ -154,5 +155,6 @@ namespace Servant.Agent.Infrastructure
         public string NewPath { get; set; }
         public bool RollbackCompleted { get; set; }
         public int IisSiteId { get; set; }
+        public int DeploymentId { get; set; }
     }
 }
