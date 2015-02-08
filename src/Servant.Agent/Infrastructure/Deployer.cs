@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -12,21 +13,22 @@ using TinyIoC;
 
 namespace Servant.Agent.Infrastructure
 {
-    public static class Deployer
+    public class Deployer
     {
-        private static readonly ServantAgentConfiguration Configuration = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();
+        private readonly ServantAgentConfiguration Configuration = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();
+        private List<DeploymentInstance> _deploymentInstances = new List<DeploymentInstance>();
 
-        private static byte[] DownloadUrl(string url)
+        private byte[] DownloadUrl(string url)
         {
             return new WebClient().DownloadData(url);
         }
 
-        private static void SendResponse(int deploymentId, DeploymentResponseType type, string message, bool success = true)
+        private void SendResponse(int deploymentId, DeploymentResponseType type, string message, bool success = true)
         {
             SocketClient.SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.Deployment) { Message = Json.SerializeToString(new DeploymentResponse() { DeploymentId = deploymentId, Message = message, InstallationGuid = Configuration.InstallationGuid, Success = success, Type = type }), Success = success });
         }
 
-        public static void Deploy(Deployment deployment)
+        public void Deploy(Deployment deployment)
         {
             var sw = new Stopwatch();
             var fullSw = new Stopwatch();
@@ -43,7 +45,7 @@ namespace Servant.Agent.Infrastructure
             {
                 rootPath = rootPath.Substring(0, rootPath.LastIndexOf(@"\", System.StringComparison.Ordinal));
             }
-            var newPath = Path.Combine(rootPath, "servant-" + DateTime.Now.ToString("ddMMMyyyy-HHmmss"));
+            var newPath = Path.Combine(rootPath, "servant-" + deployment.Guid);
 
             var fullPath = Environment.ExpandEnvironmentVariables(newPath);
             Directory.CreateDirectory(fullPath);
@@ -69,6 +71,7 @@ namespace Servant.Agent.Infrastructure
 
             SendResponse(deployment.Id, DeploymentResponseType.ChangeSitePath, string.Format("Changed site path to {0}. Deployment completed in {1} seconds.", fullPath, fullSw.Elapsed.TotalSeconds));
 
+            var rollbackCompleted = false;
             if (deployment.WarmupAfterDeploy)
             {
                 var statusCode = GetReturnedStatusCode(site, deployment.WarmupUrl);
@@ -87,12 +90,33 @@ namespace Servant.Agent.Infrastructure
                         {
                             SiteManager.RecycleApplicationPool(site.ApplicationPool);
                         }
-
+                        rollbackCompleted = true;
                         GetReturnedStatusCode(site, deployment.WarmupUrl);
+                        
                         SendResponse(deployment.Id, DeploymentResponseType.Rollback, string.Format("Rollback completed. Site path is now: {0}.", originalPath));
                     }
                 }
             }
+
+            _deploymentInstances.RemoveAll(x => x.DeploymentGuid == deployment.Guid);
+            _deploymentInstances.Add(new DeploymentInstance() { DeploymentGuid = deployment.Guid, NewPath = newPath, OriginalPath = originalPath, RollbackCompleted = rollbackCompleted, IisSiteId = site.IisId});
+        }
+
+        public void Rollback(Guid deploymentGuid)
+        {
+            var instance = _deploymentInstances.SingleOrDefault(x => x.DeploymentGuid == deploymentGuid);
+            if (instance == null)
+                return;
+
+            Site site = SiteManager.GetSiteById(instance.IisSiteId);
+            site.SitePath = instance.OriginalPath;
+            SiteManager.UpdateSite(site);
+            if (site.ApplicationPoolState == InstanceState.Started)
+            {
+                SiteManager.RecycleApplicationPool(site.ApplicationPool);
+            }
+
+            instance.RollbackCompleted = true;
         }
 
         public static HttpStatusCode? GetReturnedStatusCode(Site site, string warmupUrl)
@@ -121,5 +145,14 @@ namespace Servant.Agent.Infrastructure
             }
             return response.StatusCode;
         }
+    }
+
+    public class DeploymentInstance
+    {
+        public Guid DeploymentGuid { get; set; }
+        public string OriginalPath { get; set; }
+        public string NewPath { get; set; }
+        public bool RollbackCompleted { get; set; }
+        public int IisSiteId { get; set; }
     }
 }

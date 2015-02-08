@@ -14,5 +14,6 @@ namespace Servant.Business.Objects
         public bool RollbackOnError { get; set; }
         public bool WarmupAfterDeploy { get; set; }
         public string WarmupUrl { get; set; }
+        public Guid Guid { get; set; }
     }
 }

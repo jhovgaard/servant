@@ -15,6 +15,7 @@ namespace Servant.Agent
         {
             TinyIoCContainer.Current.Register(ConfigManager.GetConfigurationFromDisk());
             TinyIoCContainer.Current.Register(typeof(ConsoleManager)).AsSingleton();
+            TinyIoCContainer.Current.Register<Deployer>().AsSingleton();
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
 
             var config = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();

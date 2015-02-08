@@ -59,6 +59,8 @@ namespace Servant.Agent.SocketClient
 
             _myHub.On<CommandRequest>("Request", request =>
             {
+                var deployer = TinyIoCContainer.Current.Resolve<Deployer>();
+
                 switch (request.Command)
                 {
                     case CommandRequestType.Unauthorized:
@@ -179,7 +181,10 @@ namespace Servant.Agent.SocketClient
                         ReplyOverHttp(new CommandResponse(request.Guid) { Message = "Started", Success = true });
                         break;
                     case CommandRequestType.DeploySite:
-                        Task.Factory.StartNew(() => Deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject)));
+                        Task.Factory.StartNew(() => deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject)));
+                        break;
+                    case CommandRequestType.RollbackDeployment:
+                        Task.Factory.StartNew(() => deployer.Rollback(Guid.Parse(request.Value)));
                         break;
                     case CommandRequestType.CmdExeCommand:
                         if (!Configuration.DisableConsoleAccess)

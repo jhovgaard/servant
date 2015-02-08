@@ -31,6 +31,7 @@ namespace Servant.Shared.SocketClient
         UpdateApplicationPool,
         DeleteApplicationPool,
         GetAll,
-        CreateApplicationPool
+        CreateApplicationPool,
+        RollbackDeployment
     }
 }
