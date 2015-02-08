@@ -104,7 +104,7 @@ namespace Servant.Agent.Infrastructure
 
         public void Rollback(Guid deploymentGuid)
         {
-            var instance = _deploymentInstances.SingleOrDefault(x => x.DeploymentGuid == deploymentGuid);
+            var instance = _deploymentInstances.SingleOrDefault(x => x.DeploymentGuid == deploymentGuid && !x.RollbackCompleted);
             if (instance == null)
                 return;
 
@@ -117,7 +117,7 @@ namespace Servant.Agent.Infrastructure
             }
 
             instance.RollbackCompleted = true;
-            SendResponse(instance.DeploymentId, DeploymentResponseType.Rollback, string.Format("Rollback completed. Site path is now: {0}.", instance.OriginalPath));
+            SendResponse(instance.DeploymentId, DeploymentResponseType.Rollback, string.Format("Rollback requested received. Site path is now: {0}.", instance.OriginalPath));
         }
 
         public static HttpStatusCode? GetReturnedStatusCode(Site site, string warmupUrl)
