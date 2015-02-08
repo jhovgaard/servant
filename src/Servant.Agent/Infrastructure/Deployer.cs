@@ -97,13 +97,11 @@ namespace Servant.Agent.Infrastructure
 
         public static HttpStatusCode? GetReturnedStatusCode(Site site, string warmupUrl)
         {
-            var binding = site.Bindings.First();
-            var host = binding.Hostname;
-            if (string.IsNullOrEmpty(host))
-                host = "localhost";
+            var uri = new Uri(warmupUrl);
+            var testUrl = uri.ToString().Replace(uri.Host, "127.0.0.1");
 
-            var request = WebRequest.Create("http://127.0.0.1:" + binding.Port + "/" + warmupUrl) as HttpWebRequest;
-            request.Host = host;
+            var request = WebRequest.Create(testUrl) as HttpWebRequest;
+            request.Host = uri.Host + ":" + uri.Port;
             HttpWebResponse response;
             try
             {
