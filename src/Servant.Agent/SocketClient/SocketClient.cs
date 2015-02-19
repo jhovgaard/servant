@@ -61,165 +61,172 @@ namespace Servant.Agent.SocketClient
             {
                 var deployer = TinyIoCContainer.Current.Resolve<Deployer>();
 
-                switch (request.Command)
+                try
                 {
-                    case CommandRequestType.Unauthorized:
-                        IsStopped = true;
-                        MessageHandler.LogException("Servant.io key was not recognized.");
-                        _connection.Stop();
-                        break;
-                    case CommandRequestType.GetSites:
-                        var sites = SiteManager.GetSites();
-                        var result = Json.SerializeToString(sites);
-                        ReplyOverHttp(new CommandResponse(request.Guid)
-                        {
-                            Message = result,
-                            Success = true
-                        });
-                        break;
-                    case CommandRequestType.UpdateSite:
-                        var site = Json.DeserializeFromString<Site>(request.JsonObject);
+                    switch (request.Command)
+                    {
+                        case CommandRequestType.Unauthorized:
+                            IsStopped = true;
+                            MessageHandler.LogException("Servant.io key was not recognized.");
+                            _connection.Stop();
+                            break;
+                        case CommandRequestType.GetSites:
+                            var sites = SiteManager.GetSites();
+                            var result = Json.SerializeToString(sites);
+                            ReplyOverHttp(new CommandResponse(request.Guid)
+                            {
+                                Message = result,
+                                Success = true
+                            });
+                            break;
+                        case CommandRequestType.UpdateSite:
+                            var site = Json.DeserializeFromString<Site>(request.JsonObject);
 
-                        var originalSite = SiteManager.GetSiteByName(request.Value);
+                            var originalSite = SiteManager.GetSiteByName(request.Value);
 
-                        if (originalSite == null)
-                        {
+                            if (originalSite == null)
+                            {
+                                ReplyOverHttp(new CommandResponse(request.Guid)
+                                    {
+                                        Message =
+                                            Json.SerializeToString(new ManageSiteResult
+                                            {
+                                                Result = SiteResult.SiteNameNotFound
+                                            }),
+                                        Success = false
+                                    });
+                                return;
+                            }
+
+                            var validationResult = Validators.ValidateSite(site, originalSite);
+                            if (validationResult.Errors.Any())
+                            {
+                                ReplyOverHttp(new CommandResponse(request.Guid) { Message = Json.SerializeToString(validationResult) });
+                                return;
+                            }
+
+                            site.IisId = originalSite.IisId;
+
+                            var updateResult = SiteManager.UpdateSite(site);
+
                             ReplyOverHttp(new CommandResponse(request.Guid)
                                 {
-                                    Message =
-                                        Json.SerializeToString(new ManageSiteResult
-                                        {
-                                            Result = SiteResult.SiteNameNotFound
-                                        }),
-                                    Success = false
+                                    Message = Json.SerializeToString(updateResult),
+                                    Success = true
                                 });
-                            return;
-                        }
-
-                        var validationResult = Validators.ValidateSite(site, originalSite);
-                        if (validationResult.Errors.Any())
-                        {
-                            ReplyOverHttp(new CommandResponse(request.Guid) { Message = Json.SerializeToString(validationResult) });
-                            return;
-                        }
-
-                        site.IisId = originalSite.IisId;
-
-                        var updateResult = SiteManager.UpdateSite(site);
-
-                        ReplyOverHttp(new CommandResponse(request.Guid)
-                            {
-                                Message = Json.SerializeToString(updateResult),
-                                Success = true
-                            });
-                        break;
-                    case CommandRequestType.GetAll:
-                        ReplyOverHttp(new CommandResponse(request.Guid)
-                            {
-                                Message = Json.SerializeToString(new AllResponse
+                            break;
+                        case CommandRequestType.GetAll:
+                            ReplyOverHttp(new CommandResponse(request.Guid)
                                 {
-                                    Sites = SiteManager.GetSites().ToList(),
-                                    FrameworkVersions = NetFrameworkHelper.GetAllVersions().ToList(),
-                                    ApplicationPools = SiteManager.GetApplicationPools(),
-                                    Certificates = SiteManager.GetCertificates().ToList(),
-                                    DefaultApplicationPool = SiteManager.GetDefaultApplicationPool()
-                                }),
-                                Success = true
-                            });
-                        break;
-                    case CommandRequestType.GetApplicationPools:
-                        var appPools = SiteManager.GetApplicationPools();
-                        ReplyOverHttp(new CommandResponse(request.Guid)
-                            {
-                                Message = Json.SerializeToString(appPools),
-                                Success = true
-                            });
-                        break;
-                    case CommandRequestType.GetCertificates:
-                        ReplyOverHttp(new CommandResponse(request.Guid)
-                            {
-                                Message = Json.SerializeToString(SiteManager.GetCertificates()),
-                                Success = true
-                            });
-                        break;
-                    case CommandRequestType.StartSite:
-                        var startSite = SiteManager.GetSiteByName(request.Value);
-                        var startResult = SiteManager.StartSite(startSite);
+                                    Message = Json.SerializeToString(new AllResponse
+                                    {
+                                        Sites = SiteManager.GetSites().ToList(),
+                                        FrameworkVersions = NetFrameworkHelper.GetAllVersions().ToList(),
+                                        ApplicationPools = SiteManager.GetApplicationPools(),
+                                        Certificates = SiteManager.GetCertificates().ToList(),
+                                        DefaultApplicationPool = SiteManager.GetDefaultApplicationPool()
+                                    }),
+                                    Success = true
+                                });
+                            break;
+                        case CommandRequestType.GetApplicationPools:
+                            var appPools = SiteManager.GetApplicationPools();
+                            ReplyOverHttp(new CommandResponse(request.Guid)
+                                {
+                                    Message = Json.SerializeToString(appPools),
+                                    Success = true
+                                });
+                            break;
+                        case CommandRequestType.GetCertificates:
+                            ReplyOverHttp(new CommandResponse(request.Guid)
+                                {
+                                    Message = Json.SerializeToString(SiteManager.GetCertificates()),
+                                    Success = true
+                                });
+                            break;
+                        case CommandRequestType.StartSite:
+                            var startSite = SiteManager.GetSiteByName(request.Value);
+                            var startResult = SiteManager.StartSite(startSite);
 
-                        ReplyOverHttp(new CommandResponse(request.Guid)
+                            ReplyOverHttp(new CommandResponse(request.Guid)
+                                {
+                                    Success = startResult == SiteStartResult.Started,
+                                    Message = Json.SerializeToString(startResult)
+                                });
+                            break;
+                        case CommandRequestType.StopSite:
+                            var stopSite = SiteManager.GetSiteByName(request.Value);
+                            SiteManager.StopSite(stopSite);
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
+                            break;
+                        case CommandRequestType.RestartSite:
+                            var restartSite = SiteManager.GetSiteByName(request.Value);
+                            SiteManager.RestartSite(restartSite.IisId);
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                            break;
+                        case CommandRequestType.DeleteSite:
+                            var deleteSite = SiteManager.GetSiteByName(request.Value);
+                            SiteManager.DeleteSite(deleteSite.IisId);
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                            break;
+                        case CommandRequestType.CreateSite:
+                            var createSite = Json.DeserializeFromString<Site>(request.JsonObject);
+                            var createResult = SiteManager.CreateSite(createSite);
+                            ReplyOverHttp(new CommandResponse(request.Guid)
+                                {
+                                    Message = Json.SerializeToString(createResult),
+                                    Success = true
+                                });
+                            break;
+                        case CommandRequestType.ForceUpdate:
+                            Servant.Update();
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Message = "Started", Success = true });
+                            break;
+                        case CommandRequestType.DeploySite:
+                            Task.Factory.StartNew(() => deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject)));
+                            break;
+                        case CommandRequestType.RollbackDeployment:
+                            Task.Factory.StartNew(() => deployer.Rollback(int.Parse(request.Value)));
+                            break;
+                        case CommandRequestType.CmdExeCommand:
+                            if (!Configuration.DisableConsoleAccess)
                             {
-                                Success = startResult == SiteStartResult.Started,
-                                Message = Json.SerializeToString(startResult)
-                            });
-                        break;
-                    case CommandRequestType.StopSite:
-                        var stopSite = SiteManager.GetSiteByName(request.Value);
-                        SiteManager.StopSite(stopSite);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
-                        break;
-                    case CommandRequestType.RestartSite:
-                        var restartSite = SiteManager.GetSiteByName(request.Value);
-                        SiteManager.RestartSite(restartSite.IisId);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
-                        break;
-                    case CommandRequestType.DeleteSite:
-                        var deleteSite = SiteManager.GetSiteByName(request.Value);
-                        SiteManager.DeleteSite(deleteSite.IisId);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
-                        break;
-                    case CommandRequestType.CreateSite:
-                        var createSite = Json.DeserializeFromString<Site>(request.JsonObject);
-                        var createResult = SiteManager.CreateSite(createSite);
-                        ReplyOverHttp(new CommandResponse(request.Guid)
-                            {
-                                Message = Json.SerializeToString(createResult),
-                                Success = true
-                            });
-                        break;
-                    case CommandRequestType.ForceUpdate:
-                        Servant.Update();
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "Started", Success = true });
-                        break;
-                    case CommandRequestType.DeploySite:
-                        Task.Factory.StartNew(() => deployer.Deploy(Json.DeserializeFromString<Deployment>(request.JsonObject)));
-                        break;
-                    case CommandRequestType.RollbackDeployment:
-                        Task.Factory.StartNew(() => deployer.Rollback(int.Parse(request.Value)));
-                        break;
-                    case CommandRequestType.CmdExeCommand:
-                        if (!Configuration.DisableConsoleAccess)
-                        {
-                            var manager = TinyIoCContainer.Current.Resolve<ConsoleManager>();
-                            manager.SendCommand(request.Value);
-                        }
-                        break;
-                    case CommandRequestType.UpdateApplicationPool:
-                        var applicationPool = Json.DeserializeFromString<ApplicationPool>(request.JsonObject);
-                        var originalName = request.Value;
-                        SiteManager.UpdateApplicationPool(originalName, applicationPool);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
-                        break;
-                    case CommandRequestType.StartApplicationPool:
-                        SiteManager.StartApplicationPool(request.Value);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
-                        break;
-                    case CommandRequestType.StopApplicationPool:
-                        SiteManager.StopApplicationPool(request.Value);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
-                        break;
-                    case CommandRequestType.RecycleApplicationPool:
-                        SiteManager.RecycleApplicationPool(request.Value);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
-                        break;
-                    case CommandRequestType.DeleteApplicationPool:
-                        SiteManager.DeleteApplicationPool(request.Value);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
-                        break;
-                    case CommandRequestType.CreateApplicationPool:
-                        var applicationPoolToCreate = Json.DeserializeFromString<ApplicationPool>(request.JsonObject);
-                        SiteManager.CreateApplicationPool(applicationPoolToCreate);
-                        ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
-                        break;
+                                var manager = TinyIoCContainer.Current.Resolve<ConsoleManager>();
+                                manager.SendCommand(request.Value);
+                            }
+                            break;
+                        case CommandRequestType.UpdateApplicationPool:
+                            var applicationPool = Json.DeserializeFromString<ApplicationPool>(request.JsonObject);
+                            var originalName = request.Value;
+                            SiteManager.UpdateApplicationPool(originalName, applicationPool);
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
+                            break;
+                        case CommandRequestType.StartApplicationPool:
+                            SiteManager.StartApplicationPool(request.Value);
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
+                            break;
+                        case CommandRequestType.StopApplicationPool:
+                            SiteManager.StopApplicationPool(request.Value);
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Success = true });
+                            break;
+                        case CommandRequestType.RecycleApplicationPool:
+                            SiteManager.RecycleApplicationPool(request.Value);
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                            break;
+                        case CommandRequestType.DeleteApplicationPool:
+                            SiteManager.DeleteApplicationPool(request.Value);
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                            break;
+                        case CommandRequestType.CreateApplicationPool:
+                            var applicationPoolToCreate = Json.DeserializeFromString<ApplicationPool>(request.JsonObject);
+                            SiteManager.CreateApplicationPool(applicationPoolToCreate);
+                            ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
+                            break;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    HandleException(exception);
                 }
             });
 
@@ -238,18 +245,23 @@ namespace Servant.Agent.SocketClient
 
                 try
                 {
-                    var exceptionUrl = new System.Uri(Configuration.ServantIoHost + "/exceptions/log");
-                    new WebClient().UploadValuesAsync(exceptionUrl, new NameValueCollection()
-                                                                                         {
-                                                                                             { "InstallationGuid", Configuration.InstallationGuid.ToString() },
-                                                                                             { "Message", exception.Message},
-                                                                                             { "Stacktrace", exception.StackTrace }
-                                                                                         });
+                    HandleException(exception);
                 }
                 catch (Exception)
                 {
                 }
             };
+        }
+
+        private static void HandleException(Exception exception)
+        {
+            var exceptionUrl = new Uri(Configuration.ServantIoHost + "/exceptions/log");
+            new WebClient().UploadValuesAsync(exceptionUrl, new NameValueCollection
+                                                            {
+                                                                {"InstallationGuid", Configuration.InstallationGuid.ToString()},
+                                                                {"Message", exception.Message},
+                                                                {"Stacktrace", exception.StackTrace}
+                                                            });
         }
 
         private static void Connect()
