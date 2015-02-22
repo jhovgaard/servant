@@ -226,7 +226,7 @@ namespace Servant.Agent.SocketClient
                 }
                 catch (Exception exception)
                 {
-                    HandleException(exception);
+                    MessageHandler.LogException(exception);
                 }
             });
 
@@ -239,29 +239,7 @@ namespace Servant.Agent.SocketClient
                 }
             };
 
-            _connection.Error += exception =>
-            {
-                MessageHandler.LogException(exception.Message + Environment.NewLine + exception.StackTrace);
-
-                try
-                {
-                    HandleException(exception);
-                }
-                catch (Exception)
-                {
-                }
-            };
-        }
-
-        private static void HandleException(Exception exception)
-        {
-            var exceptionUrl = new Uri(Configuration.ServantIoHost + "/exceptions/log");
-            new WebClient().UploadValuesAsync(exceptionUrl, new NameValueCollection
-                                                            {
-                                                                {"InstallationGuid", Configuration.InstallationGuid.ToString()},
-                                                                {"Message", exception.Message},
-                                                                {"Stacktrace", exception.StackTrace}
-                                                            });
+            _connection.Error += MessageHandler.LogException;
         }
 
         private static void Connect()
