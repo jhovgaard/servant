@@ -42,9 +42,14 @@
                Order="2">1</Publish>
       <Publish Dialog="KeyDialog"
                Control="Next"
+               Event="SpawnDialog"
+               Value="MissingKeyDlg_Error"
+               Order="2"><![CDATA[Not (KEY <> "")]]></Publish>
+      <Publish Dialog="KeyDialog"
+               Control="Next"
                Event="NewDialog"
                Value="InstallDirDlg"
-               Order="2">1</Publish>
+               Order="2"><![CDATA[(KEY <> "")]]></Publish>
       <Publish Dialog="KeyDialog"
                Control="Back"
                Event="NewDialog"
@@ -55,6 +60,14 @@
                Event="NewDialog"
                Value="KeyDialog"
                Order="2">1</Publish>
+
+      <Dialog Id="MissingKeyDlg_Error" Width="230" Height="85" NoMinimize="yes" Title="Key Required">
+        <Control Id="MissingKeyDlgSkipDesc1" Type="Text" Width="180" X="15" Y="15" Height="20" Text="You didn't type in a key." />
+        <Control Id="MissingKeyDlgSkipDesc2" Type="Text" Width="180" X="15" Y="30" Height="20" Text="Log into Servant.io to get your key." />
+        <Control Id="Ok" Type="PushButton" X="85" Y="55" Width="66" Height="17" Text="OK" />
+      </Dialog>
+
+      <Publish Dialog="MissingKeyDlg_Error" Control="Ok" Event="EndDialog" Value="Return">1</Publish>
     </UI>
 
     <CustomAction Id="SetKey_set" Property='SetKey' Value='"[INSTALLDIR]Servant.Agent.exe" -k [KEY]' Execute='immediate'/>
