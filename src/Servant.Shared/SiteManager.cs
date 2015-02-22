@@ -611,6 +611,10 @@ namespace Servant.Shared
             using (var manager = new ServerManager())
             {
                 var siteToDelete = manager.Sites.SingleOrDefault(x => x.Id == iisId);
+
+                if (siteToDelete == null)
+                    return;
+
                 var applicationPoolname = siteToDelete.Applications[0].ApplicationPoolName;
 
                 var sitesWithApplicationPoolname =

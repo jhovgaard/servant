@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
@@ -85,15 +86,16 @@ namespace Servant.Agent.Infrastructure
             var rollbackCompleted = false;
             if (deployment.WarmupAfterDeploy)
             {
-                var statusCode = GetReturnedStatusCode(site, deployment.WarmupUrl);
-                var msg = statusCode == null ? "Could not contact IIS site" : string.Format("Site locally returned HTTP {0} {1}.", (int) statusCode, statusCode);
+                var warmupResult = GetReturnedStatusCode(site, deployment.WarmupUrl);
+                SendResponse(deployment.Id, DeploymentResponseType.WarmupResult, Json.SerializeToString(warmupResult));
+                var msg = warmupResult == null ? "Could not contact IIS site" : string.Format("Site locally returned HTTP {0} {1}.", (int) warmupResult.StatusCode, warmupResult.StatusCode);
 
-                SendResponse(deployment.Id, DeploymentResponseType.Warmup, msg, statusCode.HasValue && statusCode.Value == HttpStatusCode.OK);
+                SendResponse(deployment.Id, DeploymentResponseType.Warmup, msg, warmupResult.StatusCode == HttpStatusCode.OK);
 
                 if (deployment.RollbackOnError)
                 {
                     // Roll-back if not 200 OK
-                    if (statusCode != HttpStatusCode.OK)
+                    if (warmupResult.StatusCode != HttpStatusCode.OK)
                     {
                         site.SitePath = originalPath;
                         SiteManager.UpdateSite(site);
@@ -133,7 +135,7 @@ namespace Servant.Agent.Infrastructure
             instance.RollbackCompleted = true;
         }
 
-        public static HttpStatusCode? GetReturnedStatusCode(Site site, string warmupUrl)
+        public static WarmupResult GetReturnedStatusCode(Site site, string warmupUrl)
         {
             var uri = new Uri(warmupUrl);
             var testUrl = uri.ToString().Replace(uri.Host, "127.0.0.1");
@@ -144,7 +146,7 @@ namespace Servant.Agent.Infrastructure
             try
             {
                  response = (HttpWebResponse)request.GetResponse();
-
+                 return new WarmupResult(response);
             }
             catch (WebException ex)
             {
@@ -155,9 +157,32 @@ namespace Servant.Agent.Infrastructure
                     return null;
                 }
 
-                return exceptionResponse.StatusCode;
+                return new WarmupResult(exceptionResponse);
             }
-            return response.StatusCode;
+        }
+    }
+
+    public class WarmupResult
+    {
+        public HttpStatusCode StatusCode { get; set; }
+        public string Body { get; set; }
+        public List<KeyValuePair<string, string>> Headers { get; set; }
+
+        public WarmupResult(HttpWebResponse response)
+        {
+            StatusCode = response.StatusCode;
+
+            var encoding = Encoding.ASCII;
+            using (var reader = new System.IO.StreamReader(response.GetResponseStream(), encoding))
+            {
+                Body = reader.ReadToEnd();
+            }
+
+            Headers = Enumerable
+                .Range(0, response.Headers.Count)
+                .SelectMany(i => response.Headers.GetValues(i)
+                .Select(v => new KeyValuePair<string, string>(response.Headers.GetKey(i), v)))
+                .ToList();
         }
     }
 

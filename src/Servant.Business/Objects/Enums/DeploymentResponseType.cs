@@ -8,6 +8,7 @@
         PackageUnzipping = 3,
         Warmup = 4,
         Rollback = 5,
-        ChangeSitePath = 6
+        ChangeSitePath = 6,
+        WarmupResult = 7
     }
 }
