@@ -13,7 +13,7 @@ namespace Servant.Agent.Infrastructure
     {
         private static readonly ServantAgentConfiguration Configuration = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();
         static readonly Assembly ExecutingAssembly = Assembly.GetExecutingAssembly();
-        static string _logFilePath = Path.Combine(Path.GetDirectoryName(ExecutingAssembly.Location), "log.txt");
+        static readonly string LogFilePath = Path.Combine(Path.GetDirectoryName(ExecutingAssembly.Location), "log.txt");
 
         public static void Print(string message)
         {
@@ -54,17 +54,24 @@ namespace Servant.Agent.Infrastructure
 
         private static void ReportException(string text)
         {
-            var exceptionUrl = new Uri(Configuration.ServantIoHost + "/exceptions/log");
-            new WebClient().UploadValuesAsync(exceptionUrl, new NameValueCollection
-                                                            {
-                                                                {"InstallationGuid", Configuration.InstallationGuid.ToString()},
-                                                                {"Message", text}
-                                                            });
+            try
+            {
+                var exceptionUrl = new Uri(Configuration.ServantIoHost + "/exceptions/log");
+                new WebClient().UploadValuesAsync(exceptionUrl, new NameValueCollection
+                                                                {
+                                                                    {"InstallationGuid", Configuration.InstallationGuid.ToString()},
+                                                                    {"Message", text}
+                                                                });
+            }
+            catch
+            {
+                // If this fails, we screwed things up -- and you shouldn't pay for that.
+            }
         }
 
         private static void WriteLine(string line)
         {
-            var filePath = _logFilePath;
+            var filePath = LogFilePath;
 
             try
             {
@@ -79,6 +86,7 @@ namespace Servant.Agent.Infrastructure
             }
             catch (IOException)
             {
+                // The file might already be in use -- that's okay, we can live without that log line.
             }
         }
     }

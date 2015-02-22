@@ -79,7 +79,7 @@ namespace Servant.Agent
 
             if (exception != null)
             {
-                MessageHandler.LogException(exception.Message);
+                MessageHandler.LogException(exception);
             }
         }
     }
