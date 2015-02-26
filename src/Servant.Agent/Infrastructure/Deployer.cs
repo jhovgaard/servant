@@ -86,7 +86,8 @@ namespace Servant.Agent.Infrastructure
             var rollbackCompleted = false;
             if (deployment.WarmupAfterDeploy)
             {
-                var warmupResult = GetReturnedStatusCode(site, deployment.WarmupUrl);
+                System.Threading.Thread.Sleep(1000); // Waits for IIS to complete
+                var warmupResult = Warmup(site, deployment.WarmupUrl);
                 SendResponse(deployment.Id, DeploymentResponseType.WarmupResult, Json.SerializeToString(warmupResult));
                 var msg = warmupResult == null ? "Could not contact IIS site" : string.Format("Site locally returned HTTP {0} {1}.", (int) warmupResult.StatusCode, warmupResult.StatusCode);
 
@@ -104,7 +105,7 @@ namespace Servant.Agent.Infrastructure
                             SiteManager.RecycleApplicationPool(site.ApplicationPool);
                         }
                         rollbackCompleted = true;
-                        GetReturnedStatusCode(site, deployment.WarmupUrl);
+                        Warmup(site, deployment.WarmupUrl);
                         
                         SendResponse(deployment.Id, DeploymentResponseType.Rollback, string.Format("Rollback completed. Site path is now: {0}.", originalPath));
                     }
@@ -135,7 +136,7 @@ namespace Servant.Agent.Infrastructure
             instance.RollbackCompleted = true;
         }
 
-        public static WarmupResult GetReturnedStatusCode(Site site, string warmupUrl)
+        public static WarmupResult Warmup(Site site, string warmupUrl)
         {
             var uri = new Uri(warmupUrl);
             var testUrl = uri.ToString().Replace(uri.Host, "127.0.0.1");
