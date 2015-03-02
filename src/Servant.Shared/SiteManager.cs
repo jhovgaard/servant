@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Web.Administration;
-using Servant.Business.Helpers;
 using Servant.Business.Objects;
 using Servant.Business.Objects.Enums;
 using ApplicationPool = Servant.Business.Objects.ApplicationPool;
@@ -35,7 +34,6 @@ namespace Servant.Shared
                     throw new Exception("Servant doesn't support IIS Express.");
                 }
             }
-
         }
 
         public static IEnumerable<Site> GetSites(bool excludeAppPools = false)
@@ -224,15 +222,6 @@ namespace Servant.Shared
             return site.Name;
         }
 
-        private static IEnumerable<string> ConvertBindingsToBindingInformations(IEnumerable<Binding> bindings)
-        {
-            var bindingsToAdd = bindings
-                .Select(binding => string.Format("*:{0}:{1}", binding.Port, binding.Hostname))
-                .ToList();
-
-            return bindingsToAdd.Distinct();
-        }
-
         public static ManageSiteResult UpdateSite(Site site)
         {
             var result = new ManageSiteResult { IisSiteId = site.IisId };
@@ -357,12 +346,12 @@ namespace Servant.Shared
             return result;
         }
 
-        public static List<Business.Objects.ApplicationPool> GetApplicationPools()
+        public static List<ApplicationPool> GetApplicationPools()
         {
             using (var manager = new ServerManager())
             {
                 
-                return manager.ApplicationPools.Select(x => new Business.Objects.ApplicationPool
+                return manager.ApplicationPools.Select(x => new ApplicationPool
                             {
                                 Name = x.Name,
                                 State = (InstanceState) Enum.Parse(typeof (InstanceState), x.State.ToString()),
@@ -442,19 +431,7 @@ namespace Servant.Shared
             }
         }
 
-        public static bool IsBindingInUse(string rawBinding, string ipAddress, int iisSiteId = 0)
-        {
-            var binding = BindingHelper.ConvertToBinding(BindingHelper.FinializeBinding(rawBinding), ipAddress);
-            return IsBindingInUse(binding, iisSiteId);
-        }
-
-        public static bool IsBindingInUse(Binding binding, int iisSiteId = 0)
-        {
-            var bindingInformations = ConvertBindingsToBindingInformations(new[] {binding});
-            return GetBindingInUse(iisSiteId, bindingInformations.ToList()) != null;
-        }
-
-        public static Business.Objects.ManageSiteResult CreateSite(Site site)
+        public static ManageSiteResult CreateSite(Site site)
         {
             var validationResult = Validators.ValidateSite(site, null);
             if (validationResult.Errors.Any())
@@ -462,9 +439,7 @@ namespace Servant.Shared
                 return validationResult;
             }
 
-            var result = new Business.Objects.ManageSiteResult();
-
-
+            var result = new ManageSiteResult();
             var bindingInformations = site.Bindings.Select(x => x.ToIisBindingInformation()).ToList();
 
             // Check bindings
@@ -656,7 +631,7 @@ namespace Servant.Shared
         {
             using (var manager = new ServerManager())
             {
-                return new Business.Objects.ApplicationPool
+                return new ApplicationPool
                 {
                     ClrVersion = manager.ApplicationPoolDefaults.ManagedRuntimeVersion,
                     PipelineMode = manager.ApplicationPoolDefaults.ManagedPipelineMode.ToString().ToLower(),
