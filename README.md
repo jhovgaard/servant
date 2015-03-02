@@ -21,4 +21,4 @@ There are a few minimum requirements for Servant Agent:
 
 License
 --------------
-Servant is licensed under MIT. Refer to license.txt for more information.
+Servant is licensed under MIT. Refer to [license.txt](license.txt) for more information.
