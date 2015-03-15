@@ -1,6 +1,4 @@
-﻿using Servant.Business.Objects.Enums;
-
-namespace Servant.Business.Objects
+﻿namespace Servant.Agent.Objects
 {
     public class SiteApplication
     {

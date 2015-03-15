@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using Servant.Business.Objects;
-using Servant.Business.Objects.Enums;
+using Servant.Agent.Objects;
+using Servant.Agent.Objects.Enums;
 using Servant.Shared.Helpers;
 
-namespace Servant.Shared
+namespace Servant.Agent.Infrastructure
 {
     public static class Validators
     {

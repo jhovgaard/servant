@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using Servant.Business.Objects;
+using Servant.Agent.Objects;
 
 namespace Servant.Agent.Infrastructure
 {

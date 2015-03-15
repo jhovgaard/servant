@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Servant.Business.Objects.Enums;
+using Servant.Agent.Objects.Enums;
 
-namespace Servant.Business.Objects
+namespace Servant.Agent.Objects
 {
     public class Site
     {

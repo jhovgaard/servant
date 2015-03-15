@@ -62,6 +62,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.2.1.2\lib\net40\Microsoft.AspNet.SignalR.Client.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.Administration, Version=7.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\dependencies\Microsoft.Web.Administration.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
@@ -74,6 +82,23 @@
     <Compile Include="Infrastructure\Deployer.cs" />
     <Compile Include="Infrastructure\MessageHandler.cs" />
     <Compile Include="Infrastructure\ServantClientConfiguration.cs" />
+    <Compile Include="Infrastructure\SiteManager.cs" />
+    <Compile Include="Infrastructure\Validators.cs" />
+    <Compile Include="Objects\AllResponse.cs" />
+    <Compile Include="Objects\ApplicationPool.cs" />
+    <Compile Include="Objects\Binding.cs" />
+    <Compile Include="Objects\Certificate.cs" />
+    <Compile Include="Objects\Deployment.cs" />
+    <Compile Include="Objects\DeploymentResponse.cs" />
+    <Compile Include="Objects\Enums\DeploymentResponseType.cs" />
+    <Compile Include="Objects\Enums\InstanceState.cs" />
+    <Compile Include="Objects\Enums\ManageSiteResult.cs" />
+    <Compile Include="Objects\Enums\Protocol.cs" />
+    <Compile Include="Objects\Enums\SiteStartResult.cs" />
+    <Compile Include="Objects\ManageSiteResult.cs" />
+    <Compile Include="Objects\ServantVersion.cs" />
+    <Compile Include="Objects\Site.cs" />
+    <Compile Include="Objects\SiteApplication.cs" />
     <Compile Include="Service\ServantClientServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -96,10 +121,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Servant.Business\Servant.Business.csproj">
-      <Project>{91ba5146-45d2-4fce-bf35-fa451bf7528d}</Project>
-      <Name>Servant.Business</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Servant.Shared\Servant.Shared.csproj">
       <Project>{e3a0e6d8-5341-4fd1-bbb1-c42d0574976d}</Project>
       <Name>Servant.Shared</Name>
