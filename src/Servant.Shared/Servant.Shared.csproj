@@ -39,10 +39,12 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\FileSystemHelper.cs" />
     <Compile Include="Helpers\NetFrameworkHelper.cs" />
+    <Compile Include="Helpers\OperatingSystemHelper.cs" />
     <Compile Include="Json.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketClient\CommandRequest.cs" />

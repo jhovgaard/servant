@@ -97,6 +97,7 @@
     <Compile Include="Objects\Enums\SiteStartResult.cs" />
     <Compile Include="Objects\ManageSiteResult.cs" />
     <Compile Include="Objects\ServantVersion.cs" />
+    <Compile Include="Objects\ServerInfo.cs" />
     <Compile Include="Objects\Site.cs" />
     <Compile Include="Objects\SiteApplication.cs" />
     <Compile Include="Service\ServantClientServiceInstaller.cs">

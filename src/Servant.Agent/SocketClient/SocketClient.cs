@@ -232,13 +232,32 @@ namespace Servant.Agent.SocketClient
             _connection.StateChanged += change =>
             {
                 MessageHandler.Print("State changed to: " + change.NewState);
-                if (change.NewState == ConnectionState.Disconnected)
+                switch (change.NewState)
                 {
-                    Connect();
+                    case ConnectionState.Disconnected:
+                        Connect();
+                        break;
+                    case ConnectionState.Connected:
+                        SendServerInfo(Configuration);
+                        break;
                 }
             };
 
             _connection.Error += MessageHandler.LogException;
+        }
+
+        private static void SendServerInfo(ServantAgentConfiguration configuration)
+        {
+            ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.ServerInfo) { Message = Json.SerializeToString(
+                new ServerInfo()
+                {
+                    ServantVersion = configuration.Version,
+                    ServerName = Environment.MachineName,
+                    OperatingSystem = OperatingSystemHelper.GetOsVersion(),
+                    TotalSites = SiteManager.TotalSites,
+                    TotalApplicationPools = SiteManager.TotalApplicationPools
+                }
+                ), Success = true });
         }
 
         private static void Connect()

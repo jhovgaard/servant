@@ -29,7 +29,8 @@ namespace Servant.Shared.SocketClient
         {
             Iis,
             CmdExe,
-            Deployment
+            Deployment,
+            ServerInfo
         }
     }
 }

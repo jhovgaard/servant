@@ -36,6 +36,28 @@ namespace Servant.Agent.Infrastructure
             }
         }
 
+        public static int TotalSites
+        {
+            get
+            {
+                using (var manager = new ServerManager())
+                {
+                    return manager.Sites.Count;
+                }
+            }
+        }
+
+        public static int TotalApplicationPools
+        {
+            get
+            {
+                using (var manager = new ServerManager())
+                {
+                    return manager.ApplicationPools.Count;
+                }
+            }
+        }
+
         public static IEnumerable<Site> GetSites(bool excludeAppPools = false)
         {
             using (var manager = new ServerManager())
