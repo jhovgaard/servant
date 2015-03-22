@@ -1,13 +1,14 @@
 ﻿using System.Linq;
-using Servant.Agent.Objects;
-using Servant.Agent.Objects.Enums;
+using Servant.Shared;
 using Servant.Shared.Helpers;
+using Servant.Shared.Objects;
+using Servant.Shared.Objects.Enums;
 
 namespace Servant.Agent.Infrastructure
 {
     public static class Validators
     {
-        public static ManageSiteResult ValidateSite(Site site, Site originalSite)
+        public static ManageSiteResult ValidateSite(IisSite site, IisSite originalSite)
         {
             var certificates = SiteManager.GetCertificates();
 
@@ -21,10 +22,10 @@ namespace Servant.Agent.Infrastructure
             if (string.IsNullOrWhiteSpace(site.Name))
                 result.Errors.Add("Name is required.");
 
-            var existingSite = SiteManager.GetSiteByName(site.Name);
+            IisSite existingSite = SiteManager.GetSiteByName(site.Name);
             if (originalSite == null)
             {
-                originalSite = new Site() {IisId = 0};
+                originalSite = new IisSite() { IisId = 0};
             }
 
             if (site.Name != null && existingSite != null && site.Name.ToLower() == existingSite.Name.ToLower() && existingSite.IisId != originalSite.IisId)

@@ -84,22 +84,6 @@
     <Compile Include="Infrastructure\ServantClientConfiguration.cs" />
     <Compile Include="Infrastructure\SiteManager.cs" />
     <Compile Include="Infrastructure\Validators.cs" />
-    <Compile Include="Objects\AllResponse.cs" />
-    <Compile Include="Objects\ApplicationPool.cs" />
-    <Compile Include="Objects\Binding.cs" />
-    <Compile Include="Objects\Certificate.cs" />
-    <Compile Include="Objects\Deployment.cs" />
-    <Compile Include="Objects\DeploymentResponse.cs" />
-    <Compile Include="Objects\Enums\DeploymentResponseType.cs" />
-    <Compile Include="Objects\Enums\InstanceState.cs" />
-    <Compile Include="Objects\Enums\ManageSiteResult.cs" />
-    <Compile Include="Objects\Enums\Protocol.cs" />
-    <Compile Include="Objects\Enums\SiteStartResult.cs" />
-    <Compile Include="Objects\ManageSiteResult.cs" />
-    <Compile Include="Objects\ServantVersion.cs" />
-    <Compile Include="Objects\ServerInfo.cs" />
-    <Compile Include="Objects\Site.cs" />
-    <Compile Include="Objects\SiteApplication.cs" />
     <Compile Include="Service\ServantClientServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -114,18 +98,12 @@
     <Compile Include="Service\ServantClientService.Designer.cs">
       <DependentUpon>ServantClientService.cs</DependentUpon>
     </Compile>
-    <Compile Include="SocketClient\SocketClient.cs" />
+    <Compile Include="SocketClient.cs" />
     <Compile Include="TinyIoC.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Servant.Shared\Servant.Shared.csproj">
-      <Project>{e3a0e6d8-5341-4fd1-bbb1-c42d0574976d}</Project>
-      <Name>Servant.Shared</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -143,6 +121,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\servant-shared\Servant.Shared.csproj">
+      <Project>{89771074-6322-4274-ae8d-1d6bc2dd5475}</Project>
+      <Name>Servant.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

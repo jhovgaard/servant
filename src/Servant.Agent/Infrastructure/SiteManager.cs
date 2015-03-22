@@ -6,11 +6,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Web.Administration;
-using Servant.Agent.Objects;
-using Servant.Agent.Objects.Enums;
-using ApplicationPool = Servant.Agent.Objects.ApplicationPool;
-using Binding = Servant.Agent.Objects.Binding;
-using Site = Servant.Agent.Objects.Site;
+using Servant.Shared;
+using Servant.Shared.Objects;
+using Servant.Shared.Objects.Enums;
+using ApplicationPool = Servant.Shared.Objects.ApplicationPool;
+using Binding = Servant.Shared.Objects.Binding;
 
 namespace Servant.Agent.Infrastructure
 {
@@ -58,7 +58,7 @@ namespace Servant.Agent.Infrastructure
             }
         }
 
-        public static IEnumerable<Site> GetSites(bool excludeAppPools = false)
+        public static IEnumerable<IisSite> GetSites(bool excludeAppPools = false)
         {
             using (var manager = new ServerManager())
             {
@@ -82,7 +82,7 @@ namespace Servant.Agent.Infrastructure
             }
         }
 
-        public static Site GetSiteById(int iisId) 
+        public static IisSite GetSiteById(int iisId) 
         {
             using (var manager = new ServerManager())
             {
@@ -94,17 +94,17 @@ namespace Servant.Agent.Infrastructure
             }
         }
 
-        private static Site ParseSite(Microsoft.Web.Administration.Site site, bool excludeAppPools = false, List<Microsoft.Web.Administration.ApplicationPool> applicationPools = null)
+        private static IisSite ParseSite(Microsoft.Web.Administration.Site site, bool excludeAppPools = false, List<Microsoft.Web.Administration.ApplicationPool> applicationPools = null)
         {
             if (site == null)
                 return null;
 
-            var servantSite = new Site {
+            var servantSite = new IisSite {
                     IisId = (int)site.Id,
                     Name = site.Name,
                     ApplicationPool = site.Applications[0].ApplicationPoolName,
                     SitePath = site.Applications[0].VirtualDirectories[0].PhysicalPath,
-                    SiteState = (InstanceState)Enum.Parse(typeof(InstanceState), site.State.ToString()),
+                    SiteState = (InstanceState)Enum.Parse(typeof(Shared.Objects.Enums.InstanceState), site.State.ToString()),
                     LogFileDirectory = site.LogFile.Directory,
                     Bindings = GetBindings(site).ToList(),
                 };
@@ -181,12 +181,12 @@ namespace Servant.Agent.Infrastructure
             return iisApplicationPool;
         }
 
-        private static IEnumerable<Binding> GetBindings(Microsoft.Web.Administration.Site iisSite)
+        private static IEnumerable<Binding> GetBindings(Microsoft.Web.Administration.Site site)
         {
             var allowedProtocols = new[] { "http", "https" };
             var certificates = GetCertificates();
             
-            foreach (var binding in iisSite.Bindings.Where(x => allowedProtocols.Contains(x.Protocol)))
+            foreach (var binding in site.Bindings.Where(x => allowedProtocols.Contains(x.Protocol)))
             {
                 var servantBinding = new Binding();
 
@@ -244,7 +244,7 @@ namespace Servant.Agent.Infrastructure
             return site.Name;
         }
 
-        public static ManageSiteResult UpdateSite(Site site)
+        public static ManageSiteResult UpdateSite(IisSite site)
         {
             var result = new ManageSiteResult { IisSiteId = site.IisId };
 
@@ -399,7 +399,7 @@ namespace Servant.Agent.Infrastructure
             }
         }
 
-        public static SiteStartResult StartSite(Site site)
+        public static SiteStartResult StartSite(IisSite site)
         {
             using (var manager = new ServerManager())
             {
@@ -428,7 +428,7 @@ namespace Servant.Agent.Infrastructure
             }
         }
 
-        public static void StopSite(Site site)
+        public static void StopSite(IisSite site)
         {
             using (var manager = new ServerManager())
             {
@@ -445,7 +445,7 @@ namespace Servant.Agent.Infrastructure
             public SiteNotFoundException(string message) : base(message) {}
         }
 
-        public static Site GetSiteByName(string name)
+        public static IisSite GetSiteByName(string name)
         {
             using (var manager = new ServerManager())
             {
@@ -453,7 +453,7 @@ namespace Servant.Agent.Infrastructure
             }
         }
 
-        public static ManageSiteResult CreateSite(Site site)
+        public static ManageSiteResult CreateSite(IisSite site)
         {
             var validationResult = Validators.ValidateSite(site, null);
             if (validationResult.Errors.Any())

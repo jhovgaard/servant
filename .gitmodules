@@ -1,0 +1,3 @@
+[submodule "src/servant-shared"]
+	path = src/servant-shared
+	url = git@github.com:servantio/servant-shared.git

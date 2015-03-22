@@ -43,11 +43,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Servant.Shared\Servant.Shared.csproj">
-      <Project>{e3a0e6d8-5341-4fd1-bbb1-c42d0574976d}</Project>
+    <ProjectReference Include="..\servant-shared\Servant.Shared.csproj">
+      <Project>{89771074-6322-4274-ae8d-1d6bc2dd5475}</Project>
       <Name>Servant.Shared</Name>
     </ProjectReference>
   </ItemGroup>

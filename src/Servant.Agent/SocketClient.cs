@@ -5,15 +5,15 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client;
-using Servant.Agent.Objects;
-using Servant.Agent.Objects.Enums;
 using Servant.Agent.Infrastructure;
 using Servant.Shared;
+using Servant.Shared.Communication;
 using Servant.Shared.Helpers;
-using Servant.Shared.SocketClient;
+using Servant.Shared.Objects;
+using Servant.Shared.Objects.Enums;
 using TinyIoC;
 
-namespace Servant.Agent.SocketClient
+namespace Servant.Agent
 {
     public static class SocketClient
     {
@@ -79,7 +79,7 @@ namespace Servant.Agent.SocketClient
                             });
                             break;
                         case CommandRequestType.UpdateSite:
-                            var site = Json.DeserializeFromString<Site>(request.JsonObject);
+                            var site = Json.DeserializeFromString<IisSite>(request.JsonObject);
 
                             var originalSite = SiteManager.GetSiteByName(request.Value);
 
@@ -169,7 +169,7 @@ namespace Servant.Agent.SocketClient
                             ReplyOverHttp(new CommandResponse(request.Guid) { Message = "ok", Success = true });
                             break;
                         case CommandRequestType.CreateSite:
-                            var createSite = Json.DeserializeFromString<Site>(request.JsonObject);
+                            var createSite = Json.DeserializeFromString<IisSite>(request.JsonObject);
                             var createResult = SiteManager.CreateSite(createSite);
                             ReplyOverHttp(new CommandResponse(request.Guid)
                                 {

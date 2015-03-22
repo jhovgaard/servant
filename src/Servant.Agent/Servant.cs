@@ -36,8 +36,8 @@ namespace Servant.Agent
 #endif
             Timer.Start();
 
-            SocketClient.SocketClient.IsStopped = false;
-            new System.Threading.Thread(SocketClient.SocketClient.Initialize).Start();
+            SocketClient.IsStopped = false;
+            new System.Threading.Thread(SocketClient.Initialize).Start();
         }
 
         public static void Update()

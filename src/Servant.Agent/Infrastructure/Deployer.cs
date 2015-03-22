@@ -6,10 +6,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
-using Servant.Agent.Objects;
-using Servant.Agent.Objects.Enums;
 using Servant.Shared;
-using Servant.Shared.SocketClient;
+using Servant.Shared.Communication;
+using Servant.Shared.Objects;
+using Servant.Shared.Objects.Enums;
 using TinyIoC;
 
 namespace Servant.Agent.Infrastructure
@@ -26,7 +26,7 @@ namespace Servant.Agent.Infrastructure
 
         private void SendResponse(int deploymentId, DeploymentResponseType type, string message, bool success = true)
         {
-            SocketClient.SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.Deployment) { Message = Json.SerializeToString(new DeploymentResponse() { DeploymentId = deploymentId, Message = message, InstallationGuid = Configuration.InstallationGuid, Success = success, Type = type }), Success = success });
+            SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.Deployment) { Message = Json.SerializeToString(new DeploymentResponse() { DeploymentId = deploymentId, Message = message, InstallationGuid = Configuration.InstallationGuid, Success = success, Type = type }), Success = success });
         }
 
         public void Deploy(Deployment deployment)
@@ -47,7 +47,7 @@ namespace Servant.Agent.Infrastructure
 
             fullSw.Start();
             SendResponse(deployment.Id, DeploymentResponseType.DeploymentRequestReceived,  "Received deployment request.");
-            Site site = SiteManager.GetSiteByName(deployment.SiteName);
+            IisSite site = SiteManager.GetSiteByName(deployment.SiteName);
             var originalPath = site.SitePath;
 
             var rootPath = site.SitePath;
@@ -125,7 +125,7 @@ namespace Servant.Agent.Infrastructure
                 return;
             }
 
-            Site site = SiteManager.GetSiteById(instance.IisSiteId);
+            IisSite site = SiteManager.GetSiteById(instance.IisSiteId);
             site.SitePath = instance.OriginalPath;
             SiteManager.UpdateSite(site);
             if (site.ApplicationPoolState == InstanceState.Started)
@@ -136,7 +136,7 @@ namespace Servant.Agent.Infrastructure
             instance.RollbackCompleted = true;
         }
 
-        public static WarmupResult Warmup(Site site, string warmupUrl)
+        public static WarmupResult Warmup(IisSite site, string warmupUrl)
         {
             var uri = new Uri(warmupUrl);
             var testUrl = uri.ToString().Replace(uri.Host, "127.0.0.1");

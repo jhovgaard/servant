@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Timers;
 using Servant.Agent.Infrastructure;
 using Servant.Shared;
-using Servant.Shared.SocketClient;
+using Servant.Shared.Communication;
 using TinyIoC;
 
 namespace Servant.Agent
@@ -71,7 +71,7 @@ namespace Servant.Agent
         {
             if (ResponseLines.Any())
             {
-                SocketClient.SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.CmdExe) { Message =  Json.SerializeToString(ResponseLines), Success = true });
+                SocketClient.ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.CmdExe) { Message =  Json.SerializeToString(ResponseLines), Success = true });
                 ResponseLines.Clear();
             }
         }
