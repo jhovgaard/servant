@@ -116,9 +116,6 @@
         <ServiceInstall Id="ServantAgentService" Description="Servant Agent is responsible for exchanging data with Servant.io" DisplayName="Servant Agent" Name="ServantAgent" Start="auto" Type="ownProcess" ErrorControl="normal"/> 
         <ServiceControl Id="ServantAgentServiceControl" Name="ServantAgent" Stop="both" Remove="uninstall" Wait="yes" /> 
       </Component>
-      <Component Id="Servant.Business.dll" Guid="b03243fbd54b4b46acfd3db4db40f0d1">
-        <File Id="Servant.Business.dll" Source="$(var.Servant.Agent.TargetDir)\Servant.Business.dll" KeyPath="yes" />
-      </Component>
       <Component Id="CommandLine.dll" Guid="3190095badda4fb89085d77f35fa153a">
         <File Id="CommandLine.dll" Source="$(var.Servant.Agent.TargetDir)\CommandLine.dll" KeyPath="yes" />
       </Component>

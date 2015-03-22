@@ -1,4 +1,4 @@
-﻿namespace Servant.Business.Objects.Enums
+﻿namespace Servant.Agent.Objects.Enums
 {
     public enum DeploymentResponseType
     {

@@ -5,8 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client;
-using Servant.Business.Objects;
-using Servant.Business.Objects.Enums;
+using Servant.Agent.Objects;
+using Servant.Agent.Objects.Enums;
 using Servant.Agent.Infrastructure;
 using Servant.Shared;
 using Servant.Shared.Helpers;
@@ -232,13 +232,32 @@ namespace Servant.Agent.SocketClient
             _connection.StateChanged += change =>
             {
                 MessageHandler.Print("State changed to: " + change.NewState);
-                if (change.NewState == ConnectionState.Disconnected)
+                switch (change.NewState)
                 {
-                    Connect();
+                    case ConnectionState.Disconnected:
+                        Connect();
+                        break;
+                    case ConnectionState.Connected:
+                        SendServerInfo(Configuration);
+                        break;
                 }
             };
 
             _connection.Error += MessageHandler.LogException;
+        }
+
+        private static void SendServerInfo(ServantAgentConfiguration configuration)
+        {
+            ReplyOverHttp(new CommandResponse(CommandResponse.ResponseType.ServerInfo) { Message = Json.SerializeToString(
+                new ServerInfo()
+                {
+                    ServantVersion = configuration.Version,
+                    ServerName = Environment.MachineName,
+                    OperatingSystem = OperatingSystemHelper.GetOsVersion(),
+                    TotalSites = SiteManager.TotalSites,
+                    TotalApplicationPools = SiteManager.TotalApplicationPools
+                }
+                ), Success = true });
         }
 
         private static void Connect()

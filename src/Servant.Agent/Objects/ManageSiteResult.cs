@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using Servant.Agent.Objects.Enums;
 
-namespace Servant.Business.Objects
+namespace Servant.Agent.Objects
 {
     public class ManageSiteResult
     {
         public int IisSiteId { get; set; }
-        public Enums.SiteResult Result { get; set; }
+        public SiteResult Result { get; set; }
         public List<string> Errors { get; set; }
 
         public ManageSiteResult()

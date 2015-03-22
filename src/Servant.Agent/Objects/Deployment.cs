@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Servant.Business.Objects
+namespace Servant.Agent.Objects
 {
     public class Deployment
     {

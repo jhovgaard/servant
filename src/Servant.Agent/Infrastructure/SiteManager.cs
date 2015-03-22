@@ -6,13 +6,13 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Web.Administration;
-using Servant.Business.Objects;
-using Servant.Business.Objects.Enums;
-using ApplicationPool = Servant.Business.Objects.ApplicationPool;
-using Binding = Servant.Business.Objects.Binding;
-using Site = Servant.Business.Objects.Site;
+using Servant.Agent.Objects;
+using Servant.Agent.Objects.Enums;
+using ApplicationPool = Servant.Agent.Objects.ApplicationPool;
+using Binding = Servant.Agent.Objects.Binding;
+using Site = Servant.Agent.Objects.Site;
 
-namespace Servant.Shared
+namespace Servant.Agent.Infrastructure
 {
     public static class SiteManager
     {
@@ -32,6 +32,28 @@ namespace Servant.Shared
                 catch (NotImplementedException)
                 {
                     throw new Exception("Servant doesn't support IIS Express.");
+                }
+            }
+        }
+
+        public static int TotalSites
+        {
+            get
+            {
+                using (var manager = new ServerManager())
+                {
+                    return manager.Sites.Count;
+                }
+            }
+        }
+
+        public static int TotalApplicationPools
+        {
+            get
+            {
+                using (var manager = new ServerManager())
+                {
+                    return manager.ApplicationPools.Count;
                 }
             }
         }
