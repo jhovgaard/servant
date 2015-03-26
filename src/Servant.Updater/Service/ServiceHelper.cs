@@ -4,15 +4,14 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
 using Servant.Shared;
-using MessageHandler = Servant.Agent.Infrastructure.MessageHandler;
 
-namespace Servant.Agent.Service
+namespace Servant.Updater.Service
 {
     internal static class ServiceHelper
     {
         public static void Uninstall(string directory = null)
         {
-            MessageHandler.Print("Trying to uninstall the Servant Agent service...");
+            MessageHandler.Print("Trying to uninstall the Servant Updater service...");
             try
             {
                 ManagedInstallerClass.InstallHelper(new[] { "/u", "/LogToConsole=false", directory ?? Assembly.GetExecutingAssembly().Location });
@@ -34,23 +33,23 @@ namespace Servant.Agent.Service
 
             if (new ServiceController(ServiceConfig.ServiceName).Container != null)
             {
-                MessageHandler.Print("Servant is already installed. Use /uninstall or /u to uninstall.");
+                MessageHandler.Print("Servant Updater is already installed. Use /uninstall or /u to uninstall.");
                 installPossible = false;
             }
 
             if (ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == ServiceConfig.ServiceName) != null)
             {
-                MessageHandler.Print("Servant is already running on this machine.");
+                MessageHandler.Print("Servant Updater is already running on this machine.");
                 installPossible = false;
             }
 
             if (installPossible)
             {
-                MessageHandler.Print("Trying to install Servant Agent as Windows service...");
+                MessageHandler.Print("Trying to install Servant Updater as Windows service...");
                 try
                 {
                     ManagedInstallerClass.InstallHelper(new[] { "/LogToConsole=false", Assembly.GetExecutingAssembly().Location });
-                    MessageHandler.Print("The Servant Agent service was installed.");
+                    MessageHandler.Print("The Servant Updater service was installed.");
                 }
                 catch (UnauthorizedAccessException)
                 {

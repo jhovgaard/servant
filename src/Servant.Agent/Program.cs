@@ -6,6 +6,7 @@ using Servant.Agent.Service;
 using Servant.Shared;
 using Servant.Shared.Helpers;
 using TinyIoC;
+using MessageHandler = Servant.Agent.Infrastructure.MessageHandler;
 
 namespace Servant.Agent
 {

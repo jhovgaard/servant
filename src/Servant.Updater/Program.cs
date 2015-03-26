@@ -7,9 +7,9 @@ using Servant.Shared;
 
 namespace Servant.Updater
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
 #if DEBUG
             args = new[] { Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Servant.Agent.exe") };
@@ -33,7 +33,7 @@ namespace Servant.Updater
                 return;
             }
 
-            var release = GetLatestRelease();
+            var release = GetLatestRelease(servantFile);
 
             if (release == null)
             {
@@ -104,8 +104,9 @@ namespace Servant.Updater
                 EventLog.WriteEntry("Servant Agent Updater", value, EventLogEntryType.Error);
         }
 
-        private static ReleaseResult GetLatestRelease()
+        private static ReleaseResult GetLatestRelease(string servantFile)
         {
+            var prelease = System.IO.File.Exists(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(servantFile), "prerelease"));
 #if DEBUG
             return new ReleaseResult { Url = "https://dl.dropboxusercontent.com/u/969563/Servant.Agent.1.1.0.0.msi", Version = "1.1.0" };
 #endif

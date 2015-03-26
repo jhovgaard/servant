@@ -2,15 +2,13 @@
 using System.Diagnostics;
 using System.Security.Principal;
 using System.ServiceProcess;
-using Servant.Agent.Infrastructure;
 using Servant.Shared;
-using MessageHandler = Servant.Agent.Infrastructure.MessageHandler;
 
-namespace Servant.Agent.Service
+namespace Servant.Updater.Service
 {
-    partial class ServantAgentService : ServiceBase
+    partial class ServantUpdaterService : ServiceBase
     {
-        public ServantAgentService()
+        public ServantUpdaterService()
         {
             InitializeComponent();
         }
@@ -36,7 +34,7 @@ namespace Servant.Agent.Service
             try
             {
                 SetRecoveryOptions(ServiceConfig.ServiceName);
-                Servant.Start();
+                Program.Main(null);
             }
             catch (Exception ex)
             {

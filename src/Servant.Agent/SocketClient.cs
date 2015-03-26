@@ -12,6 +12,7 @@ using Servant.Shared.Helpers;
 using Servant.Shared.Objects;
 using Servant.Shared.Objects.Enums;
 using TinyIoC;
+using MessageHandler = Servant.Agent.Infrastructure.MessageHandler;
 
 namespace Servant.Agent
 {

@@ -35,12 +35,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceProcess" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ReleaseResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\ServantUpdaterService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Service\ServantUpdaterService.Designer.cs">
+      <DependentUpon>ServantUpdaterService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Service\ServantClientServiceInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Service\ServiceConfig.cs" />
+    <Compile Include="Service\ServiceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

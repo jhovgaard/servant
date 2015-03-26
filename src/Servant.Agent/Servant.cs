@@ -3,7 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Timers;
 using Servant.Agent.Infrastructure;
+using Servant.Shared;
 using TinyIoC;
+using MessageHandler = Servant.Agent.Infrastructure.MessageHandler;
 
 namespace Servant.Agent
 {
