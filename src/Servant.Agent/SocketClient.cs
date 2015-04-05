@@ -255,7 +255,8 @@ namespace Servant.Agent
                     ServerName = Environment.MachineName,
                     OperatingSystem = OperatingSystemHelper.GetOsVersion(),
                     TotalSites = SiteManager.TotalSites,
-                    TotalApplicationPools = SiteManager.TotalApplicationPools
+                    TotalApplicationPools = SiteManager.TotalApplicationPools,
+                    InstalledModules = SiteManager.GetModules()
                 }
                 ), Success = true });
         }

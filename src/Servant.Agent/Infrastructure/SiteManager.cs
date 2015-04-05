@@ -723,5 +723,16 @@ namespace Servant.Agent.Infrastructure
                 manager.CommitChanges();
             }
         }
+
+        public static IEnumerable<string> GetModules()
+        {
+            using (var manager = new ServerManager())
+            {
+                Configuration config = manager.GetApplicationHostConfiguration();
+                ConfigurationSection modulesSection = config.GetSection("system.webServer/modules");
+                ConfigurationElementCollection modulesCollection = modulesSection.GetCollection();
+                return modulesCollection.AsEnumerable().Select(x => x.Attributes[0]).Select(x => (string)x.Value).ToList();
+            }
+        }
     }
 }
