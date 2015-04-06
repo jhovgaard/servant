@@ -147,8 +147,19 @@ namespace Servant.Agent.Infrastructure
                         });
                 }
             }
+            servantSite.TotalFilesInSitePath = GetTotalFilesInDirectory(servantSite.SitePath);
 
             return servantSite;
+        }
+
+        private static int GetTotalFilesInDirectory(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                return new DirectoryInfo(path).GetFileSystemInfos().Length;
+            }
+
+            return 0;
         }
 
         private static Microsoft.Web.Administration.ApplicationPool UpdateIisApplicationPoolFromServant(this Microsoft.Web.Administration.ApplicationPool iisApplicationPool, ApplicationPool servantApplicationPool)
@@ -720,6 +731,24 @@ namespace Servant.Agent.Infrastructure
             {
                 Microsoft.Web.Administration.ApplicationPool newAppPool = manager.ApplicationPools.Add(applicationPool.Name);
                 newAppPool.UpdateIisApplicationPoolFromServant(applicationPool);
+                manager.CommitChanges();
+            }
+        }
+
+        public static void WipeIisConfiguration()
+        {
+            using (var manager = new ServerManager())
+            {
+                foreach (var site in manager.Sites)
+                {
+                    site.Delete();
+                }
+
+                foreach (var pool in manager.ApplicationPools)
+                {
+                    pool.Delete();
+                }
+
                 manager.CommitChanges();
             }
         }

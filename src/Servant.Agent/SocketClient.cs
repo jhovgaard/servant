@@ -78,6 +78,14 @@ namespace Servant.Agent
                                 Success = true
                             });
                             break;
+                        case CommandRequestType.WipeIisConfiguration:
+                            SiteManager.WipeIisConfiguration();
+                            ReplyOverHttp(new CommandResponse(request.Guid)
+                            {
+                                Message = "Wipe completed",
+                                Success = true
+                            });
+                            break;
                         case CommandRequestType.UpdateSite:
                             var site = Json.DeserializeFromString<IisSite>(request.JsonObject);
 
@@ -123,7 +131,8 @@ namespace Servant.Agent
                                         FrameworkVersions = NetFrameworkHelper.GetAllVersions().ToList(),
                                         ApplicationPools = SiteManager.GetApplicationPools(),
                                         Certificates = SiteManager.GetCertificates().ToList(),
-                                        DefaultApplicationPool = SiteManager.GetDefaultApplicationPool()
+                                        DefaultApplicationPool = SiteManager.GetDefaultApplicationPool(),
+                                        InstalledModules = SiteManager.GetModules().OrderBy(x => x).ToList()
                                     }),
                                     Success = true
                                 });
@@ -255,8 +264,7 @@ namespace Servant.Agent
                     ServerName = Environment.MachineName,
                     OperatingSystem = OperatingSystemHelper.GetOsVersion(),
                     TotalSites = SiteManager.TotalSites,
-                    TotalApplicationPools = SiteManager.TotalApplicationPools,
-                    InstalledModules = SiteManager.GetModules()
+                    TotalApplicationPools = SiteManager.TotalApplicationPools
                 }
                 ), Success = true });
         }
