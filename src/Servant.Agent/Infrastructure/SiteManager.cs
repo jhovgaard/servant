@@ -711,7 +711,10 @@ namespace Servant.Agent.Infrastructure
             using (var manager = new ServerManager())
             {
                 var pool = manager.ApplicationPools.Single(x => x.Name == poolName);
-                pool.Recycle();
+                if (pool.State == ObjectState.Started)
+                {
+                    pool.Recycle();
+                }
             }
         }
 
