@@ -54,6 +54,7 @@ namespace Servant.Agent
                     {"version", Configuration.Version.ToString()},
                 });
             
+            
             _myHub = _connection.CreateHubProxy("ServantClientHub");
 
             _myHub.On<CommandRequest>("Request", request =>
@@ -244,6 +245,8 @@ namespace Servant.Agent
                 switch (change.NewState)
                 {
                     case ConnectionState.Disconnected:
+                        _connection.Stop(new TimeSpan(0));
+                        System.Threading.Thread.Sleep(2000);
                         Connect();
                         break;
                     case ConnectionState.Connected:
@@ -252,7 +255,11 @@ namespace Servant.Agent
                 }
             };
 
-            _connection.Error += MessageHandler.LogException;
+            _connection.Error += (e) =>
+            {
+                MessageHandler.LogException(e);
+                _connection.Dispose();
+            };
         }
 
         private static void SendServerInfo(ServantAgentConfiguration configuration)
@@ -279,7 +286,23 @@ namespace Servant.Agent
 
             MessageHandler.Print("Connecting...");
             InitializeConnection();
-            _connection.Start().Wait(TimeSpan.FromSeconds(5));
+            try
+            {
+                _connection.Start().Wait(TimeSpan.FromSeconds(5));
+                if(_connection.State != ConnectionState.Connected)
+                    _connection.Stop(new TimeSpan(0));
+            }
+            catch (WebException e)
+            {
+                MessageHandler.LogException(e);
+            }
+            catch (AggregateException e)
+            {
+                foreach (var ex in e.InnerExceptions)
+                {
+                    MessageHandler.LogException(ex);
+                }
+            }
         }
     }
 }
