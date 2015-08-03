@@ -21,19 +21,6 @@ namespace Servant.Agent
 
         public static void Start()
         {
-#if(!DEBUG)
-
-            var configuration = TinyIoCContainer.Current.Resolve<ServantAgentConfiguration>();
-            #region Version 1.0.7 specific
-            var newHost = "https://www.servant.io";
-            if (configuration.ServantIoHost != newHost)
-            {
-                configuration.ServantIoHost = newHost;
-            } 
-
-            ConfigManager.UpdateConfiguration(configuration);
-            #endregion
-#endif
             Timer.Start();
 
             SocketClient.IsStopped = false;

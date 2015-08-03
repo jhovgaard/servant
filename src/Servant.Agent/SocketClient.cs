@@ -257,8 +257,12 @@ namespace Servant.Agent
 
             _connection.Error += (e) =>
             {
-                MessageHandler.LogException(e);
-                _connection.Dispose();
+                if (e.GetType() != typeof (TimeoutException))
+                {
+                    MessageHandler.LogException(e);
+                    _connection.Dispose();    
+                }
+                
             };
         }
 

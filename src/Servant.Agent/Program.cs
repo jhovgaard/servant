@@ -13,7 +13,6 @@ namespace Servant.Agent
     {
         static void Main(string[] args)
         {
-            SiteManager.GetModules();
             TinyIoCContainer.Current.Register(ConfigManager.GetConfigurationFromDisk());
             TinyIoCContainer.Current.Register(typeof(ConsoleManager)).AsSingleton();
             TinyIoCContainer.Current.Register<Deployer>().AsSingleton();
